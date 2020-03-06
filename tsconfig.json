@@ -17,7 +17,13 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ccbl-gfx9": [
+        "dist/ccbl-gfx9/ccbl-gfx9",
+        "dist/ccbl-gfx9"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

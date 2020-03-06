@@ -1,0 +1,20 @@
+<label>Overhides</label>
+
+<lib-editable-option  [value]     = "action.channel"
+                      [options]   = "channelOptions"
+                      (onupdate)  = "updateChannel($event)"
+                      class="channel" >
+  {{action.channel}}
+</lib-editable-option>
+
+<label>with</label>
+
+<lib-ccbl-expression [program-versionner] = "progVersionner"
+                     [expression]         = "action.affectation"
+                     (update)             = "updateExpression($event)"
+></lib-ccbl-expression>
+
+
+<label class="delete" (click)="deleteAction()">
+  ✕
+</label>

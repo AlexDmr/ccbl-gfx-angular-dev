@@ -1,0 +1,8 @@
+<mat-form-field>
+  <input matInput
+         [placeholder]   = "data.label"
+         [ngModel]       = "obs | async"
+         (ngModelChange) = "update($event)"
+         type            = "number"
+  >
+</mat-form-field>

@@ -1,0 +1,71 @@
+<!--<summary class="declarations">
+  <h3>Déclarations</h3>
+  <details>
+    <section>
+      <h4>Locals</h4>
+      <section>
+        <h5>Channels <button (click)="appendLocalChannel()">Append</button></h5>
+        <ul>
+          <li *ngFor="let c of getLocalChannels()">
+            <lib-ccbl-variable-declaration [description]="c" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+      </section>
+    </section>
+
+    <section>
+      <h4>Import</h4>
+      <section>
+        <h5>Channels <button (click)="appendImportedChannel()">Append</button></h5>
+        <ul>
+          <li *ngFor="let c of getImportedChannels()">
+            <lib-ccbl-variable-declaration [description]="c" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+        <h5>Emitters <button (click)="appendImportedEmitter()">Append</button></h5>
+        <ul>
+          <li *ngFor="let e of getImportedEmitters()">
+            <lib-ccbl-variable-declaration [description]="e" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+        <h5>Events <button (click)="appendImportedEvent()">Append</button></h5>
+        <ul>
+          <li *ngFor="let evt of getImportedEvents()">
+            <lib-ccbl-variable-declaration [description]="evt" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+      </section>
+    </section>
+
+    <section>
+      <h4>Export</h4>
+      <section>
+        <h5>Channels <button (click)="appendExportedChannel()">Append</button></h5>
+        <ul>
+          <li *ngFor="let c of getExportedChannels()">
+            <lib-ccbl-variable-declaration [description]="c" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+        <h5>Emitters <button (click)="appendExportedEmitter()">Append</button></h5>
+        <ul>
+          <li *ngFor="let e of getExportedEmitters()">
+            <lib-ccbl-variable-declaration [description]="e" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+        <h5>Events <button (click)="appendExportedEvent()">Append</button></h5>
+        <ul>
+          <li *ngFor="let evt of getExportedEvents()">
+            <lib-ccbl-variable-declaration [description]="evt" [program-versionner]="programVersionner"></lib-ccbl-variable-declaration>
+          </li>
+        </ul>
+      </section>
+    </section>
+  </details>
+</summary>
+-->
+<lib-ccbl-context-or-program [program-versionner] = "programVersionner"
+                             [data]               = "getRootContext()"
+                             [isProgramRoot]      = "true"
+                             *ngIf                = "updateObs | async"
+>
+</lib-ccbl-context-or-program>
