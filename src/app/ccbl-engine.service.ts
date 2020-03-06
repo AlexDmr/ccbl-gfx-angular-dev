@@ -29,14 +29,39 @@ export class CcblEngineService {
 
   constructor() {
     this.env = new CCBLEnvironmentExecution( this.clock );
-    if (localStorage.getItem(localSensorsKey)) {
-      const L: Sensor[] = JSON.parse( localStorage.getItem(localSensorsKey) );
-      L.forEach( s => this.appendDevice(s.label, s.varType, s.type) );
+    try {
+      if (localStorage.getItem(localSensorsKey)) {
+        const L: Sensor[] = JSON.parse(localStorage.getItem(localSensorsKey));
+        L.forEach(s => this.appendDevice(s.label, s.varType, s.type));
+      }
+      if (localStorage.getItem(localProgramKey)) {
+        const prog: HumanReadableProgram = JSON.parse(localStorage.getItem(localProgramKey));
+        this.setRootProgram(prog);
+      }
+    } catch(err) {
+      console.error(err);
     }
-    if (localStorage.getItem(localProgramKey)) {
-      const prog: HumanReadableProgram = JSON.parse( localStorage.getItem(localProgramKey) );
-      this.setRootProgram(prog);
-    }
+  }
+
+  load(name: string) {
+    this.unregister( ...this.sensors );
+    const {devices, program} = JSON.parse( localStorage.getItem(name) );
+    localStorage.setItem(localSensorsKey, JSON.stringify(devices) );
+    localStorage.setItem(localProgramKey, JSON.stringify(program) );
+    location.reload();
+  }
+
+  get savedConfigurations(): string[] {
+    const L = Object.entries(localStorage).map( ([k]) => k);
+    return L.filter( k => k.indexOf(`CCBL_TEST::`) === 0);
+  }
+
+  save(name: string) {
+    localStorage.setItem(`CCBL_TEST::${name}`, JSON.stringify( {
+      devices: this.sensors,
+      program: this.progVersionner.getCurrent()
+    } ) );
+    console.log(`CCBL_TEST::${name}`, localStorage.getItem(`CCBL_TEST::${name}`) );
   }
 
   startProgram() {
@@ -69,8 +94,8 @@ export class CcblEngineService {
     this.register(sensor);
   }
 
-  unregister(sensor: Sensor) {
-    this.sensors = this.sensors.filter( s => s !== sensor );
+  unregister(...sensors: Sensor[]) {
+    this.sensors = this.sensors.filter( s => sensors.indexOf(s) !== -1 );
   }
 
   register(sensor: Sensor) {

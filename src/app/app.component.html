@@ -12,8 +12,31 @@
   <button mat-menu-item (click)="reset()">
     <span>Tout effacer</span>
   </button>
+  <button mat-menu-item (click)="reset()">
+    <span>Tout effacer</span>
+  </button>
+  <hr/>
+  <mat-form-field class="example-full-width">
+    <mat-label></mat-label>
+    <input matInput placeholder="nom de la configuration" #saveInput>
+    <button mat-menu-item (click)="save( saveInput.value )">
+      Sauver
+    </button>
+  </mat-form-field>
+
+  <button mat-menu-item [matMenuTriggerFor]="menuCharger">
+    Charger
+  </button>
 </mat-menu>
 
+<mat-menu #menuCharger>
+  <button mat-menu-item
+          *ngFor  = "let name of savedConfigurations"
+          (click) = "load(name)"
+  >
+    {{name.slice(11)}}
+  </button>
+</mat-menu>
 <section class="gridRoot">
   <section class="pilotage">
     Pilotage du moteur CCBL .................... <br/>

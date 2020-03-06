@@ -31,6 +31,18 @@ export class AppComponent implements OnInit {
     this.ccblEngineService.startProgram();
   }
 
+  get savedConfigurations(): string[] {
+    return this.ccblEngineService.savedConfigurations;
+  }
+
+  load(name: string) {
+    this.ccblEngineService.load(name);
+  }
+
+  save(name: string) {
+    this.ccblEngineService.save(name);
+  }
+
   initProgram() {
     const prog: HumanReadableProgram = {
       localChannels: [],
