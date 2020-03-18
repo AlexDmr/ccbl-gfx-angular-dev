@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
+import {copyHumanReadableProgram, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {Sensor, SensorDataType, SensorVarType} from './data/setup';
 import {initCCBL} from 'ccbl-js/lib/main';
 import {Observable} from 'rxjs';
@@ -10,6 +10,7 @@ import {CCBLClock, CCBLTestClock} from 'ccbl-js/lib/Clock';
 import {CCBLEmitterValue} from 'ccbl-js/lib/EmitterValue';
 import {Channel, commitStateActions} from 'ccbl-js/lib/Channel';
 import {CCBLProgramObject} from 'ccbl-js/lib/ProgramObject';
+import {CCBLEvent} from 'ccbl-js/lib/Event';
 
 initCCBL();
 
@@ -36,9 +37,11 @@ export class CcblEngineService {
       }
       if (localStorage.getItem(localProgramKey)) {
         const prog: HumanReadableProgram = JSON.parse(localStorage.getItem(localProgramKey));
-        this.setRootProgram(prog);
+        const CP = copyHumanReadableProgram(prog, false);
+        this.setRootProgram( CP );
+        console.log(prog, CP);
       }
-    } catch(err) {
+    } catch (err) {
       console.error(err);
     }
   }
@@ -59,9 +62,10 @@ export class CcblEngineService {
   save(name: string) {
     localStorage.setItem(`CCBL_TEST::${name}`, JSON.stringify( {
       devices: this.sensors,
-      program: this.progVersionner.getCurrent()
+      program: copyHumanReadableProgram( this.progVersionner.getCurrent(), false )
     } ) );
-    console.log(`CCBL_TEST::${name}`, localStorage.getItem(`CCBL_TEST::${name}`) );
+    const obj = JSON.parse( localStorage.getItem(`CCBL_TEST::${name}`) );
+    console.log(`CCBL_TEST::${name}`, obj );
   }
 
   startProgram() {
@@ -79,6 +83,10 @@ export class CcblEngineService {
 
   reset() {
     localStorage.removeItem(localSensorsKey);
+    this.deleteProgram();
+  }
+
+  deleteProgram() {
     localStorage.removeItem(localProgramKey);
     location.reload();
   }
@@ -100,14 +108,23 @@ export class CcblEngineService {
 
   register(sensor: Sensor) {
     const emitter = new CCBLEmitterValue<any>(undefined);
-    if (sensor.userCanControl) {
-      const channel = new Channel<any>( emitter );
-      this.env.register_Channel(sensor.name, channel);
-    } else {
-      this.env.register_CCBLEmitterValue(sensor.name, emitter);
-      emitter.on( v => {
-        setTimeout( () => this.ccblProg?.UpdateChannelsActions() );
-      } );
+    switch (sensor.varType) {
+      case 'channel':
+        const channel = new Channel<any>( emitter );
+        this.env.register_Channel(sensor.name, channel);
+        break;
+      case 'emitter':
+        this.env.register_CCBLEmitterValue(sensor.name, emitter);
+        emitter.on( v => {
+          setTimeout( () => this.ccblProg?.UpdateChannelsActions() );
+        } );
+        break;
+      case 'event':
+        this.env.registerCCBLEvent( sensor.name, new CCBLEvent({
+          eventName: sensor.name,
+          env: this.env,
+        }) );
+        break;
     }
     this.sensors.push(sensor);
     localStorage.setItem(localSensorsKey, JSON.stringify(this.sensors));
@@ -119,7 +136,12 @@ export class CcblEngineService {
     }
     this.privProgVersionner = new ProgVersionner(program);
     this.privProgVersionner.asObservable().subscribe( prog => {
-      localStorage.setItem(localProgramKey, JSON.stringify(prog) );
+      const copy = copyHumanReadableProgram(prog, false);
+      localStorage.setItem(localProgramKey, JSON.stringify( copy ) );
+      const obj = JSON.parse( localStorage.getItem(localProgramKey) );
+      console.log(`${localProgramKey}:`, obj );
+      console.log('original', prog );
+      console.log('copy', copy );
     });
   }
 

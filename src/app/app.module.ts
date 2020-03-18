@@ -22,6 +22,9 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
 import {MatGridListModule} from '@angular/material/grid-list';
+import {MatStepperModule} from '@angular/material/stepper';
+import {MatRadioModule} from '@angular/material/radio';
+import { EventerComponent } from './eventer/eventer.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,8 @@ import {MatGridListModule} from '@angular/material/grid-list';
     SensorColorComponent,
     SensorComponent,
     SensorScalarComponent,
-    DialogDeviceComponent
+    DialogDeviceComponent,
+    EventerComponent
   ],
   imports: [
     BrowserModule,
@@ -48,7 +52,9 @@ import {MatGridListModule} from '@angular/material/grid-list';
     MatDialogModule,
     MatInputModule,
     MatListModule,
-    MatGridListModule
+    MatGridListModule,
+    MatStepperModule,
+    MatRadioModule
   ],
   providers: [],
   bootstrap: [AppComponent]

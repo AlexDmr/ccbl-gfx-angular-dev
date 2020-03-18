@@ -1,25 +1,28 @@
 :host {
-  display: flex;
-  flex-flow: row;
 
-  label.delete {
-    display: none;
-  }
+  > section {
+    display: flex;
+    flex-flow: row;
 
-  > * {
-    flex: 0 1;
-    margin-right: 0.5em;
-  }
+    label.delete {
+      display: none;
+    }
 
-  > lib-ccbl-expression {
-    flex: 1 1;
-    margin-right: 0;
-  }
+    > * {
+      flex: 0 1;
+      margin-right: 0.5em;
+    }
 
-  .operator {
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    font-weight: bolder;
+    > lib-ccbl-expression {
+      flex: 1 1;
+      margin-right: 0;
+    }
+
+    .operator {
+      margin-left: 0.5em;
+      margin-right: 0.5em;
+      font-weight: bolder;
+    }
   }
 }
 

@@ -7,25 +7,25 @@
 
 <mat-menu #menuGeneral="matMenu">
   <button mat-menu-item (click)="openDialogDevice()">
-    <span>Ajouter appareil/service</span>
+    <span>Add device</span>
   </button>
   <button mat-menu-item (click)="reset()">
-    <span>Tout effacer</span>
+    <span>Delete program</span>
   </button>
-  <button mat-menu-item (click)="reset()">
-    <span>Tout effacer</span>
+  <button mat-menu-item (click)="deleteProgram()">
+    <span>Reset all</span>
   </button>
   <hr/>
   <mat-form-field class="example-full-width">
     <mat-label></mat-label>
     <input matInput placeholder="nom de la configuration" #saveInput>
     <button mat-menu-item (click)="save( saveInput.value )">
-      Sauver
+      Save
     </button>
   </mat-form-field>
 
   <button mat-menu-item [matMenuTriggerFor]="menuCharger">
-    Charger
+    Load
   </button>
 </mat-menu>
 
@@ -49,7 +49,7 @@
   </section>
   <section class="sensors">
     <mat-list>
-      <mat-list-item  *ngFor="let sensor of sensors">
+      <mat-list-item  *ngFor="let sensor of inputs">
         <app-sensor [data]="sensor"></app-sensor>
       </mat-list-item>
     </mat-list>

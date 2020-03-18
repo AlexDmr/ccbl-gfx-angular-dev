@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {BasicSensor, isBooleanSensor, isColorSensor, isScalarSensor} from '../data/setup';
+import {BasicSensor, isBooleanSensor, isColorSensor, isEvent, isScalarSensor} from '../data/setup';
 
 @Component({
   selector: 'app-sensor',
@@ -15,16 +15,20 @@ export class SensorComponent implements OnInit {
   ngOnInit() {
   }
 
+  get isEvent(): boolean {
+    return isEvent(this.data);
+  }
+
   get isBooleanSensor(): boolean {
-    return isBooleanSensor(this.data);
+    return !isEvent(this.data) && isBooleanSensor(this.data);
   }
 
   get isScalarSensor(): boolean {
-    return isScalarSensor(this.data);
+    return !isEvent(this.data) && isScalarSensor(this.data);
   }
 
   get isColorSensor(): boolean {
-    return isColorSensor(this.data);
+    return !isEvent(this.data) && isColorSensor(this.data);
   }
 
 }

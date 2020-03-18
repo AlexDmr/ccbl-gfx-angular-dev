@@ -55,6 +55,10 @@ export class AppComponent implements OnInit {
     };
 
     // Import devices
+    prog.dependencies.import.events = this.events.map(s => ({
+      name: s.name,
+      type: s.type
+    }) );
     prog.dependencies.import.emitters = this.sensors.map(s => ({
       name: s.name,
       type: s.type
@@ -76,8 +80,16 @@ export class AppComponent implements OnInit {
     this.ccblEngineService.setRootProgram( prog );
   }
 
+  get inputs(): Sensor[] {
+    return [...this.events, ...this.sensors];
+  }
+
+  get events(): Sensor[] {
+    return this.ccblEngineService.sensors.filter(d => d.varType === 'event');
+  }
+
   get sensors(): Sensor[] {
-    return this.ccblEngineService.sensors.filter(d => d.varType !== 'channel');
+    return this.ccblEngineService.sensors.filter(d => d.varType === 'emitter');
   }
 
   get actuators(): Sensor[] {
@@ -105,6 +117,10 @@ export class AppComponent implements OnInit {
 
   reset() {
     this.ccblEngineService.reset();
+  }
+
+  deleteProgram() {
+    this.ccblEngineService.deleteProgram();
   }
 
 }

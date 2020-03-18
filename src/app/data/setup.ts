@@ -21,6 +21,10 @@ export interface BasicSensor extends VariableDescription {
   varType: SensorVarType;
 }
 
+export function isEvent(s: BasicSensor): boolean {
+  return s && s.varType === 'event';
+}
+
 export function isBooleanSensor(s: BasicSensor): boolean {
   return s && s.type === 'boolean';
 }

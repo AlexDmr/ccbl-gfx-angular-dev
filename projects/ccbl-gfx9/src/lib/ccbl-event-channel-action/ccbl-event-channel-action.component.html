@@ -1,20 +1,30 @@
-<label>Overhides</label>
+<section [mat-menu-trigger-for]="matMenuGeneral">
 
-<lib-editable-option  [value]     = "action.channel"
-                      [options]   = "channelOptions"
-                      (onupdate)  = "updateChannel($event)"
-                      class="channel" >
-  {{action.channel}}
-</lib-editable-option>
+  <label>Overhides</label>
 
-<label>with</label>
+  <lib-editable-option  [value]     = "action.channel"
+                        [options]   = "channelOptions"
+                        [editable]  = "false"
+                        (onupdate)  = "updateChannel($event)"
+                        class="channel" >
+    {{action.channel}}
+  </lib-editable-option>
 
-<lib-ccbl-expression [program-versionner] = "progVersionner"
-                     [expression]         = "action.affectation"
-                     (update)             = "updateExpression($event)"
-></lib-ccbl-expression>
+  <label>with</label>
 
+  <lib-ccbl-expression [program-versionner] = "progVersionner"
+                       [expression]         = "action.affectation"
+                       [editable]           = "false"
+                       (update)             = "updateExpression($event)"
+  ></lib-ccbl-expression>
 
-<label class="delete" (click)="deleteAction()">
-  ✕
-</label>
+</section>
+
+<mat-menu #matMenuGeneral="matMenu">
+  <button mat-menu-item (click)="editAction()">
+    Edit
+  </button>
+  <button mat-menu-item (click)="deleteAction()">
+    Delete
+  </button>
+</mat-menu>
