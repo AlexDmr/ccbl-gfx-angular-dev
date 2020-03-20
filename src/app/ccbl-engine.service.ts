@@ -23,7 +23,7 @@ const localProgramKey = 'test_ccbl-gfx_program';
 export class CcblEngineService {
   private privProgVersionner: ProgVersionner;
   env: CCBLEnvironmentExecutionInterface;
-  clock: CCBLClock = new CCBLTestClock();
+  clock: CCBLTestClock = new CCBLTestClock();
   mapObs = new Map<string, Observable<any>>();
   sensors: Sensor[] = [];
   ccblProg: CCBLProgramObject;
@@ -120,10 +120,14 @@ export class CcblEngineService {
         } );
         break;
       case 'event':
-        this.env.registerCCBLEvent( sensor.name, new CCBLEvent({
+        const eventer = new CCBLEvent({
           eventName: sensor.name,
           env: this.env,
-        }) );
+        });
+        this.env.registerCCBLEvent( sensor.name, eventer );
+        eventer.on( v => {
+          setTimeout( () => this.ccblProg?.UpdateChannelsActions() );
+        } );
         break;
     }
     this.sensors.push(sensor);
@@ -165,10 +169,12 @@ export class CcblEngineService {
   }
 
   setValue(type: 'channel' | 'emitter' | 'event', varName: string, value: any) {
+    const ms = Date.now();
+    this.clock.set(ms);
     switch (type) {
       case 'channel': return this.env.get_Channel_FromId(varName)?.getValueEmitter().set(value);
       case 'emitter': return this.env.get_CCBLEmitterValue_FromId(varName)?.set(value);
-      case 'event': return this.env.getCCBLEvent(varName)?.trigger( {value} );
+      case 'event': return this.env.getCCBLEvent(varName)?.trigger( {value, ms} );
     }
   }
 
