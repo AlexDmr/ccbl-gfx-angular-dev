@@ -1,0 +1,50 @@
+<mat-toolbar color="primary">
+  Specify trigger from {{triggerType}}
+  <mat-select [(value)]="triggerType">
+    <mat-option value="event" *ngIf="events.length > 0">event</mat-option>
+    <mat-option value="expression">expression</mat-option>
+  </mat-select>
+</mat-toolbar>
+
+<section *ngIf="triggerType === 'event'" class="event">
+  when
+  <select [(ngModel)]="currentEvent">
+    <option *ngFor="let evt of events" [ngValue]="evt.name">
+      {{evt.name}}
+    </option>
+  </select>
+  <select [ngModel]="!!currentFilter" (ngModelChange)="createFilter($event)">
+    <option [ngValue]="false">changes</option>
+    <option [ngValue]="true" >changes and</option>
+  </select>
+  {{currentFilter}}
+  <lib-ccbl-expression *ngIf                = "!!currentFilter"
+                       [acceptEvents]       = "true"
+                       [expression]         = "currentFilterForDisplay"
+                       [program-versionner] = "data.progVersionner"
+                       (update)             = "currentFilter = $event"
+  ></lib-ccbl-expression>
+</section>
+
+<section *ngIf="triggerType === 'expression'" class="expression">
+  When (
+  <lib-ccbl-expression [expression]="expression"
+                       [program-versionner]="data.progVersionner"
+                       (update)="setExpression( $event )"
+  ></lib-ccbl-expression>
+  )
+  <select [ngModel]="expectedExpressionValue" (ngModelChange)="setExpectedValue($event)">
+    <option [ngValue]="true">becomes true</option>
+    <option [ngValue]="false">becomes false</option>
+    <option [ngValue]="undefined">changes</option>
+  </select>
+
+</section>
+
+<hr/>
+
+<section class="okcancel">
+  <button mat-raised-button color="warn"    (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="ok()"    > OK   </button>
+</section>
+

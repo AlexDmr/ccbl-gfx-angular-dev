@@ -1,0 +1,19 @@
+<!--
+<lib-editable-label
+  [label]="getExpression()"
+  (onupdate)="update($event)"
+>
+  <code [innerHTML] = "parsedHTML"></code>
+</lib-editable-label>
+
+<ul>
+  <li *ngFor="let en of parsedExprNodes">
+    <pre>{{en | json}}</pre>
+  </li>
+</ul>
+-->
+<section class = "expression">
+  <code *ngIf="parsedExprNodes.length === 0" class="error">parsing error</code>
+  <code *ngFor  = "let en of parsedExprNodes"
+        [class] = "en.type">{{getLabel(en)}}</code>
+</section>

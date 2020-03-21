@@ -1,0 +1,11 @@
+Triggers &nbsp;
+<label class="event">
+  {{action.eventer}}
+</label>
+&nbsp;
+with
+&nbsp;
+<lib-ccbl-expression [program-versionner] = "progVersionner"
+                     [expression]         = "action.expression"
+                     (update)             = "updateExpression($event)"
+></lib-ccbl-expression>

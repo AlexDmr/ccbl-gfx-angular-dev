@@ -1,0 +1,212 @@
+<section [class.isActive]="active | async" [class.hide]="hide">
+  <header class="noTouchDrag"
+          dndDraggable
+          dndType = "HumanReadableStateContext"
+          [class.hasNoCondition] = "hasNoCondition"
+          (dndStart)          = "startDragging()"
+          (dndEnd)            = "stopDragging()"
+          (dndCanceled)       = "stopDragging()"
+          [dndDropzone]       = "dndDropZoneAll"
+          (dndDrop)           = "appendContext('During', this.draggedContext )"
+          [matMenuTriggerFor] = "menuGeneral"
+  >
+    <section class="event start" *ngIf="!!context.eventStart">
+      <lib-ccbl-event-expression [evt]                = "context.eventStart"
+                                 [program-versionner] = "programVersionner"
+                                 ></lib-ccbl-event-expression>
+    </section>
+    <section class="state">
+      <!-- <label class="contextName">&nbsp;{{context.contextName}}:&nbsp;</label> -->
+      <lib-editable-label [label]="context.contextName"
+                          (onupdate)="updateLabel($event)"
+                          *ngIf="isProgramRoot"
+      >
+        {{context.contextName}}
+      </lib-editable-label>
+      <lib-ccbl-expression [program-versionner] = "programVersionner"
+                           [expression]         = "context.state"
+                           (update)             = "updateState($event)"
+                           *ngIf                = "!isProgramRoot"
+      ></lib-ccbl-expression>
+    </section>
+    <section class="event finish" *ngIf="!!context.eventStart">
+      <lib-ccbl-event-expression [evt]                = "context.eventStart"
+                                 [program-versionner] = "programVersionner"
+      ></lib-ccbl-event-expression>
+    </section>
+  </header>
+
+  <!-- Actions performed by the context -->
+  <section class="startActions"
+           *ngIf="startActions.length > 0"
+           [dndDropzone]="dndDropZoneAll"
+           (dndDrop)="appendContext('During', this.draggedContext )"
+  >
+    <lib-ccbl-event-channel-action  *ngFor               = "let action of startActions"
+                                    [program-versionner] = "programVersionner"
+                                    [action]             = "action"
+    ></lib-ccbl-event-channel-action>
+  </section>
+  <section class="actions"
+           [dndDropzone]="dndDropZoneAll"
+           (dndDrop)="appendContext('During', this.draggedContext )"
+  >
+    <lib-ccbl-action-state          *ngFor               = "let action of actions"
+                                    [program-versionner] = "programVersionner"
+                                    [action]             = "action"
+    ></lib-ccbl-action-state>
+  </section>
+
+  <!-- Related contexts, connected to this via a Allen relationship -->
+  <section class="allen">
+    <!-- DURING -->
+    <section #firstDuringSeparator
+             class            = "During first separator"
+             [class.alone]    = "getDuringContexts().length === 0"
+             [dndDropzone]    = "dndDropZoneAll"
+             (dndDrop)        = "appendContext('During', this.draggedContext )"
+    ></section>
+    <section class="During"
+             *ngFor="let c of getDuringContexts()"
+    >
+      <lib-ccbl-context-or-program [data]="c" class="During"
+                                   [program-versionner]="programVersionner"
+      ></lib-ccbl-context-or-program>
+      <section class="separator"
+               [dndDropzone]    = "dndDropZoneAll"
+               (dndDrop)        = "appendContext('During', this.draggedContext, c)"
+      ></section>
+    </section>
+
+    <!-- START WITH -->
+    <section class="StartWith first separator"
+             [class.alone]="getStartWithContexts().length === 0"
+    ></section>
+    <section class="StartWith"
+             *ngFor         = "let c of getStartWithContexts()">
+      <lib-ccbl-context-or-program [data]="c" class="StartWith"
+                                   [program-versionner]="programVersionner"
+      ></lib-ccbl-context-or-program>
+      <section class="separator"></section>
+    </section>
+
+    <!-- END WITH -->
+    <section class="EndWith first separator" [class.alone]="getEndWithContexts().length === 0"></section>
+    <section class="EndWith"
+             *ngFor="let c of getEndWithContexts()">
+      <lib-ccbl-context-or-program [data]="c" class="EndWith"
+                                   [program-versionner]="programVersionner"
+      ></lib-ccbl-context-or-program>
+      <section class="separator"></section>
+    </section>
+
+    <section class="cover"></section>
+  </section>
+
+  <section class="finishActions"
+           *ngIf="finishActions.length > 0"
+           [dndDropzone]="dndDropZoneAll"
+           (dndDrop)="appendContext('During', this.draggedContext )"
+  >
+    <lib-ccbl-event-channel-action  *ngFor               = "let action of finishActions"
+                                    [program-versionner] = "programVersionner"
+                                    [action]             = "action"
+    ></lib-ccbl-event-channel-action>
+  </section>
+
+</section>
+
+
+
+<!--------------------------------------------------------------------------------------------------------------------->
+<!---------------------------------------------- Contextual menus ----------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------------------->
+<mat-menu #menuGeneral="matMenu">
+  <button mat-menu-item (click)="editCondition()">
+    Edit condition
+  </button>
+  <hr/>
+  <button mat-menu-item [matMenuTriggerFor]="menuAction" [disabled]="hasNoCondition">
+    New action
+  </button>
+  <button mat-menu-item [mat-menu-trigger-for]="menuContextType" [disabled]="hasNoCondition">
+    New context
+  </button>
+  <button mat-menu-item disabled>
+    New program instance
+  </button>
+  <hr/>
+  <button mat-menu-item (click)="cut()" [disabled]="hasNoCondition">
+    Couper
+  </button>
+  <button mat-menu-item (click)="copy()" [disabled]="hasNoCondition">
+    Copier
+  </button>
+  <button mat-menu-item (click)="paste()" [disabled]="hasNoCondition">
+    Coller
+  </button>
+  <hr/>
+  <button mat-menu-item (click)="deleteContext()">
+    Supprimer
+  </button>
+</mat-menu>
+
+<mat-menu #menuAction="matMenu">
+  <button mat-menu-item
+          [disabled]="getAvailableChannels().length === 0"
+          [matMenuTriggerFor]="menuAvailableChannels"
+  >
+    State action
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="menuAllChannels" [matMenuTriggerData]="{contextType: 'EVENT', position: 'start'}">
+    Event action at the start of the context
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="menuAllChannels" [matMenuTriggerData]="{contextType: 'EVENT', position: 'finish'}">
+    Event action at the end of the context
+  </button>
+</mat-menu>
+
+<mat-menu #menuAvailableChannels="matMenu">
+  <button mat-menu-item
+          *ngFor  = "let c of getAvailableChannels()"
+          (click) = "appendStatedAction(c)"
+  >
+    {{c.name}}
+  </button>
+</mat-menu>
+
+<mat-menu #menuAllChannels="matMenu">
+  <ng-template matMenuContent let-contextType="contextType" let-position="position">
+    <button mat-menu-item
+            *ngFor  = "let c of channels"
+            (click) = "appendAction(c, contextType, position)"
+    >
+      {{c.name}}
+    </button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #menuContextType="matMenu">
+  <button mat-menu-item  (click)="newContext('During', 'EVENT')">
+    Event
+  </button>
+  <button mat-menu-item  [matMenuTriggerFor]="appTimingPosition" [matMenuTriggerData]="{contextType: 'STATE'}">
+    State
+  </button>
+</mat-menu>
+
+<mat-menu #appTimingPosition="matMenu">
+  <ng-template matMenuContent let-contextType="contextType">
+    <button mat-menu-item (click)="newContext('During', contextType)">
+      During
+    </button>
+    <button mat-menu-item (click)="newContext('StartWith', contextType)">
+      Start
+    </button>
+    <button mat-menu-item (click)="newContext('EndWith', contextType)">
+      End
+    </button>
+  </ng-template>
+
+</mat-menu>
+

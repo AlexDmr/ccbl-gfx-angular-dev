@@ -1,0 +1,30 @@
+:host {
+  section.expression {
+    color: green;
+    position: relative;
+    margin: 0;
+    padding: 0;
+
+    code {
+      margin: 0;
+      padding: 0;
+    }
+
+    code.channel, code.emitter, code.event {
+      font-weight: bold;
+      color: blue;
+    }
+
+    code.attribute {
+      color: darkblue;
+    }
+
+    code.error {
+      color: red;
+    }
+  }
+
+  section:hover {
+    background-color: yellow;
+  }
+}

@@ -1,0 +1,68 @@
+<header>
+  {{data.as}} (instance of {{data.programId}})
+</header>
+
+<table>
+  <thead>
+    <th>Inputs</th>
+    <th>Outputs</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="inputs">
+        <table>
+          <tbody>
+            <tr *ngFor="let c of inputChannels">
+              <td>C</td>
+              <td>{{c.name}}</td>
+              <td>
+                <lib-editable-option  [value]    = "getValueOfInput(c.name)"
+                                      [options]  = "possibleChannels"
+                                      (onupdate) = "updateInput('channels', c.name, $event)"
+                >{{getValueOfInput(c.name)}}</lib-editable-option>
+              </td>
+            </tr>
+            <tr *ngFor="let e of inputEmitters">
+              <td>E</td>
+              <td>{{e.name}}</td>
+              <td>
+                <lib-editable-option  [value]    = "getValueOfInput(e.name)"
+                                      [options]  = "possibleEmitters"
+                                      (onupdate) = "updateInput('emitters', e.name, $event)"
+                >{{getValueOfInput(e.name)}}</lib-editable-option>
+              </td>
+            </tr>
+            <tr *ngFor="let e of inputEvents">
+              <td>e</td>
+              <td>{{e.name}}</td>
+              <td>
+                <lib-editable-option  [value]    = "getValueOfInput(e.name)"
+                                      [options]  = "possibleEvents"
+                                      (onupdate) = "updateInput('events', e.name, $event)"
+                >{{getValueOfInput(e.name)}}</lib-editable-option>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td class="outputs">
+        <table>
+          <tbody>
+            <tr *ngFor="let c of outputChannels">
+              <td>{{c.name}}</td>
+              <td>C</td>
+            </tr>
+            <tr *ngFor="let e of outputEmitters">
+              <td>{{e.name}}</td>
+              <td>E</td>
+            </tr>
+            <tr *ngFor="let e of outputEvents">
+              <td>{{e.name}}</td>
+              <td>e</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>

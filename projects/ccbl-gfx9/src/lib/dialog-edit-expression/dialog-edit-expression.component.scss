@@ -1,0 +1,88 @@
+:host {
+
+  > section.expression {
+    position: relative;
+    min-height: 2em;
+    min-width: 30em;
+
+    input.inputExpr {
+      // background-color: transparent;
+      border: none;
+      // color: transparent;
+      font-family: monospace;
+      height: 100%;
+      line-height: 4rem;
+      outline: none;
+      padding: 0;
+      margin: 0;
+      font-size: medium;
+      font-weight: bold;
+      width: 100%;
+      // position: absolute;
+      top: 0;
+    }
+
+    lib-ccbl-expression {
+      font-size: medium;
+    }
+
+    pre {
+      color: transparent;
+      position: absolute;
+      font-family: monospace;
+      font-size: medium;
+      top: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    div.cursor {
+      font-family: monospace;
+      font-size: medium;
+      width: 0.3em;
+      height: 1.5em;
+      position: absolute;;
+      top: 0;
+      background-color: black;
+      animation: cursorFrame 1.25s ease 0.5s infinite;
+    }
+
+    div.cursorError {
+      font-family: monospace;
+      font-size: medium;
+      width: 1em;
+      height: 1.5em;
+      position: absolute;
+      top: 0;
+      background-color: red;
+      animation: cursorFrame 1.25s ease 0.5s infinite;
+    }
+
+  }
+
+  > section.expression.error {
+  }
+
+  section.okcancel {
+    display: flex;
+    flex-flow: row;
+
+    label.error {
+      flex: 1 1;
+    }
+
+    button {
+      margin-left: 1em;
+    }
+  }
+}
+
+@keyframes cursorFrame {
+  50% {
+    opacity: 0.2;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

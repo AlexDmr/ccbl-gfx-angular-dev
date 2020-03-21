@@ -1,0 +1,41 @@
+<mat-horizontal-stepper [linear]="true">
+  <mat-step label="Device type">
+    <mat-radio-group aria-label="Select a device type" [(ngModel)]="deviceType">
+      <mat-radio-button value="channel">Channel</mat-radio-button>
+      <mat-radio-button value="emitter">Emitter</mat-radio-button>
+      <mat-radio-button value="event"  >Eventer</mat-radio-button>
+    </mat-radio-group>
+    <hr/>
+    <button mat-button matStepperNext [disabled]="!isDeviceTypeValide">
+      Next
+    </button>
+  </mat-step>
+  <mat-step label="Device specification">
+    <form>
+      <mat-form-field>
+        <mat-label>Nom</mat-label>
+        <label>
+          <input matInput placeholder="Device name" [(ngModel)]="name" name="name" required>
+        </label>
+      </mat-form-field>
+
+      <br/>
+      <mat-form-field>
+        <mat-label>Type de données</mat-label>
+        <mat-select [(value)]="dataType" name="dataType">
+          <mat-option [value]="opt" *ngFor="let opt of dataTypes">{{opt}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <hr/>
+      <button mat-raised-button color="warn" (click)="cancel()" [disabled]="!canSubmit">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" (click)="ok()" [disabled]="!canSubmit">
+        OK
+      </button>
+
+    </form>
+  </mat-step>
+</mat-horizontal-stepper>
+

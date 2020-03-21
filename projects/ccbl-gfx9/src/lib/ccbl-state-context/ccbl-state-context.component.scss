@@ -1,0 +1,208 @@
+$margin: 3em;
+$separator-width: 0.4em;
+$shadow: #41687f99;
+
+:host {
+  display: flex;
+  flex-flow: column;
+  background: white;
+  position: relative;
+
+  section.cover {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.8);
+    left: 0;
+    top: 0;
+  }
+
+  > section.hide > section.allen > section.cover {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  section.separator {
+    height: 0;
+    transition: height .3s;
+  }
+
+  header.dndDragover + section + section.allen > section.separator.During, section.separator.dndDragover {
+    height: 1em;
+    background-color: lightgreen;
+    transition: height .3s;
+  }
+
+  > section.isActive {
+    > header {
+      background-color: yellow;
+    }
+  }
+
+  header {
+    border-bottom: solid black 1px;
+    background-color: aliceblue;
+    display: flex;
+    flex-flow: column;
+    min-height: 1em;
+
+    > label {
+      color: rgba(0, 0, 0, 0);
+      flex: 0 1 1em;
+    }
+    section.state {
+      flex: 1 1;
+      text-align: center;
+      lib-editable-label, label.contextName {
+        font-weight: bold;
+      }
+    }
+
+    section.event {
+      background-color: lightgoldenrodyellow;
+      display: inline-block;
+    }
+    section.event.start {
+      align-self: flex-start;
+      margin-right: 2 * $margin;
+    }
+    section.event.finish {
+      align-self: flex-end;
+      margin-left: 2 * $margin;
+    }
+  }
+
+  header.hasNoCondition {
+    background-color: orangered;
+  }
+
+  header:hover {
+    background-color: lightgreen;
+    label.delete {
+      display: inline;
+      align-self: center;
+      border: solid black 1px;
+      border-radius: 50%;
+      background-color: orangered;
+      padding: 2px;
+      height: 1em;
+      flex: 0 1 1em;
+      text-align: center;
+      font-size: 8px;
+      color: rgba(0, 0, 0, 1);
+    }
+    > label {
+      color: rgba(0, 0, 0, 1);
+    }
+  }
+
+  > section.root.dropCandidate {
+    > section.allen section.first.During {
+      // padding-top: 2 * $separator-width;
+      background-color: green;
+    }
+  }
+
+  > section.root.dropCandidate.canDrop {
+    > section.allen > section.first.During {
+      // padding-top: 2 * $separator-width;
+      background-color: lightgreen;
+    }
+  }
+
+  section.startActions {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    background-color: #eeffaa;
+  }
+  section.actions {
+    // column-width: 300px;
+    columns: auto;
+    background-color: #D1E5E8;
+    padding-left: 1em;
+  }
+  section.finishActions {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-end;
+    background-color: #eeffaa;
+  }
+
+  section.allen {
+    display: flex;
+    flex-flow: column;
+    position: relative;
+    // border-bottom: dashed black 1px;
+    // box-shadow:inset 3px 3px 5px 3px $shadow;
+
+    section.first.separator.alone {
+      padding: 0;
+      transition: padding .3s, margin .3s;
+    }
+
+    lib-ccbl-context-or-program {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    section.separator {
+      padding-top: $separator-width;
+    }
+
+    section.separator.dropCandidate {
+      background-color: green;
+      // padding-top: 2 * $separator-width;
+      // margin-top: .25 * $separator-width;
+      // margin-bottom: .25 * $separator-width;
+    }
+
+    section.separator.dropCandidate.canDrop {
+      background-color: lightgreen;
+    }
+
+    > * {
+      flex: 0 1 auto;
+      display: flex;
+      flex-flow: column;
+    }
+
+    > *.dropCandidate {
+      background-color: green;
+    }
+
+    > *.dropCandidate.canDrop {
+      padding-bottom: 4 * $separator-width;
+      background-color: lightgreen;
+      transition: padding 0.3s;
+    }
+
+    > section.During {
+      margin-left: $margin;
+      margin-right: $margin;
+    }
+
+    > section.EndWith {
+      margin-left: 2 * $margin;
+
+      lib-ccbl-state-context:first-of-type {
+        border-right: none;
+      }
+    }
+
+    > section.StartWith {
+      margin-right: 2 * $margin;
+
+      lib-ccbl-state-context:first-of-type {
+        border-left: none;
+      }
+    }
+
+  }
+}
+
+.expand {
+  flex: 1 1 auto;
+}

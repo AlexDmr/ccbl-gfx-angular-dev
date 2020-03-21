@@ -1,0 +1,15 @@
+{
+  "name": "ccbl-gfx9",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/animations": "~9.0.3",
+    "@angular/cdk": "~9.1.0",
+    "@angular/common": "^9.0.3",
+    "@angular/core": "^9.0.3",
+    "@angular/material": "^9.1.0",
+    "ccbl-js": "1.0.15",
+    "mathjs": "~6.6.1",
+    "ngx-drag-drop": "2.0.0",
+    "tslib": "^1.10.0"
+  }
+}

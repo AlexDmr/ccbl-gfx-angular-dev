@@ -1,0 +1,200 @@
+<section>
+  <header [alx-draggable] = "context"
+          class="noTouchDrag">
+    <label class="grip">&nbsp;↕&nbsp;</label>
+    <label class="edit"
+           [contextMenu]          = "menuGeneral"
+    >☰</label>
+    <section class="state">
+      <label class="contextName">&nbsp;{{context.contextName}}:&nbsp;</label>
+      <lib-ccbl-expression [program-versionner] = "programVersionner"
+                           [expression]         = "context.state"
+                           (update)             = "updateState($event)"
+                           *ngIf                = "context.state"
+      ></lib-ccbl-expression>
+    </section>
+    <label class="delete" (click)="deleteContext()">✕</label>
+  </header>
+
+  <!-- Related contexts, connected to this via a Allen relationship -->
+  <section class="allen">
+    <section class="EndWith"
+             *ngFor="let c of getEndWithContexts(); let i = index"
+             [class.expand] = "getEndWithContexts().length === i+1">
+      <lib-ccbl-context-or-program [data]="c" class="EndWith"
+                                   [program-versionner]="programVersionner"
+      ></lib-ccbl-context-or-program>
+    </section>
+    <section class="StartWith"
+             *ngFor         = "let c of getStartWithContexts(); let i = index"
+             [class.expand] = "getStartWithContexts().length === i+1">
+      <lib-ccbl-context-or-program [data]="c" class="StartWith"
+                                   [program-versionner]="programVersionner"
+      ></lib-ccbl-context-or-program>
+    </section>
+    <section class="During"
+             *ngFor="let c of getDuringContexts(); let i = index"
+             [class.expand] = "getDuringContexts().length === i+1">
+      <lib-ccbl-context-or-program [data]="c" class="During"
+                                   [program-versionner]="programVersionner"
+      ></lib-ccbl-context-or-program>
+    </section>
+
+    <!--
+    <section class="OLD">
+    <section class="StartWith">
+      <section class = "dropPlace"
+               [class.expand]         = "getStartWithContexts().length === 0"
+               alx-dropzone
+               alx-drag-over-css      = "canDrop"
+               [alx-accept-function]  = "canDrop"
+               (alx-ondrop)           = "appendContext('StartWith', $event)"
+               [contextMenu]          = "menuAddContext"
+               [contextMenuSubject]   = "{allen: 'StartWith'}"
+      ></section>
+      <section *ngFor         = "let c of getStartWithContexts(); let i = index"
+               [class.expand] = "getStartWithContexts().length === i+1"
+      >
+        <lib-ccbl-context-or-program [data]="c"
+                                     [program-versionner]="programVersionner"
+        ></lib-ccbl-context-or-program>
+        <section class = "dropPlace"
+                 [class.expand] = "getStartWithContexts().length === i+1"
+                 alx-dropzone
+                 alx-drag-over-css      = "canDrop"
+                 [alx-accept-function]  = "canDrop"
+                 (alx-ondrop)           = "appendContext('StartWith', $event, c)"
+                 [contextMenu]          = "menuAddContext"
+                 [contextMenuSubject]   = "{allen: 'StartWith', after: c}"
+        ></section>
+      </section>
+    </section>
+    <section class="During">
+      <section class = "dropPlace"
+               [class.expand]         = "getDuringContexts().length === 0"
+               alx-dropzone
+               alx-drag-over-css      = "canDrop"
+               [alx-accept-function]  = "canDrop"
+               (alx-ondrop)           = "appendContext('During', $event)"
+               [contextMenu]          = "menuAddContext"
+               [contextMenuSubject]   = "{allen: 'During'}"
+      ></section>
+      <section *ngFor="let c of getDuringContexts(); let i = index"
+               [class.expand] = "getDuringContexts().length === i+1">
+        <lib-ccbl-context-or-program [data]="c"
+                                     [program-versionner]="programVersionner"
+        ></lib-ccbl-context-or-program>
+        <section class = "dropPlace"
+                 [class.expand] = "getDuringContexts().length === i+1"
+                 alx-dropzone
+                 alx-drag-over-css      = "canDrop"
+                 [alx-accept-function]  = "canDrop"
+                 (alx-ondrop)           = "appendContext('During', $event, c)"
+                 [contextMenu]          = "menuAddContext"
+                 [contextMenuSubject]   = "{allen: 'During', after: c}"
+        ></section>
+      </section>
+    </section>
+    <section class="EndWith">
+      <section class = "dropPlace"
+               [class.expand]         = "getEndWithContexts().length === 0"
+               alx-dropzone
+               alx-drag-over-css      = "canDrop"
+               [alx-accept-function]  = "canDrop"
+               (alx-ondrop)           = "appendContext('EndWith', $event)"
+               [contextMenu]          = "menuAddContext"
+               [contextMenuSubject]   = "{allen: 'EndWith'}"
+      ></section>
+      <section *ngFor="let c of getEndWithContexts(); let i = index"
+               [class.expand] = "getEndWithContexts().length === i+1">
+        <lib-ccbl-context-or-program [data]="c"
+                                     [program-versionner]="programVersionner"
+        ></lib-ccbl-context-or-program>
+        <section class = "dropPlace"
+                 [class.expand] = "getEndWithContexts().length === i+1"
+                 alx-dropzone
+                 alx-drag-over-css      = "canDrop"
+                 [alx-accept-function]  = "canDrop"
+                 (alx-ondrop)           = "appendContext('EndWith', $event, c)"
+                 [contextMenu]          = "menuAddContext"
+                 [contextMenuSubject]   = "{allen: 'EndWith', after: c}"
+        ></section>
+      </section>
+    </section>
+  </section>
+  -->
+
+  </section>
+
+  <!-- Actions performed by the context -->
+  <section class="actions" droppable="true">
+    <lib-ccbl-action-state *ngFor = "let action of actions"
+                           [program-versionner] = "programVersionner"
+                           [action] = "action"
+    ></lib-ccbl-action-state>
+  </section>
+
+</section>
+
+
+<!-- contextual menus -->
+<context-menu #menuAddContext>
+  <ng-template contextMenuItem *ngIf="isThereEvents()" (execute) = "appendEventContext($event.item)">
+    Create event context
+  </ng-template>
+  <ng-template contextMenuItem (execute) = "appendStateContext($event.item)">
+    Create state context
+  </ng-template>
+</context-menu>
+
+<!-- contextual menus related to the context-->
+<context-menu #menuGeneral>
+  <ng-template contextMenuItem [subMenu]="ActionMenu">
+    Append an action on...
+  </ng-template>
+  <ng-template contextMenuItem [subMenu]="StartWithMenu">
+    Append in "Start with"
+  </ng-template>
+  <ng-template contextMenuItem [subMenu]="DuringMenu">
+    Append in "During"
+  </ng-template>
+  <ng-template contextMenuItem [subMenu]="EndWithMenu">
+    Append in "End with"
+  </ng-template>
+
+  <context-menu #ActionMenu>
+    <ng-template contextMenuItem
+                 *ngFor = "let c of getAvailableChannels()"
+                 (execute) = "appendAction(c)">
+      {{c.name}}
+    </ng-template>
+  </context-menu>
+
+  <context-menu #StartWithMenu>
+    <ng-template contextMenuItem *ngIf="isThereEvents()" (execute) = "appendEventContext({allen: 'StartWith'})">
+      Create event context
+    </ng-template>
+    <ng-template contextMenuItem (execute) = "appendStateContext({allen: 'StartWith'})">
+      Create state context
+    </ng-template>
+  </context-menu>
+
+  <context-menu #DuringMenu>
+    <ng-template contextMenuItem *ngIf="isThereEvents()" (execute) = "appendEventContext({allen: 'During'})">
+      Create event context
+    </ng-template>
+    <ng-template contextMenuItem (execute) = "appendStateContext({allen: 'During'})">
+      Create state context
+    </ng-template>
+  </context-menu>
+
+  <context-menu #EndWithMenu>
+    <ng-template contextMenuItem *ngIf="isThereEvents()" (execute) = "appendEventContext({allen: 'EndWith'})">
+      Create event context
+    </ng-template>
+    <ng-template contextMenuItem (execute) = "appendStateContext({allen: 'EndWith'})">
+      Create state context
+    </ng-template>
+  </context-menu>
+
+</context-menu>

@@ -1,0 +1,58 @@
+<section class="content">
+  <section class="start">
+    <mat-checkbox [ngModel]="!!newContext.eventStart"
+                  (ngModelChange) = "enableEvent($event, 'eventStart')"
+    >
+      Start event
+    </mat-checkbox> <br/>
+    <lib-ccbl-event-expression  *ngIf                 = "hasEvent('eventStart')"
+                                [evt]                 = "newContext.eventStart"
+                                [program-versionner]  = "progV"
+                                (update)              = "newContext.eventStart = $event"
+                                #eventStart
+                                (click)               = "eventStart.editEvent()"
+                                ></lib-ccbl-event-expression>
+  </section>
+  <hr/>
+  <section class="during">
+    <mat-checkbox [ngModel]="!!newContext.state"
+                  (ngModelChange) = "enableState($event)"
+    >
+      During condition
+    </mat-checkbox> <br/>
+    <lib-ccbl-expression *ngIf                = "!!newContext.state"
+                         [expression]         = "newContext.state"
+                         [editable]           = "true"
+                         [program-versionner] = "progV"
+                         #stateExpr
+                         (click)               = "stateExpr.edit()"
+                         (update)              = "newContext.state = $event"
+                         ></lib-ccbl-expression>
+  </section>
+  <hr/>
+  <section class="finish">
+    <mat-checkbox [ngModel]="!!newContext.eventFinish"
+                  (ngModelChange) = "enableEvent($event, 'eventFinish')"
+    >
+      Finish event
+    </mat-checkbox> <br/>
+    <lib-ccbl-event-expression  *ngIf                 = "hasEvent('eventFinish')"
+                                [evt]                 = "newContext.eventFinish"
+                                [program-versionner]  = "progV"
+                                (update)              = "newContext.eventFinish = $event"
+                                #eventFinish
+                                (click)               = "eventFinish.editEvent()"
+                                ></lib-ccbl-event-expression>
+  </section>
+</section>
+
+<hr/>
+
+<section class="okcancel">
+  <button (click)="cancel()" mat-raised-button color="warn">
+    Cancel
+  </button>
+  <button (click)="ok()" mat-raised-button color="primary">
+    OK
+  </button>
+</section>

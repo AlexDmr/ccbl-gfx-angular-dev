@@ -1,0 +1,11 @@
+<label *ngIf = "!editing" (dblclick)="editing = true" class="notEdited">
+  <ng-content></ng-content>
+</label>
+
+<form *ngIf = "editing" (submit) = "update(newExpr.value)">
+  <input #newExpr
+         name       = "expression"
+         [ngModel]  = "label"
+         (blur)     = "editing = false"
+  />
+</form>

@@ -1,0 +1,48 @@
+<header class="noTouchDrag"
+        dndDraggable
+        dndType="HumanReadableEventContext"
+        (dndStart)    = "startDragging()"
+        (dndEnd)      = "stopDragging()"
+        (dndCanceled) = "stopDragging()"
+        [matMenuTriggerFor] = "menuGeneral"
+>
+  <section class="event">
+    <!-- <label class="grip">&nbsp;↕&nbsp;</label> -->
+    <lib-ccbl-event-expression [evt] = "context"
+                               [program-versionner]="programVersionner"
+                               (update)="updateEvent($event)"
+                               #eventExpr
+                               ></lib-ccbl-event-expression>
+    <!--When {{htmlEvent}}-->
+  </section>
+</header>
+
+<section class="actions">
+  <lib-ccbl-event-channel-action *ngFor = "let action of stateActions"
+                         [program-versionner] = "programVersionner"
+                         [action] = "action"
+  ></lib-ccbl-event-channel-action>
+  <lib-ccbl-event-trigger-action *ngFor = "let action of eventTriggerActions"
+                         [program-versionner] = "programVersionner"
+                         [action] = "action"
+  ></lib-ccbl-event-trigger-action>
+  <!-- <code>{{context | json}}</code> -->
+</section>
+
+
+
+
+<!-- Contextual menu -->
+<mat-menu #menuGeneral="matMenu">
+  <button mat-menu-item (click)="eventExpr.editEvent()">
+    Edit trigger
+  </button>
+  <hr/>
+  <button mat-menu-item (click)="appendAction()">
+    Append action
+  </button>
+  <hr/>
+  <button mat-menu-item (click)="deleteContext()">
+    Delete context
+  </button>
+</mat-menu>

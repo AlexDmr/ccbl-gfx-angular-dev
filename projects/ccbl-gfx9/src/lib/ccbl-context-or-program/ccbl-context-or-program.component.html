@@ -1,0 +1,23 @@
+<section>
+  <lib-ccbl-state-context
+    *ngIf = "isStateContext()"
+    [program-versionner] = "programVersionner"
+    [context]            = "asStateContext()"
+    [isProgramRoot]      = "isProgramRoot"
+  ></lib-ccbl-state-context>
+
+  <lib-ccbl-event-context
+    *ngIf = "isEventContext()"
+    [program-versionner] = "programVersionner"
+    [context] = "asEventContext()"
+  ></lib-ccbl-event-context>
+
+  <!--<code
+    *ngIf = "isProgramReference()"
+  >PROGRAM REFERENCE: {{asProgramReference() | json}}</code>-->
+  <lib-ccbl-program-reference *ngIf                = "isProgramReference()"
+                              [data]               = "asProgramReference()"
+                              [program-versionner] = "programVersionner"
+  ></lib-ccbl-program-reference>
+
+</section>

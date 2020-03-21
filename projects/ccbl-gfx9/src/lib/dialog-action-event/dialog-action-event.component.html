@@ -1,0 +1,31 @@
+<section>
+  <label>
+    Channel:
+    <select [(ngModel)]="newAction.channel">
+      <option *ngFor="let chan of channels" [ngValue]="chan.name">
+        {{chan.name}} ({{chan.type}})
+      </option>
+    </select>
+  </label>
+
+  <p>
+    override with
+  </p>
+
+  <lib-ccbl-expression [expression]         = "newAction.affectation"
+                       [editable]           = "true"
+                       [program-versionner] = "progVersionner"
+                       (update) = "newAction.affectation = $event"
+  ></lib-ccbl-expression>
+</section>
+
+<hr/>
+
+<section class="okcancel">
+  <button (click)="cancel()" mat-raised-button color="warn">
+    Cancel
+  </button>
+  <button (click)="ok()" mat-raised-button color="primary">
+    OK
+  </button>
+</section>

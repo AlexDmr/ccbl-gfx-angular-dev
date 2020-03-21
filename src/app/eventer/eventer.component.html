@@ -1,0 +1,12 @@
+<section>
+  <label class="dataType">
+    <label *ngIf="isScalar">
+      <label>{{data.name}}</label>
+      <input type="number" [(ngModel)]="value">
+    </label>
+    <mat-checkbox [(ngModel)]="value" *ngIf="isBoolean">
+      {{data.name}}
+    </mat-checkbox>
+  </label>
+  <button (click)="emit()">Trigger</button>
+</section>

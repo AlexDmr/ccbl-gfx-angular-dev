@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+  flex-flow: row;
+
+  label.row {
+    display: inline-flex;
+    flex-flow: row;
+  }
+}

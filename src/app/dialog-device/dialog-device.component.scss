@@ -1,0 +1,12 @@
+:host {
+
+  mat-horizontal-stepper {
+    mat-radio-button {
+      display: block;
+    }
+  }
+
+  button[matStepperNext] {
+    float: right;
+  }
+}

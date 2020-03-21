@@ -1,0 +1,14 @@
+:host {
+
+  > section {
+    display: flex;
+    flex-flow: row;
+
+    > label {
+      flex: 1 1;
+    }
+    > button {
+      flex: 0 1;
+    }
+  }
+}

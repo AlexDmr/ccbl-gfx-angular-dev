@@ -1,0 +1,15 @@
+<label class="noWrap" *ngIf="!edition" (dblclick)="edition = true" class="notEdited">
+  <ng-content></ng-content>
+</label>
+
+<select #select
+        *ngIf           = "edition"
+        title           = "select"
+        [ngModel]       = "value"
+        (ngModelChange) = "updateValue($event)"
+        (blur)          = "edition = false"
+>
+  <option *ngFor    = "let option of options"
+          [value]   = "option.value"
+  >{{option.label}}</option>
+</select>

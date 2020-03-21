@@ -1,0 +1,30 @@
+<section [class.isActive]="active | async" [class.isOverrided]="!!(overridedWith | async)">
+
+  <lib-editable-option [options]  = "channelsOptions"
+                       [value]    = "channel"
+                       (onupdate) = "channel = $event"
+                       class      = "channel" >
+    {{channel}}
+  </lib-editable-option>
+
+
+  <lib-editable-option [options]  = "operationsOptions"
+                       [value]    = "operation"
+                       (onupdate) = "operation = $event"
+                       class      = "operator" >
+    {{ operationLabel(operation) }}
+  </lib-editable-option>
+
+  <section class="value">
+    <lib-ccbl-expression [program-versionner] = "programVersionner"
+                         [expression] = "action.affectation.value"
+                         (update) = "updateAffectation($event)"
+    ></lib-ccbl-expression>
+
+    <lib-ccbl-expression [program-versionner] = "programVersionner"
+                         [expression] = "overridedValue"
+                         *ngIf = "overridedWith | async as overridedValue"
+    ></lib-ccbl-expression>
+  </section>
+
+</section>

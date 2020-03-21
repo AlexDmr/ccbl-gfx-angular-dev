@@ -1,0 +1,17 @@
+<label>When &nbsp;</label>
+
+<label *ngIf="isBasedOnEvent">
+  <code class="event">{{evt.eventSource}}</code>
+  is triggered
+  <label *ngIf="!!evt.eventFilter">
+    and <code>{{filterForEvent}}</code>
+  </label>
+</label>
+
+<label *ngIf="isBasedOnExpression" class="row">
+  <lib-ccbl-expression [expression]         = "evt.eventExpression"
+                       [program-versionner] = "progV"
+                       (update)             = "evt.eventExpression = $event"
+                       ></lib-ccbl-expression>
+  <label>&nbsp;{{labelEventExpressionChange}}</label>
+</label>

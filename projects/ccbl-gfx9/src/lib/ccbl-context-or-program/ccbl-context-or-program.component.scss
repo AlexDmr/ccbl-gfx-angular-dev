@@ -1,0 +1,18 @@
+$color: black;
+$shadow: #41687f;
+
+:host > section {
+  border: solid $color 2px;
+  // border-bottom-width: 1px;
+  // border-right-width: 1px;
+  overflow: hidden;
+  display: block;
+}
+
+:host.StartWith > section {
+  border-left: none;
+}
+
+:host.EndWith > section {
+  border-right: none;
+}
