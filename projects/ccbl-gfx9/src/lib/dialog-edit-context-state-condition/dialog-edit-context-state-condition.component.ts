@@ -1,11 +1,13 @@
-import {ChangeDetectionStrategy, Component, Inject, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {copyHumanReadableStateContext, HumanReadableStateContext} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
+import {AllenType} from 'ccbl-js/lib/AllenInterface';
 
 export interface DataEditionContextState {
   context: HumanReadableStateContext;
   progV: ProgVersionner;
+  from: AllenType;
 }
 
 @Component({
@@ -62,4 +64,15 @@ export class DialogEditContextStateConditionComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  get canHaveStartEvent(): boolean {
+    return this.data.from !== AllenType.Meet && this.data.from !== AllenType.StartWith;
+  }
+
+  get canHaveFinishEvent(): boolean {
+    return this.data.from !== AllenType.EndWith;
+  }
+
+  get canHaveState(): boolean {
+    return this.data.from !== AllenType.EndWith;
+  }
 }

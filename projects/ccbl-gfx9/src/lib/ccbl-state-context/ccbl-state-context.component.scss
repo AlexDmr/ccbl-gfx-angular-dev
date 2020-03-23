@@ -130,6 +130,9 @@ $shadow: #41687f99;
     align-items: flex-end;
     background-color: #eeffaa;
   }
+  lib-ccbl-action-state:hover, lib-ccbl-event-channel-action:hover {
+    background-color: lightgreen;
+  }
 
   section.allen {
     display: flex;

@@ -23,14 +23,14 @@
       >
         {{context.contextName}}
       </lib-editable-label>
-      <lib-ccbl-expression [program-versionner] = "programVersionner"
-                           [expression]         = "context.state"
-                           (update)             = "updateState($event)"
-                           *ngIf                = "!isProgramRoot"
+      <lib-ccbl-expression [program-versionner]   = "programVersionner"
+                           [expression]           = "context.state"
+                           (update)               = "updateState($event)"
+                           *ngIf                  = "!isProgramRoot"
       ></lib-ccbl-expression>
     </section>
-    <section class="event finish" *ngIf="!!context.eventStart">
-      <lib-ccbl-event-expression [evt]                = "context.eventStart"
+    <section class="event finish" *ngIf="!!context.eventFinish">
+      <lib-ccbl-event-expression [evt]                = "context.eventFinish"
                                  [program-versionner] = "programVersionner"
       ></lib-ccbl-event-expression>
     </section>
@@ -54,6 +54,7 @@
     <lib-ccbl-action-state          *ngFor               = "let action of actions"
                                     [program-versionner] = "programVersionner"
                                     [action]             = "action"
+                                    [context]            = "context"
     ></lib-ccbl-action-state>
   </section>
 
@@ -71,6 +72,7 @@
     >
       <lib-ccbl-context-or-program [data]="c" class="During"
                                    [program-versionner]="programVersionner"
+                                   [from] = "AllenTypeDuring"
       ></lib-ccbl-context-or-program>
       <section class="separator"
                [dndDropzone]    = "dndDropZoneAll"
@@ -84,9 +86,10 @@
     ></section>
     <section class="StartWith"
              *ngFor         = "let c of getStartWithContexts()">
-      <lib-ccbl-context-or-program [data]="c" class="StartWith"
-                                   [program-versionner]="programVersionner"
-      ></lib-ccbl-context-or-program>
+      <lib-ccbl-state-context [context]="c" class="StartWith"
+                              [program-versionner]  = "programVersionner"
+                              [from]                = "AllenTypeStartWith"
+      ></lib-ccbl-state-context>
       <section class="separator"></section>
     </section>
 
@@ -94,9 +97,10 @@
     <section class="EndWith first separator" [class.alone]="getEndWithContexts().length === 0"></section>
     <section class="EndWith"
              *ngFor="let c of getEndWithContexts()">
-      <lib-ccbl-context-or-program [data]="c" class="EndWith"
-                                   [program-versionner]="programVersionner"
-      ></lib-ccbl-context-or-program>
+      <lib-ccbl-state-context [context]="c" class="EndWith"
+                              [program-versionner]  = "programVersionner"
+                              [from]                = "AllenTypeEndWith"
+      ></lib-ccbl-state-context>
       <section class="separator"></section>
     </section>
 
@@ -111,6 +115,7 @@
     <lib-ccbl-event-channel-action  *ngFor               = "let action of finishActions"
                                     [program-versionner] = "programVersionner"
                                     [action]             = "action"
+                                    #actFin
     ></lib-ccbl-event-channel-action>
   </section>
 
@@ -154,36 +159,16 @@
 <mat-menu #menuAction="matMenu">
   <button mat-menu-item
           [disabled]="getAvailableChannels().length === 0"
-          [matMenuTriggerFor]="menuAvailableChannels"
+          (click) = "newStateAction()"
   >
     State action
   </button>
-  <button mat-menu-item [matMenuTriggerFor]="menuAllChannels" [matMenuTriggerData]="{contextType: 'EVENT', position: 'start'}">
+  <button mat-menu-item (click)="newEventAction('start')">
     Event action at the start of the context
   </button>
-  <button mat-menu-item [matMenuTriggerFor]="menuAllChannels" [matMenuTriggerData]="{contextType: 'EVENT', position: 'finish'}">
+  <button mat-menu-item (click)="newEventAction('finish')">
     Event action at the end of the context
   </button>
-</mat-menu>
-
-<mat-menu #menuAvailableChannels="matMenu">
-  <button mat-menu-item
-          *ngFor  = "let c of getAvailableChannels()"
-          (click) = "appendStatedAction(c)"
-  >
-    {{c.name}}
-  </button>
-</mat-menu>
-
-<mat-menu #menuAllChannels="matMenu">
-  <ng-template matMenuContent let-contextType="contextType" let-position="position">
-    <button mat-menu-item
-            *ngFor  = "let c of channels"
-            (click) = "appendAction(c, contextType, position)"
-    >
-      {{c.name}}
-    </button>
-  </ng-template>
 </mat-menu>
 
 <mat-menu #menuContextType="matMenu">

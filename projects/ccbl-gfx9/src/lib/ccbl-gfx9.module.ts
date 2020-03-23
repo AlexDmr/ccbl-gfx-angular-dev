@@ -27,6 +27,7 @@ import { DialogEditContextStateConditionComponent } from './dialog-edit-context-
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CcblEventExpressionComponent } from './ccbl-event-expression/ccbl-event-expression.component';
 import { DialogEditExpressionComponent } from './dialog-edit-expression/dialog-edit-expression.component';
+import { DialogEditActionStateComponent } from './dialog-edit-action-state/dialog-edit-action-state.component';
 
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {
@@ -56,7 +57,8 @@ export class SafeHtmlPipe implements PipeTransform  {
     DialogActionEventComponent,
     DialogEditContextStateConditionComponent,
     CcblEventExpressionComponent,
-    DialogEditExpressionComponent
+    DialogEditExpressionComponent,
+    DialogEditActionStateComponent
   ],
     imports: [
         CommonModule,

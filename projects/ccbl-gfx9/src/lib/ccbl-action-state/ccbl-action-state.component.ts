@@ -1,13 +1,15 @@
-import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ProgVersionner} from '../ccbl-gfx9.service';
-import {HumanReadableStateAction, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {HumanReadableStateAction, HumanReadableStateContext, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 import {BehaviorSubject} from 'rxjs';
+import {MatDialog} from '@angular/material/dialog';
+import {DataActionState, DialogEditActionStateComponent} from '../dialog-edit-action-state/dialog-edit-action-state.component';
 
 type OPERATOR = 'expression' | 'constraint';
 
 @Component({
-  selector: 'lib-ccbl-action-state',
+  selector: 'lib-ccbl-action-state[action][context]',
   templateUrl: './ccbl-action-state.component.html',
   styleUrls: ['./ccbl-action-state.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -15,9 +17,15 @@ type OPERATOR = 'expression' | 'constraint';
 export class CcblActionStateComponent implements OnInit, OnDestroy {
   active = new BehaviorSubject<boolean>(false);
   overridedWith = new BehaviorSubject<string | undefined>(undefined);
+  newAction: HumanReadableStateAction;
+  @Output() update = new EventEmitter<HumanReadableStateAction>();
   pAction: HumanReadableStateAction;
-  get action(): HumanReadableStateAction {return this.pAction;}
-  @Input() set action(a: HumanReadableStateAction) {
+  @Input() context: HumanReadableStateContext;
+  @Input()
+  get action(): HumanReadableStateAction {
+    return this.pAction;
+  }
+  set action(a: HumanReadableStateAction) {
     if (this.pAction && this.pAction.ccblAction && !!this.pAction.ccblAction.getIsActivated) {
       // @ts-ignore
       this.pAction.ccblAction.getIsActivated().off( this.cbCcblActivation );
@@ -32,6 +40,17 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     this.pAction?.ccblAction?.onOverride( this.cbCcblOverridedWith );
   }
   @Input('program-versionner') private progVersionner: ProgVersionner;
+  static async staticEdit(matDialog: MatDialog, data: DataActionState) {
+    const dialogRef = matDialog.open<DialogEditActionStateComponent, DataActionState, HumanReadableStateAction>(
+      DialogEditActionStateComponent, {
+        data,
+        closeOnNavigation: false
+      } );
+    const newAction: HumanReadableStateAction = await dialogRef.afterClosed().toPromise();
+    if (newAction) {
+      data.progV.updateStateAction(data.action, newAction);
+    }
+  }
   cbCcblActivation = (a: boolean) => {
     // console.log('action active:', a);
     this.active.next(a);
@@ -40,7 +59,7 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     this.overridedWith.next(e);
   }
 
-  constructor() { }
+  constructor(private matDialog: MatDialog) { }
 
   ngOnInit() {
   }
@@ -117,6 +136,19 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
   private isConstraint(): boolean {
     const affectation = this.action.affectation;
     return affectation.type === 'constraint';
+  }
+
+  async edit() {
+    const data: DataActionState = {
+      action: this.action,
+      context: this.context,
+      progV: this.programVersionner
+    };
+    return CcblActionStateComponent.staticEdit(this.matDialog, data);
+  }
+
+  delete() {
+    this.programVersionner.removeStateAction(this.action);
   }
 
 }

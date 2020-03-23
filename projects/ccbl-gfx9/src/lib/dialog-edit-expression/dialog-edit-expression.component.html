@@ -1,4 +1,10 @@
-<section class="expression" [class.error]="cursorErrorPos >= 0">
+<section class="exprType">
+  <mat-checkbox [(ngModel)]="isTransition" [disabled]="!canExpressTransition">
+    transition
+  </mat-checkbox>
+</section>
+
+<section class="expression" [class.error]="cursorErrorPos >= 0" *ngIf="!isTransition">
   <pre class="fake" #fakeLabel></pre>
   <!-- <pre class="error">{{newExpr}}</pre> -->
   <lib-ccbl-expression [expression]         = "newExpr"
@@ -15,6 +21,47 @@
            (ngModelChange) = "newExpr = $event"
     />
   </form>
+</section>
+
+<section class="transition" *ngIf="isTransition">
+  <h6>Express transition</h6>
+  <table>
+    <tr>
+      <td>From: </td>
+      <td>
+        <lib-ccbl-expression [expression]="V0" [program-versionner]="progV" (update)="V0 = $event"
+                             #exprV0 (click)="exprV0.edit()"
+        ></lib-ccbl-expression>
+      </td>
+    </tr>
+    <tr>
+      <td>To: </td>
+      <td>
+        <lib-ccbl-expression [expression]="V1" [program-versionner]="progV" (update)="V1 = $event"
+                             #exprV1 (click)="exprV1.edit()"
+        ></lib-ccbl-expression>
+      </td>
+    </tr>
+    <tr>
+      <td>Duration: </td>
+      <td>
+        <lib-ccbl-expression [expression]="duration" [program-versionner]="progV" (update)="duration = $event"
+                             #exprV1 (click)="exprV1.edit()"
+        ></lib-ccbl-expression>
+      </td>
+    <tr>
+      <td>Interpolation: </td>
+      <td>
+        <select [(ngModel)]="interpolator">
+          <option *ngFor="let inter of interpolators"
+                  [ngValue]="inter"
+          >
+            {{inter}}
+          </option>
+        </select>
+      </td>
+    </tr>
+  </table>
 </section>
 
 <hr/>

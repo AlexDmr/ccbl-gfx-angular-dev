@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HumanReadableEventChannelAction} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {EditableOptionType} from '../editable-option/editable-option.component';
@@ -13,17 +13,18 @@ import {DataDialogEventAction, DialogActionEventComponent} from '../dialog-actio
 export class CcblEventChannelActionComponent implements OnInit {
   @Input() action: HumanReadableEventChannelAction;
   @Input('program-versionner') progVersionner: ProgVersionner;
+  @Output() update = new EventEmitter<HumanReadableEventChannelAction>();
+  static async staticEditAction(dialog: MatDialog, data: DataDialogEventAction): Promise<HumanReadableEventChannelAction> {
+    const dialogRef = dialog.open(DialogActionEventComponent, {
+      data,
+      closeOnNavigation: false
+    });
+    return dialogRef.afterClosed().toPromise();
+  }
 
   constructor(private dialog: MatDialog) { }
 
   ngOnInit() {
-  }
-
-  updateExpression(expr: string) {
-    this.progVersionner.updateEventAction(this.action, {
-      ...this.action,
-      affectation: expr
-    } as HumanReadableEventChannelAction);
   }
 
   get channelOptions(): EditableOptionType<string>[] {
@@ -33,22 +34,15 @@ export class CcblEventChannelActionComponent implements OnInit {
     }) );
   }
 
-  updateChannel(channel: string) {
-    this.progVersionner.updateEventAction(this.action, {
-      ...this.action,
-      channel
-    });
-  }
-
   async editAction() {
     const data: DataDialogEventAction = {
       action: this.action,
       progVersionner: this.progVersionner
     };
-    const dialogRef = this.dialog.open(DialogActionEventComponent, {data});
-    const newAction: HumanReadableEventChannelAction = await dialogRef.afterClosed().toPromise();
+    const newAction = await CcblEventChannelActionComponent.staticEditAction(this.dialog, data);
     if (newAction) {
-      this.progVersionner.updateEventAction(this.action, newAction);
+      // data.progVersionner.updateEventAction(data.action as HumanReadableEventChannelAction, newAction);
+      this.update.emit( newAction );
     }
   }
 

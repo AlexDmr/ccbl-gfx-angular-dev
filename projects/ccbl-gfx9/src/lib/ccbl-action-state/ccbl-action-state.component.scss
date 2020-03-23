@@ -1,17 +1,20 @@
 :host {
+  display: block;
+
   > section {
     display: flex;
     flex-flow: row;
-
-    label.delete {
-      display: none;
-    }
 
     > * {
       flex: 0 1;
     }
 
-    > lib-ccbl-expression {
+    > label.operation {
+      margin-left: 0.5em;
+      margin-right: 0.5em;
+    }
+
+    > .value {
       flex: 1 1;
     }
 
@@ -24,21 +27,5 @@
 
   section.isActive {
     background-color: yellow;
-  }
-}
-
-:host:hover {
-  background-color: lightgreen;
-  label.delete {
-    display: inline;
-    align-self: center;
-    border: solid black 1px;
-    border-radius: 50%;
-    background-color: orangered;
-    padding: 2px;
-    height: 1em;
-    flex: 0 1 1em;
-    text-align: center;
-    font-size: 8px;
   }
 }

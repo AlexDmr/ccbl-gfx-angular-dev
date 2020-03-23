@@ -480,28 +480,21 @@ export class ProgVersionner {
     } as HumanReadableStateContext, AP.path );
   }
 
-  updateStateActionChannel(action: HumanReadableStateAction, newChannel: string) {
+  updateStateAction(action: HumanReadableStateAction, newAction: HumanReadableStateAction) {
     const AP = this.getActionPathToStateAction(action);
     const context = AP.path.pop().from;
     this.updateAncestors({
       ...context,
-      actions: (context as HumanReadableStateContext).actions.map(a => a !== action ? a : {
-        ...action,
-        channel: newChannel
-      } as HumanReadableStateAction )
+      actions: (context as HumanReadableStateContext).actions.map(a => a !== action ? a : newAction )
     } as HumanReadableStateContext, AP.path );
   }
 
+  updateStateActionChannel(action: HumanReadableStateAction, newChannel: string) {
+    this.updateStateAction(action, {...action, channel: newChannel});
+  }
+
   updateStateActionAffectationType(action: HumanReadableStateAction, type: 'expression' | 'constraint') {
-    const AP = this.getActionPathToStateAction(action);
-    const context = AP.path.pop().from;
-    this.updateAncestors({
-      ...context,
-      actions: (context as HumanReadableStateContext).actions.map(a => a !== action ? a : {
-        ...action,
-        affectation: {...action.affectation, type}
-      } as HumanReadableStateAction )
-    } as HumanReadableStateContext, AP.path );
+    this.updateStateAction(action, {...action, affectation: {...action.affectation, type} });
   }
 
   parseExpression(expr: string): {success?: MathNode, error?: string} {
@@ -541,7 +534,7 @@ export class ProgVersionner {
     } as HumanReadableStateContext, path);
   }
 
-  updateEventAction(previous: HumanReadableEventChannelAction, updated: HumanReadableEventChannelAction) {
+  /*updateEventAction(previous: HumanReadableEventChannelAction, updated: HumanReadableEventChannelAction) {
     const LP = this.asActionsAndPaths();
 
     // Find the ActionAndPath that is about this affectation
@@ -555,7 +548,7 @@ export class ProgVersionner {
 
     // Update ancestors
     this.updateEventeContextAncestors(newContext, AP.path); // XXX
-  }
+  }*/
 
   updateAffectation(affectation: Affectation, value: string) {
     const LP = this.asActionsAndPaths();
@@ -754,13 +747,26 @@ export class ProgVersionner {
       if (typeof node.value === 'string') {
         txt = `"${node.value}" `;
       } else {
-        txt = node.value !== undefined && node.value.toString ? `${node.value.toString()} ` : '';
+        txt = node.value !== undefined ? `${node.value.toString()} ` : 'undefined';
       }
       L.push({
         label: txt,
         type: typeof node.value,
         mathNode: node
       });
+    }
+    if (node.isArrayNode) {
+      const items: MathNode[] = (node as any).items;
+      const Litems: ParsedExprNode[][] = items.map( item => this.mathNodeToArray(item, acceptEvent, ...vocabulary) );
+      L.push(
+        {label: '[', type: 'MathJS::OperatorArray open unary', mathNode: node},
+        ...Litems.reduce( (acc, LN) => [
+          ...acc,
+          {label: ', ', type: 'comma', mathNode: node},
+          ...LN
+        ] ),
+        {label: '] ', type: 'MathJS::OperatorArray unary', mathNode: node}
+      );
     }
     if (node.isOperatorNode) {
       const LA: ParsedExprNode[][] = node.args.map( n => this.mathNodeToArray(n, acceptEvent, ...vocabulary) );
@@ -829,6 +835,7 @@ export class ProgVersionner {
       const LE = blocks.map( b => this.mathNodeToArray( (b as any).node, acceptEvent, ...vocabulary) );
       L.push( ...LE.reduce( (acc, e) => [...acc, {label: '; ', type: 'MathJS::BlockNode'}, ...e] ) );
     }
+
     return L;
   }
 

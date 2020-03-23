@@ -1,4 +1,7 @@
 :host {
+  display: inline-block;
+  position: relative;;
+
   section.expression {
     color: green;
     position: relative;
@@ -19,12 +22,23 @@
       color: darkblue;
     }
 
-    code.error {
+    code.error, code.undefined {
       color: red;
     }
   }
 
   section:hover {
-    background-color: yellow;
+    // background-color: yellow;
+  }
+
+  section.interpolation {
+    > * {
+      display: inline-block;
+    }
+  }
+
+  .overrided {
+    text-decoration-line: overline;
+    font-size: small;
   }
 }

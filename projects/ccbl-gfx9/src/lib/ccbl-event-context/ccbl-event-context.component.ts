@@ -124,4 +124,12 @@ export class CcblEventContextComponent implements OnInit {
   deleteContext() {
     this.progVersionner.removeContext(this.context);
   }
+
+  updateAction(oldA: HumanReadableEventAction, newA: HumanReadableEventAction) {
+    const newC: HumanReadableEventContext = {
+      ...this.context,
+      actions: this.context.actions.map(a => a !== oldA ? a : newA)
+    };
+    this.programVersionner.updateContext(this.context, newC);
+  }
 }

@@ -1,0 +1,27 @@
+:host {
+
+  table {
+    td:first-of-type {
+      text-align: right;
+      padding-right: 1em;
+    }
+
+    mat-select {
+      min-width: 200px;
+    }
+  }
+
+  section.okcancel {
+    display: flex;
+    flex-flow: row;
+
+    label.error {
+      flex: 1 1;
+    }
+
+    button {
+      margin-left: 1em;
+    }
+  }
+
+}

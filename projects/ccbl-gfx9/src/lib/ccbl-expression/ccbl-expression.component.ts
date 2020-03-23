@@ -13,6 +13,8 @@ import {ParsedExprNode} from '../dataParsedExpr';
 import {VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MatDialog} from '@angular/material/dialog';
 import {DataEditExpression, DialogEditExpressionComponent} from '../dialog-edit-expression/dialog-edit-expression.component';
+import {MathNode} from 'mathjs';
+import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 
 @Component({
   selector: 'lib-ccbl-expression',
@@ -22,18 +24,60 @@ import {DataEditExpression, DialogEditExpressionComponent} from '../dialog-edit-
 })
 export class CcblExpressionComponent implements OnInit {
   @ViewChild('newExpr') newExpr: ElementRef;
-  @Input() expression: string;
+  @Input() overrided = false;
+  @Input()
+  get expression(): string {
+    return this.pExpression;
+  }
+  set expression(e: string) {
+    this.pExpression = e;
+    try {
+      if (e !== undefined) {
+        this.nodeRoot = mathjs.parse(e);
+      }
+    } catch (err) {
+      this.nodeRoot = undefined;
+      console.error('CcblExpressionComponent::setExpression: error in parsing expression', e);
+    }
+  }
   @Input() editable = true;
   @Input() acceptEvents = false;
   @Input() vocabulary: VariableDescription[] = [];
-  @Input('program-versionner') private progVersionner: ProgVersionner;
+  @Input() canExpressTransition = false;
+  @Input('program-versionner') progVersionner: ProgVersionner;
   @Output('update')            private newExpression = new EventEmitter<string>();
 
   pEditing = false;
+  private pExpression: string;
+  private nodeRoot: MathNode;
 
   constructor(private matDialog: MatDialog) { }
 
   ngOnInit() {
+  }
+
+  get isInterpolation(): boolean {
+    return this.nodeRoot && this.nodeRoot.isBlockNode;
+  }
+
+  get V0(): string {
+    const N = this.nodeRoot as any;
+    return N?.blocks[0].node.toString();
+  }
+
+  get V1(): string {
+    const N = this.nodeRoot as any;
+    return N?.blocks[1].node.toString();
+  }
+
+  get duration(): string {
+    const N = this.nodeRoot as any;
+    return N?.blocks[2].node.toString();
+  }
+
+  get interpolator(): string {
+    const N = this.nodeRoot as any;
+    return N?.blocks[3].node.toString();
   }
 
   getExpression(): string {
@@ -63,6 +107,7 @@ export class CcblExpressionComponent implements OnInit {
         expression: this.expression,
         progV: this.progVersionner,
         acceptEvents: this.acceptEvents,
+        canExpressTransition: this.canExpressTransition,
         vocabulary
       };
       const dialogRef = this.matDialog.open<DialogEditExpressionComponent, DataEditExpression, string>(DialogEditExpressionComponent, {

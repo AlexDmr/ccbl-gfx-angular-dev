@@ -12,10 +12,12 @@
     flex-flow: row;
 
     section.event {
-      text-align: center;
+      display: flex;
+      flex-flow: row;
 
-      .name {
-        font-weight: bold;
+      > label {
+        margin-right: .5em;
+        font-weight: bolder;
       }
     }
   }

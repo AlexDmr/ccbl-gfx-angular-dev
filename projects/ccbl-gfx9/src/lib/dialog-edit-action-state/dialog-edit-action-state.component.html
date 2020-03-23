@@ -1,0 +1,53 @@
+<mat-toolbar color="primary">
+  Edit state action
+</mat-toolbar>
+
+<table>
+  <tr>
+    <td>Channel</td>
+    <td>
+      <mat-select [(ngModel)]="newAction.channel">
+        <mat-option *ngFor     = "let chan of channels"
+                    [value]    = "chan.name"
+                    [disabled] = "!isAvailable(chan)"
+        >
+          {{chan.name}} ({{chan.type}})
+        </mat-option>
+      </mat-select>
+    </td>
+  </tr>
+  <tr>
+    <td>Operator</td>
+    <td>
+      <mat-select [(ngModel)]="newAction.affectation.type">
+        <mat-option value = "expression">
+          ⇐
+        </mat-option>
+        <mat-option value = "constraint">
+          is constraint by
+        </mat-option>
+      </mat-select>
+    </td>
+  </tr>
+  <tr>
+    <td>Expression:</td>
+    <td>
+      <lib-ccbl-expression [expression]="newAction.affectation.value" [program-versionner]="data.progV"
+                           [acceptEvents]="false"
+                           #exprAction (click)="exprAction.edit()"
+                           (update)="newAction.affectation.value = $event"
+                           ></lib-ccbl-expression>
+    </td>
+  </tr>
+</table>
+
+<hr/>
+
+<section class="okcancel">
+  <button (click)="cancel()" mat-raised-button color="warn">
+    Cancel
+  </button>
+  <button (click)="ok()" mat-raised-button color="primary">
+    OK
+  </button>
+</section>

@@ -1,43 +1,23 @@
 :host {
+  display: block;
+  font-size: medium;
 
   > section {
     display: flex;
     flex-flow: row;
-
-    label.delete {
-      display: none;
-    }
+    // font-size: small;
+    font-family: monospace;
 
     > * {
       flex: 0 1;
+    }
+
+    label {
       margin-right: 0.5em;
     }
-
-    > lib-ccbl-expression {
-      flex: 1 1;
-      margin-right: 0;
-    }
-
-    .operator {
+    label.with {
       margin-left: 0.5em;
-      margin-right: 0.5em;
-      font-weight: bolder;
     }
-  }
-}
 
-:host:hover {
-  background-color: lightgreen;
-  label.delete {
-    display: inline;
-    align-self: center;
-    border: solid black 1px;
-    border-radius: 50%;
-    background-color: orangered;
-    padding: 2px;
-    height: 1em;
-    flex: 0 1 1em;
-    text-align: center;
-    font-size: 8px;
   }
 }

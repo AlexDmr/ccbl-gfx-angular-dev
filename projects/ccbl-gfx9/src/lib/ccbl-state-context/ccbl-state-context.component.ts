@@ -1,11 +1,13 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner, stringToAllen} from '../ccbl-gfx9.service';
 import {
-  ContextOrProgram,
-  HumanReadableContext, HumanReadableEventAction,
+  ContextOrProgram, copyHumanReadableStateContext,
+  HumanReadableContext,
+  HumanReadableEventAction, HumanReadableEventChannelAction,
   HumanReadableEventContext,
   HumanReadableStateAction,
-  HumanReadableStateContext, VariableDescription
+  HumanReadableStateContext,
+  VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {BehaviorSubject} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
@@ -14,6 +16,9 @@ import {
   DataEditionContextState,
   DialogEditContextStateConditionComponent
 } from '../dialog-edit-context-state-condition/dialog-edit-context-state-condition.component';
+import {AllenType} from 'ccbl-js/lib/AllenInterface';
+import {CcblActionStateComponent} from '../ccbl-action-state/ccbl-action-state.component';
+import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl-event-channel-action.component';
 
 @Component({
   selector: 'lib-ccbl-state-context',
@@ -26,6 +31,7 @@ export class CcblStateContextComponent implements OnInit {
   active = new BehaviorSubject<boolean>(false);
   pContext: HumanReadableStateContext;
   pDndDropZoneAll: string[] = ['HumanReadableStateContext', 'HumanReadableEventContext'];
+  @Input() from: AllenType;
   get context(): HumanReadableStateContext {return this.pContext; }
   @Input() set context(c: HumanReadableStateContext) {
     // console.log('Contexte', c);
@@ -58,7 +64,8 @@ export class CcblStateContextComponent implements OnInit {
     context = context || this.context;
     const data: DataEditionContextState = {
       context,
-      progV: this.progVersionner
+      progV: this.progVersionner,
+      from: this.from
     };
     const dialogRef = this.dialog.open(DialogEditContextStateConditionComponent, {
       data,
@@ -84,6 +91,26 @@ export class CcblStateContextComponent implements OnInit {
 
   get programVersionner() {
     return this.progVersionner;
+  }
+
+  get AllenTypeStartWith(): AllenType {
+    return AllenType.StartWith;
+  }
+
+  get AllenTypeEndWith(): AllenType {
+    return AllenType.EndWith;
+  }
+
+  get AllenTypeMeet(): AllenType {
+    return AllenType.Meet;
+  }
+
+  get AllenTypeDuring(): AllenType {
+    return AllenType.During;
+  }
+
+  get AllenTypeAfter(): AllenType {
+    return AllenType.After;
   }
 
   get actions(): HumanReadableStateAction[] {
@@ -199,7 +226,8 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   async appendStateContext(conf: {allen: string, after?: HumanReadableContext}) {
-    const LC: ContextOrProgram[] = this.context.allen[conf.allen];
+    const A = this.context.allen;
+    const LC: ContextOrProgram[] = A ? A[conf.allen] : [];
     const lastSubContext = LC[LC.length - 1];
     const newContext: HumanReadableStateContext = {
       contextName: 'C',
@@ -215,6 +243,8 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   appendEventContext(conf: {allen: string, after?: HumanReadableContext}) {
+    const LC: ContextOrProgram[] = this.context.allen[conf.allen];
+    const lastSubContext = LC[LC.length - 1];
     const events = this.progVersionner.getEvents();
     let context: HumanReadableEventContext;
     if (events.length) {
@@ -235,7 +265,7 @@ export class CcblStateContextComponent implements OnInit {
       context,
       parent: this.context,
       via: stringToAllen(conf.allen),
-      after: conf.after
+      after: conf.after || lastSubContext
     } );
   }
 
@@ -250,6 +280,43 @@ export class CcblStateContextComponent implements OnInit {
     }
     const LC = L.sort((v1, v2) => v1.name.toLowerCase() > v2.name.toLowerCase() ? 1 : -1);
     return LC;
+  }
+
+  async newStateAction() {
+    const channel = this.getAvailableChannels()[0];
+    const action: HumanReadableStateAction = {
+      channel: channel.name,
+      affectation: {type: 'expression', value: '0'}
+    };
+    const newContext = copyHumanReadableStateContext(this.context);
+    newContext.actions = newContext.actions ? [...newContext.actions, action] : [action];
+    this.programVersionner.updateContext(this.context, newContext);
+    return CcblActionStateComponent.staticEdit(this.dialog, {
+      action,
+      progV: this.programVersionner,
+      context: this.context
+    });
+  }
+
+  async newEventAction(position: 'start' | 'finish') {
+    const channel = this.programVersionner.getChannels()[0];
+    const action: HumanReadableEventChannelAction = {
+      channel: channel.name,
+      affectation: '0'
+    };
+    const newAction: HumanReadableEventAction = await CcblEventChannelActionComponent.staticEditAction(this.dialog, {
+      action,
+      progVersionner: this.programVersionner
+    });
+    if (newAction) {
+      const newContext = copyHumanReadableStateContext(this.context);
+      if (position === 'start') {
+        newContext.actionsOnStart = newContext.actionsOnStart ? [...newContext.actionsOnStart, newAction] : [newAction];
+      } else {
+        newContext.actionsOnEnd = newContext.actionsOnEnd ? [...newContext.actionsOnEnd, newAction] : [newAction];
+      }
+      this.programVersionner.updateContext(this.context, newContext);
+    }
   }
 
   appendAction(channel: VariableDescription, contextType: 'EVENT' | 'STATE', position: 'start' | 'finish') {

@@ -1,9 +1,15 @@
 :host {
   display: flex;
   flex-flow: row;
+  font-size: small;
 
   label.row {
     display: inline-flex;
     flex-flow: row;
+  }
+
+  code.event {
+    font-weight: bold;
+    color: blue;
   }
 }

@@ -8,6 +8,7 @@
 >
   <section class="event">
     <!-- <label class="grip">&nbsp;↕&nbsp;</label> -->
+    <label>When</label>
     <lib-ccbl-event-expression [evt] = "context"
                                [program-versionner]="programVersionner"
                                (update)="updateEvent($event)"
@@ -19,8 +20,9 @@
 
 <section class="actions">
   <lib-ccbl-event-channel-action *ngFor = "let action of stateActions"
-                         [program-versionner] = "programVersionner"
-                         [action] = "action"
+                                 [program-versionner] = "programVersionner"
+                                 [action] = "action"
+                                 (update) = "updateAction(action, $event)"
   ></lib-ccbl-event-channel-action>
   <lib-ccbl-event-trigger-action *ngFor = "let action of eventTriggerActions"
                          [program-versionner] = "programVersionner"
