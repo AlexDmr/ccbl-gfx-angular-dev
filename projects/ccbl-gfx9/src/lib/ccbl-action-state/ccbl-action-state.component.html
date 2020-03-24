@@ -1,30 +1,41 @@
-<section [class.isActive]="active | async" [class.isOverrided]="!!(overridedWith | async)">
+<section [class.isActive]       = "active | async"
+         [class.isOverrided]    = "!!(overridedWith | async)"
+         [mat-menu-trigger-for] = "menuGeneral"
+>
 
-  <lib-editable-option [options]  = "channelsOptions"
-                       [value]    = "channel"
-                       (onupdate) = "channel = $event"
-                       class      = "channel" >
-    {{channel}}
-  </lib-editable-option>
+  <lib-ccbl-expression [expression]         = "channel"
+                       [program-versionner] = "programVersionner"
+                       [editable]           = "false"
+                       class                = "channel"
+  ></lib-ccbl-expression>
 
-
-  <lib-editable-option [options]  = "operationsOptions"
-                       [value]    = "operation"
-                       (onupdate) = "operation = $event"
-                       class      = "operator" >
+  <label class="operation">
     {{ operationLabel(operation) }}
-  </lib-editable-option>
+  </label>
 
   <section class="value">
     <lib-ccbl-expression [program-versionner] = "programVersionner"
-                         [expression] = "action.affectation.value"
-                         (update) = "updateAffectation($event)"
+                         [expression]         = "action.affectation.value"
+                         [overrided]          = "!!(overridedWith | async)"
+                         (update)             = "updateAffectation($event)"
+                         class                = "orginal"
     ></lib-ccbl-expression>
 
     <lib-ccbl-expression [program-versionner] = "programVersionner"
-                         [expression] = "overridedValue"
+                         [expression]         = "overridedValue"
                          *ngIf = "overridedWith | async as overridedValue"
+                         class                = "override"
     ></lib-ccbl-expression>
   </section>
 
 </section>
+
+
+<mat-menu #menuGeneral="matMenu">
+  <button mat-menu-item (click)="edit()">
+    Edit
+  </button>
+  <button mat-menu-item (click)="delete()">
+    Delete
+  </button>
+</mat-menu>
