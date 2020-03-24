@@ -28,6 +28,10 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { CcblEventExpressionComponent } from './ccbl-event-expression/ccbl-event-expression.component';
 import { DialogEditExpressionComponent } from './dialog-edit-expression/dialog-edit-expression.component';
 import { DialogEditActionStateComponent } from './dialog-edit-action-state/dialog-edit-action-state.component';
+import { EditProgramDescrComponent } from './edit-program-descr/edit-program-descr.component';
+import {MatTabsModule} from '@angular/material/tabs';
+import { CcblProgramApiComponent } from './ccbl-program-api/ccbl-program-api.component';
+import { CcblVariableDescriptionComponent } from './ccbl-variable-description/ccbl-variable-description.component';
 
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {
@@ -58,7 +62,10 @@ export class SafeHtmlPipe implements PipeTransform  {
     DialogEditContextStateConditionComponent,
     CcblEventExpressionComponent,
     DialogEditExpressionComponent,
-    DialogEditActionStateComponent
+    DialogEditActionStateComponent,
+    EditProgramDescrComponent,
+    CcblProgramApiComponent,
+    CcblVariableDescriptionComponent
   ],
     imports: [
         CommonModule,
@@ -68,7 +75,8 @@ export class SafeHtmlPipe implements PipeTransform  {
         MatButtonModule,
         MatToolbarModule,
         MatSelectModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        MatTabsModule
     ],
   exports: [CcblGfx9Component],
   providers: [CcblGfx9Service, ClipboardService],

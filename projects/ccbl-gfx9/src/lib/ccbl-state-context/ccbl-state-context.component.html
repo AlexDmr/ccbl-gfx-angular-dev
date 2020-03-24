@@ -17,12 +17,9 @@
     </section>
     <section class="state">
       <!-- <label class="contextName">&nbsp;{{context.contextName}}:&nbsp;</label> -->
-      <lib-editable-label [label]="context.contextName"
-                          (onupdate)="updateLabel($event)"
-                          *ngIf="isProgramRoot"
-      >
+      <label class="programName" *ngIf="isProgramRoot">
         {{context.contextName}}
-      </lib-editable-label>
+      </label>
       <lib-ccbl-expression [program-versionner]   = "programVersionner"
                            [expression]           = "context.state"
                            (update)               = "updateState($event)"
@@ -127,7 +124,10 @@
 <!---------------------------------------------- Contextual menus ----------------------------------------------------->
 <!--------------------------------------------------------------------------------------------------------------------->
 <mat-menu #menuGeneral="matMenu">
-  <button mat-menu-item (click)="editCondition()">
+  <button mat-menu-item (click)="editProgram()" *ngIf="isProgramRoot">
+    <b>Edit program</b>
+  </button>
+  <button mat-menu-item (click)="editCondition()" *ngIf="!isProgramRoot">
     Edit condition
   </button>
   <hr/>

@@ -48,8 +48,9 @@ $shadow: #41687f99;
     flex-flow: column;
     min-height: 1em;
 
-    > label {
-      color: rgba(0, 0, 0, 0);
+    > section.state > label {
+      //color: rgba(0, 0, 0, 0);
+      font-weight: bold;
       flex: 0 1 1em;
     }
     section.state {

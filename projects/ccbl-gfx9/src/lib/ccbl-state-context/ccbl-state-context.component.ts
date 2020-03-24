@@ -4,7 +4,7 @@ import {
   ContextOrProgram, copyHumanReadableStateContext,
   HumanReadableContext,
   HumanReadableEventAction, HumanReadableEventChannelAction,
-  HumanReadableEventContext,
+  HumanReadableEventContext, HumanReadableProgram,
   HumanReadableStateAction,
   HumanReadableStateContext,
   VariableDescription
@@ -19,6 +19,7 @@ import {
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
 import {CcblActionStateComponent} from '../ccbl-action-state/ccbl-action-state.component';
 import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl-event-channel-action.component';
+import {DataEditProgramDescr, EditProgramDescrComponent} from '../edit-program-descr/edit-program-descr.component';
 
 @Component({
   selector: 'lib-ccbl-state-context',
@@ -47,6 +48,14 @@ export class CcblStateContextComponent implements OnInit {
   }
   @Input('program-versionner') private progVersionner: ProgVersionner;
   @Input() isProgramRoot = false;
+  static async staticEditProgram(dialog: MatDialog, data: DataEditProgramDescr): Promise<HumanReadableProgram | undefined> {
+    const dialogRef = dialog.open<EditProgramDescrComponent, any, HumanReadableProgram>(EditProgramDescrComponent, {
+      data,
+      closeOnNavigation: false
+    });
+    const P = await dialogRef.afterClosed().toPromise();
+    return dialogRef.afterClosed().toPromise();
+  }
   cbCCBL = a => {
     this.active.next(a);
   }
@@ -58,6 +67,14 @@ export class CcblStateContextComponent implements OnInit {
 
   get hasNoCondition(): boolean {
     return !this.isProgramRoot && !this.context.eventStart && !this.context.eventFinish && !this.context.state;
+  }
+
+  async editProgram() {
+    const data: DataEditProgramDescr = {
+      program: this.programVersionner.getCurrent(),
+      progV: this.programVersionner
+    };
+    return CcblStateContextComponent.staticEditProgram(this.dialog, data);
   }
 
   async editCondition(context?: HumanReadableStateContext) {
