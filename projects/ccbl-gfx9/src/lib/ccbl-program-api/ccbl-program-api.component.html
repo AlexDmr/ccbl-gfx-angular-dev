@@ -1,1 +1,55 @@
-<p>ccbl-program-api works!</p>
+<table>
+  <thead>
+    <th></th>
+    <th class="C1" [class.highlight]="onTopOfC === 1">
+      Inputs/Imports
+    </th>
+    <th class="C2" [class.highlight]="onTopOfC === 2">
+      Outputs/Exports
+    </th>
+  </thead>
+  <tbody>
+    <tr *ngFor="let vt of LVarTypes; let i = index" (mouseover)="onTopOfL = i">
+      <td [class.highlight]="onTopOfL === i">{{vt}}</td>
+      <td *ngFor="let inOut of Linout; let j = index" (mouseover)="onTopOfC = j + 1"
+          [class.highlight]="onTopOfC === j+1 && onTopOfL === i"
+      >
+        <section *ngIf="getVariables(inOut, vt).length === 0"
+                 [mat-menu-trigger-for]="menuG"
+                 [matMenuTriggerData]="{vType: vt, inOut: inOut}"
+                 class = "empty"
+        ></section>
+        <section *ngFor = "let vd of getVariables(inOut, vt)"
+                 [mat-menu-trigger-for]="menuG"
+                 [matMenuTriggerData]="{vType: vt, inOut: inOut, vd: vd}"
+                 class = "vd"
+        >
+          <lib-ccbl-expression [expression] = "vd.name" [program]="program"
+                               [editable]="false" [acceptEvents]="true"
+          ></lib-ccbl-expression>
+        </section>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<section *ngIf="!editable" class="noClick"></section>
+
+<!--
+<mat-menu #menuAppend="matMenu">
+  <ng-template matMenuContent let-vType="vType" let-inOut="inOut">
+    <button mat-menu-item (click)="appendDependency(vType, inOut)">
+      {{inOut}} {{vType}}
+    </button>
+  </ng-template>
+</mat-menu>
+-->
+<mat-menu #menuG="matMenu">
+  <ng-template matMenuContent let-vType="vType" let-inOut="inOut" let-vd="vd">
+    <button mat-menu-item (click)="appendDependency(vType, inOut)">
+      Append {{vType}}
+    </button>
+    <button mat-menu-item (click)="removeDependency(vd?.name, vType, inOut)" [disabled]="!vd">
+      Delete {{vd?.name}}
+    </button>
+  </ng-template>
+</mat-menu>

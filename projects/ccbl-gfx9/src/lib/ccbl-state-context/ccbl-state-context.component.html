@@ -3,32 +3,32 @@
           dndDraggable
           dndType = "HumanReadableStateContext"
           [class.hasNoCondition] = "hasNoCondition"
-          (dndStart)          = "startDragging()"
-          (dndEnd)            = "stopDragging()"
-          (dndCanceled)       = "stopDragging()"
-          [dndDropzone]       = "dndDropZoneAll"
-          (dndDrop)           = "appendContext('During', this.draggedContext )"
-          [matMenuTriggerFor] = "menuGeneral"
+          (dndStart)             = "startDragging()"
+          (dndEnd)               = "stopDragging()"
+          (dndCanceled)          = "stopDragging()"
+          [dndDropzone]          = "dndDropZoneAll"
+          (dndDrop)              = "appendContext('During', this.draggedContext )"
+          [matMenuTriggerFor]    = "menuGeneral"
   >
     <section class="event start" *ngIf="!!context.eventStart">
-      <lib-ccbl-event-expression [evt]                = "context.eventStart"
-                                 [program-versionner] = "programVersionner"
+      <lib-ccbl-event-expression [evt]     = "context.eventStart"
+                                 [program] = "program"
                                  ></lib-ccbl-event-expression>
     </section>
     <section class="state">
       <!-- <label class="contextName">&nbsp;{{context.contextName}}:&nbsp;</label> -->
       <label class="programName" *ngIf="isProgramRoot">
-        {{context.contextName}}
+        {{program.name || 'Root program'}}
       </label>
-      <lib-ccbl-expression [program-versionner]   = "programVersionner"
-                           [expression]           = "context.state"
-                           (update)               = "updateState($event)"
-                           *ngIf                  = "!isProgramRoot"
+      <lib-ccbl-expression [program]    = "program"
+                           [expression] = "context.state"
+                           (update)     = "updateState($event)"
+                           *ngIf        = "!isProgramRoot"
       ></lib-ccbl-expression>
     </section>
     <section class="event finish" *ngIf="!!context.eventFinish">
-      <lib-ccbl-event-expression [evt]                = "context.eventFinish"
-                                 [program-versionner] = "programVersionner"
+      <lib-ccbl-event-expression [evt]     = "context.eventFinish"
+                                 [program] = "program"
       ></lib-ccbl-event-expression>
     </section>
   </header>
@@ -52,6 +52,7 @@
                                     [program-versionner] = "programVersionner"
                                     [action]             = "action"
                                     [context]            = "context"
+                                    (update)             = "updateStateAction(action, $event);"
     ></lib-ccbl-action-state>
   </section>
 

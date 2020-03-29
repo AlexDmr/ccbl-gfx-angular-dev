@@ -7,9 +7,9 @@
 <section class="expression" [class.error]="cursorErrorPos >= 0" *ngIf="!isTransition">
   <pre class="fake" #fakeLabel></pre>
   <!-- <pre class="error">{{newExpr}}</pre> -->
-  <lib-ccbl-expression [expression]         = "newExpr"
-                       [program-versionner] = "progV"
-                       [editable]           = "false"
+  <lib-ccbl-expression [expression] = "newExpr"
+                       [program]    = "data.program"
+                       [editable]   = "false"
                        ></lib-ccbl-expression>
   <div class="cursorError" *ngIf="cursorErrorPos >= 0" [style.left]="cursorErrorPos + 'px'"></div>
   <div class="cursor" *ngIf="cursorPos >= 0" [style.left]="cursorPos + 'px'"></div>
@@ -29,7 +29,7 @@
     <tr>
       <td>From: </td>
       <td>
-        <lib-ccbl-expression [expression]="V0" [program-versionner]="progV" (update)="V0 = $event"
+        <lib-ccbl-expression [expression]="V0" [program]="data.program" (update)="V0 = $event"
                              #exprV0 (click)="exprV0.edit()"
         ></lib-ccbl-expression>
       </td>
@@ -37,7 +37,7 @@
     <tr>
       <td>To: </td>
       <td>
-        <lib-ccbl-expression [expression]="V1" [program-versionner]="progV" (update)="V1 = $event"
+        <lib-ccbl-expression [expression]="V1" [program]="data.program" (update)="V1 = $event"
                              #exprV1 (click)="exprV1.edit()"
         ></lib-ccbl-expression>
       </td>
@@ -45,7 +45,7 @@
     <tr>
       <td>Duration: </td>
       <td>
-        <lib-ccbl-expression [expression]="duration" [program-versionner]="progV" (update)="duration = $event"
+        <lib-ccbl-expression [expression]="duration" [program]="data.program" (update)="duration = $event"
                              #exprV1 (click)="exprV1.edit()"
         ></lib-ccbl-expression>
       </td>

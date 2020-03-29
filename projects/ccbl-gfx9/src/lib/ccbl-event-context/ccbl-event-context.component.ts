@@ -4,7 +4,7 @@ import {
   HumanReadableEventAction,
   HumanReadableEventChannelAction,
   HumanReadableEventContext,
-  HumanReadableEventTriggerAction,
+  HumanReadableEventTriggerAction, HumanReadableProgram,
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
@@ -23,6 +23,10 @@ export class CcblEventContextComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  get program(): HumanReadableProgram {
+    return this.programVersionner.getCurrent();
   }
 
   get programVersionner() {

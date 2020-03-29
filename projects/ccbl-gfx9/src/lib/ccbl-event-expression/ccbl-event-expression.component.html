@@ -9,9 +9,9 @@
 </label>
 
 <label *ngIf="isBasedOnExpression" class="row">
-  <lib-ccbl-expression [expression]         = "evt.eventExpression"
-                       [program-versionner] = "progV"
-                       (update)             = "evt.eventExpression = $event"
+  <lib-ccbl-expression [expression] = "evt.eventExpression"
+                       [program]    = ""
+                       (update)     = "evt.eventExpression = $event"
                        ></lib-ccbl-expression>
   <label>&nbsp;{{labelEventExpressionChange}}</label>
 </label>

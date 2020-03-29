@@ -18,19 +18,19 @@
     <option [ngValue]="true" >changes and</option>
   </select>
   {{currentFilter}}
-  <lib-ccbl-expression *ngIf                = "!!currentFilter"
-                       [acceptEvents]       = "true"
-                       [expression]         = "currentFilterForDisplay"
-                       [program-versionner] = "data.progVersionner"
-                       (update)             = "currentFilter = $event"
+  <lib-ccbl-expression *ngIf          = "!!currentFilter"
+                       [acceptEvents] = "true"
+                       [expression]   = "currentFilterForDisplay"
+                       [program]      = "data.program"
+                       (update)       = "currentFilter = $event"
   ></lib-ccbl-expression>
 </section>
 
 <section *ngIf="triggerType === 'expression'" class="expression">
   When (
-  <lib-ccbl-expression [expression]="expression"
-                       [program-versionner]="data.progVersionner"
-                       (update)="setExpression( $event )"
+  <lib-ccbl-expression [expression] = "expression"
+                       [program]    = "data.program"
+                       (update)     = "setExpression( $event )"
   ></lib-ccbl-expression>
   )
   <select [ngModel]="expectedExpressionValue" (ngModelChange)="setExpectedValue($event)">

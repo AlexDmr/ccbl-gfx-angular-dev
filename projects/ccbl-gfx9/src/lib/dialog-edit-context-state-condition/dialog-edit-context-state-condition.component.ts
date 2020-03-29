@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {copyHumanReadableStateContext, HumanReadableStateContext} from 'ccbl-js/lib/ProgramObjectInterface';
+import {copyHumanReadableStateContext, HumanReadableProgram, HumanReadableStateContext} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
 
@@ -29,6 +29,10 @@ export class DialogEditContextStateConditionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  get program(): HumanReadableProgram {
+    return this.progV.getCurrent();
   }
 
   enableState(enable: boolean) {

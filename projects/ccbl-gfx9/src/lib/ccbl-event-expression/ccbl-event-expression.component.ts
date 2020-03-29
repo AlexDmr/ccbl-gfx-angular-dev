@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {EventTrigger, HumanReadableEventChannelAction} from 'ccbl-js/lib/ProgramObjectInterface';
+import {EventTrigger, HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {DataDialogTrigger, DialogTriggerComponent} from '../dialog-trigger/dialog-trigger.component';
 import {MatDialog} from '@angular/material/dialog';
@@ -11,7 +11,7 @@ import {MatDialog} from '@angular/material/dialog';
 })
 export class CcblEventExpressionComponent implements OnInit {
   @Input() evt: EventTrigger;
-  @Input('program-versionner') progV: ProgVersionner;
+  @Input() program: HumanReadableProgram;
   @Output() update = new EventEmitter<EventTrigger>();
   static async staticEditEvent(dialog: MatDialog, data: DataDialogTrigger): Promise<EventTrigger> {
     const dialogRef = dialog.open(DialogTriggerComponent, {
@@ -29,7 +29,7 @@ export class CcblEventExpressionComponent implements OnInit {
   async editEvent() {
     const data: DataDialogTrigger = {
       evt: this.evt,
-      progVersionner: this.progV
+      program: this.program
     };
     const newEvent: EventTrigger = await CcblEventExpressionComponent.staticEditEvent(this.dialog, data);
     if (newEvent) {

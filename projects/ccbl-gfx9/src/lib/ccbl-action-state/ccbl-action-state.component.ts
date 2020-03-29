@@ -1,6 +1,11 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ProgVersionner} from '../ccbl-gfx9.service';
-import {HumanReadableStateAction, HumanReadableStateContext, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {
+  HumanReadableProgram,
+  HumanReadableStateAction,
+  HumanReadableStateContext,
+  VariableDescription
+} from 'ccbl-js/lib/ProgramObjectInterface';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 import {BehaviorSubject} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
@@ -40,16 +45,13 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     this.pAction?.ccblAction?.onOverride( this.cbCcblOverridedWith );
   }
   @Input('program-versionner') private progVersionner: ProgVersionner;
-  static async staticEdit(matDialog: MatDialog, data: DataActionState) {
+  static async staticEdit(matDialog: MatDialog, data: DataActionState): Promise<HumanReadableStateAction> {
     const dialogRef = matDialog.open<DialogEditActionStateComponent, DataActionState, HumanReadableStateAction>(
       DialogEditActionStateComponent, {
         data,
         closeOnNavigation: false
       } );
-    const newAction: HumanReadableStateAction = await dialogRef.afterClosed().toPromise();
-    if (newAction) {
-      data.progV.updateStateAction(data.action, newAction);
-    }
+    return dialogRef.afterClosed().toPromise();
   }
   cbCcblActivation = (a: boolean) => {
     // console.log('action active:', a);
@@ -66,6 +68,10 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.pAction?.ccblAction?.getIsActivated()?.off( this.cbCcblActivation );
+  }
+
+  get program(): HumanReadableProgram {
+    return this.programVersionner.getCurrent();
   }
 
   get programVersionner(): ProgVersionner {
@@ -142,9 +148,13 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     const data: DataActionState = {
       action: this.action,
       context: this.context,
-      progV: this.programVersionner
+      program: this.program
     };
-    return CcblActionStateComponent.staticEdit(this.matDialog, data);
+    const A = await CcblActionStateComponent.staticEdit(this.matDialog, data);
+    if (A) {
+      this.update.emit(A);
+    }
+    return A;
   }
 
   delete() {

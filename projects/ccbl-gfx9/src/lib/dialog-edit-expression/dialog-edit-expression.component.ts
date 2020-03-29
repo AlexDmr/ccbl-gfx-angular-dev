@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
-import {isOperatorUnary, ProgVersionner} from '../ccbl-gfx9.service';
-import {VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {convertExpressionToNodes, isOperatorUnary, ProgVersionner} from '../ccbl-gfx9.service';
+import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MathNode} from 'mathjs';
 import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 
 export interface DataEditExpression {
   expression: string;
-  progV: ProgVersionner;
+  program: HumanReadableProgram;
   acceptEvents: boolean;
   vocabulary: VariableDescription[];
   canExpressTransition: boolean;
@@ -72,10 +72,6 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
     );
   }
 
-  get progV(): ProgVersionner {
-    return this.data.progV;
-  }
-
   updateInput() {
     if (!this.errorIndication) {
       this.tmpExpr = this.newExpr;
@@ -105,10 +101,10 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
 
   set newExpr(s: string) {
     try {
-      this.mathNodeRoot = this.progV.parse(s);
+      this.mathNodeRoot = mathjs.parse(s);
       // this.pNewExpr = n.toString();
       if (!this.isTransition) {
-        const L = this.progV.convertExpressionToNodes(s, this.data.acceptEvents, ...this.data.vocabulary);
+        const L = convertExpressionToNodes(this.data.program, s, this.data.acceptEvents, ...this.data.vocabulary);
         const Lerr = L.filter(w => w.type.indexOf('error') >= 0).map(w => w.label);
         this.pNewExpr = L.map(w => w.label).join('');
         this.cursorErrorPos = -1;

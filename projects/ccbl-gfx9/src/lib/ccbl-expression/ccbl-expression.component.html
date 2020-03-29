@@ -19,18 +19,18 @@
 </section>
 
 <section class = "interpolation" *ngIf="isInterpolation && interpolator !== 'waitEnd'" [class.overrided]="overrided">
-  <lib-ccbl-expression [expression]="V0" [program-versionner]="progVersionner"></lib-ccbl-expression>
+  <lib-ccbl-expression [expression]="V0" [program]="program"></lib-ccbl-expression>
   to
-  <lib-ccbl-expression [expression]="V1" [program-versionner]="progVersionner"></lib-ccbl-expression>
+  <lib-ccbl-expression [expression]="V1" [program]="program"></lib-ccbl-expression>
   in
-  <lib-ccbl-expression [expression]="duration" [program-versionner]="progVersionner"></lib-ccbl-expression>
+  <lib-ccbl-expression [expression]="duration" [program]="program"></lib-ccbl-expression>
   ms ({{interpolator}})
 </section>
 
 <section class = "interpolation" *ngIf="isInterpolation && interpolator === 'waitEnd'" [class.overrided]="overrided">
-  <lib-ccbl-expression [expression]="V0" [program-versionner]="progVersionner"></lib-ccbl-expression>
+  <lib-ccbl-expression [expression]="V0" [program]="program"></lib-ccbl-expression>
   for
-  <lib-ccbl-expression [expression]="duration" [program-versionner]="progVersionner"></lib-ccbl-expression>
+  <lib-ccbl-expression [expression]="duration" [program]="program"></lib-ccbl-expression>
   ms, then
-  <lib-ccbl-expression [expression]="V1" [program-versionner]="progVersionner"></lib-ccbl-expression>
+  <lib-ccbl-expression [expression]="V1" [program]="program"></lib-ccbl-expression>
 </section>

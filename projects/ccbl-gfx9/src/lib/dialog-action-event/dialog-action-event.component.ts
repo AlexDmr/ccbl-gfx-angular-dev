@@ -1,7 +1,12 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ProgVersionner} from '../ccbl-gfx9.service';
-import {HumanReadableEventAction, HumanReadableEventChannelAction, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {
+  HumanReadableEventAction,
+  HumanReadableEventChannelAction,
+  HumanReadableProgram,
+  VariableDescription
+} from 'ccbl-js/lib/ProgramObjectInterface';
 
 export interface DataDialogEventAction {
   action: HumanReadableEventAction;
@@ -28,6 +33,10 @@ export class DialogActionEventComponent implements OnInit {
     const act = this.data.action as HumanReadableEventChannelAction;
     this.newAction.channel     = act.channel;
     this.newAction.affectation = act.affectation !== '' ? act.affectation : `"undefined"`;
+  }
+
+  get program(): HumanReadableProgram {
+    return this.progVersionner.getCurrent();
   }
 
   get channels(): VariableDescription[] {

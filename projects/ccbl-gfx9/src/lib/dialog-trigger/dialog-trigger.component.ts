@@ -1,12 +1,12 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {EventTrigger, HumanReadableEventContext, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
-import {ProgVersionner} from '../ccbl-gfx9.service';
+import {EventTrigger, HumanReadableEventContext, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MathNode} from 'mathjs';
+import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 
 export interface DataDialogTrigger {
   evt: EventTrigger;
-  progVersionner: ProgVersionner;
+  program: HumanReadableProgram;
 }
 
 @Component({
@@ -52,7 +52,7 @@ export class DialogTriggerComponent implements OnInit {
 
   setExpression(expr: string) {
     console.log('setExpression', expr);
-    const node: MathNode = this.data.progVersionner.parse( expr );
+    const node: MathNode = mathjs.parse( expr );
     if (node.op === '==' && node.args[0].isParenthesisNode && typeof node.args[1].value === 'boolean') {
       this.expression = node.args[0].toString();
       this.setExpectedValue( node.args[1].value );
@@ -76,7 +76,10 @@ export class DialogTriggerComponent implements OnInit {
   }
 
   get events(): VariableDescription[] {
-    return this.data.progVersionner.getEvents();
+    return [
+      ...(this.data.program?.dependencies?.import?.events || []),
+      ...(this.data.program?.dependencies?.export?.events || []),
+    ];
   }
 
   get currentFilterForDisplay(): string {
@@ -93,7 +96,7 @@ export class DialogTriggerComponent implements OnInit {
     };
     if (this.triggerType === 'event') {
       newEvent.eventSource = this.currentEvent;
-      newEvent.eventFilter = this.currentFilter ? this.data.progVersionner.parse(this.currentFilter).toString().split(' ').map(
+      newEvent.eventFilter = this.currentFilter ? mathjs.parse(this.currentFilter).toString().split(' ').map(
         w => w === newEvent.eventSource ? 'event.value' : w
       ). join( ' ' ) : undefined;
     } else {

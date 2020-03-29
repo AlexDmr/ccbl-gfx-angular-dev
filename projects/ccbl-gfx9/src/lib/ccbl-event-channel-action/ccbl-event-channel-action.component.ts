@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {HumanReadableEventChannelAction} from 'ccbl-js/lib/ProgramObjectInterface';
+import {HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 import {MatDialog} from '@angular/material/dialog';
@@ -25,6 +25,10 @@ export class CcblEventChannelActionComponent implements OnInit {
   constructor(private dialog: MatDialog) { }
 
   ngOnInit() {
+  }
+
+  get program(): HumanReadableProgram {
+    return this.progVersionner.getCurrent();
   }
 
   get channelOptions(): EditableOptionType<string>[] {

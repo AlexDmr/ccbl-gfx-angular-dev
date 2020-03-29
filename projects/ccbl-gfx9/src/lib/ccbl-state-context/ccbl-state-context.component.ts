@@ -51,9 +51,11 @@ export class CcblStateContextComponent implements OnInit {
   static async staticEditProgram(dialog: MatDialog, data: DataEditProgramDescr): Promise<HumanReadableProgram | undefined> {
     const dialogRef = dialog.open<EditProgramDescrComponent, any, HumanReadableProgram>(EditProgramDescrComponent, {
       data,
-      closeOnNavigation: false
+      closeOnNavigation: false,
+      width: '100%',
+      height: '100%',
+      maxWidth: '100vw !important'
     });
-    const P = await dialogRef.afterClosed().toPromise();
     return dialogRef.afterClosed().toPromise();
   }
   cbCCBL = a => {
@@ -65,6 +67,10 @@ export class CcblStateContextComponent implements OnInit {
   ngOnInit() {
   }
 
+  get program(): HumanReadableProgram {
+    return this.progVersionner.getCurrent();
+  }
+
   get hasNoCondition(): boolean {
     return !this.isProgramRoot && !this.context.eventStart && !this.context.eventFinish && !this.context.state;
   }
@@ -72,9 +78,12 @@ export class CcblStateContextComponent implements OnInit {
   async editProgram() {
     const data: DataEditProgramDescr = {
       program: this.programVersionner.getCurrent(),
-      progV: this.programVersionner
+      // progV: this.programVersionner
     };
-    return CcblStateContextComponent.staticEditProgram(this.dialog, data);
+    const P: HumanReadableProgram = await CcblStateContextComponent.staticEditProgram(this.dialog, data);
+    if (P) {
+      this.progVersionner.updateWith(P);
+    }
   }
 
   async editCondition(context?: HumanReadableStateContext) {
@@ -303,16 +312,18 @@ export class CcblStateContextComponent implements OnInit {
     const channel = this.getAvailableChannels()[0];
     const action: HumanReadableStateAction = {
       channel: channel.name,
-      affectation: {type: 'expression', value: '0'}
+      affectation: {type: 'expression', value: 'undefined'}
     };
-    const newContext = copyHumanReadableStateContext(this.context);
-    newContext.actions = newContext.actions ? [...newContext.actions, action] : [action];
-    this.programVersionner.updateContext(this.context, newContext);
-    return CcblActionStateComponent.staticEdit(this.dialog, {
+    const A: HumanReadableStateAction = await CcblActionStateComponent.staticEdit(this.dialog, {
       action,
-      progV: this.programVersionner,
+      program: this.program,
       context: this.context
     });
+    if (A) {
+      const newContext = copyHumanReadableStateContext(this.context);
+      newContext.actions = newContext.actions ? [...newContext.actions, A] : [A];
+      this.programVersionner.updateContext(this.context, newContext);
+    }
   }
 
   async newEventAction(position: 'start' | 'finish') {
@@ -355,6 +366,10 @@ export class CcblStateContextComponent implements OnInit {
       },
       pos === 'start' ? 'actionsOnStart' : 'actionsOnEnd'
     );
+  }
+
+  updateStateAction(oldA: HumanReadableStateAction, newA: HumanReadableStateAction): void {
+    this.programVersionner.updateStateAction(oldA, newA);
   }
 
   appendProgramReference(conf: {allen: string, after?: HumanReadableContext}) {

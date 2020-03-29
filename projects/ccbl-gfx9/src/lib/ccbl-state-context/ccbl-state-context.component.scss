@@ -2,6 +2,12 @@ $margin: 3em;
 $separator-width: 0.4em;
 $shadow: #41687f99;
 
+$stateActionsColor: #D1E5E8;
+$stateActionPadding: 1em;
+
+$eventActionsMargin: 2em;
+$eventActionsColor: #eeffaa;
+
 :host {
   display: flex;
   flex-flow: column;
@@ -117,19 +123,21 @@ $shadow: #41687f99;
     display: flex;
     flex-flow: column;
     align-items: flex-start;
-    background-color: #eeffaa;
+    background-color: $eventActionsColor;
+    padding-right: $eventActionsMargin;
   }
   section.actions {
     // column-width: 300px;
     columns: auto;
-    background-color: #D1E5E8;
-    padding-left: 1em;
+    background-color: $stateActionsColor;
+    padding-left: $stateActionPadding;
   }
   section.finishActions {
     display: flex;
     flex-flow: column;
     align-items: flex-end;
-    background-color: #eeffaa;
+    background-color: $eventActionsColor;
+    padding-left: $eventActionsMargin;
   }
   lib-ccbl-action-state:hover, lib-ccbl-event-channel-action:hover {
     background-color: lightgreen;

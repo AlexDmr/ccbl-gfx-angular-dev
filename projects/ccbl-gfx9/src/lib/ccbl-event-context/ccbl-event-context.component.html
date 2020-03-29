@@ -9,9 +9,9 @@
   <section class="event">
     <!-- <label class="grip">&nbsp;↕&nbsp;</label> -->
     <label>When</label>
-    <lib-ccbl-event-expression [evt] = "context"
-                               [program-versionner]="programVersionner"
-                               (update)="updateEvent($event)"
+    <lib-ccbl-event-expression [evt]     = "context"
+                               [program] = "program"
+                               (update)  = "updateEvent($event)"
                                #eventExpr
                                ></lib-ccbl-event-expression>
     <!--When {{htmlEvent}}-->
@@ -24,9 +24,9 @@
                                  [action] = "action"
                                  (update) = "updateAction(action, $event)"
   ></lib-ccbl-event-channel-action>
-  <lib-ccbl-event-trigger-action *ngFor = "let action of eventTriggerActions"
-                         [program-versionner] = "programVersionner"
-                         [action] = "action"
+  <lib-ccbl-event-trigger-action *ngFor    = "let action of eventTriggerActions"
+                                 [program] = "program"
+                                 [action]  = "action"
   ></lib-ccbl-event-trigger-action>
   <!-- <code>{{context | json}}</code> -->
 </section>

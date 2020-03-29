@@ -7,7 +7,7 @@
     </mat-checkbox> <br/>
     <lib-ccbl-event-expression  *ngIf                 = "hasEvent('eventStart')"
                                 [evt]                 = "newContext.eventStart"
-                                [program-versionner]  = "progV"
+                                [program]             = "program"
                                 (update)              = "newContext.eventStart = $event"
                                 #eventStart
                                 (click)               = "eventStart.editEvent()"
@@ -24,7 +24,7 @@
                          *ngIf                  = "!!newContext.state"
                          [expression]           = "newContext.state"
                          [editable]             = "true"
-                         [program-versionner]   = "progV"
+                         [program]              = "program"
                          [canExpressTransition] = "true"
                          (click)                = "stateExpr.edit()"
                          (update)               = "newContext.state = $event"
@@ -37,12 +37,12 @@
     >
       Finish event
     </mat-checkbox> <br/>
-    <lib-ccbl-event-expression  *ngIf                 = "hasEvent('eventFinish')"
-                                [evt]                 = "newContext.eventFinish"
-                                [program-versionner]  = "progV"
-                                (update)              = "newContext.eventFinish = $event"
+    <lib-ccbl-event-expression  *ngIf      = "hasEvent('eventFinish')"
+                                [evt]      = "newContext.eventFinish"
+                                [program]  = "progV"
+                                (update)   = "newContext.eventFinish = $event"
+                                (click)    = "eventFinish.editEvent()"
                                 #eventFinish
-                                (click)               = "eventFinish.editEvent()"
                                 ></lib-ccbl-event-expression>
     <hr/>
   </section>

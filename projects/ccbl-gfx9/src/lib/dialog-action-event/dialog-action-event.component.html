@@ -12,12 +12,12 @@
     override with
   </p>
 
-  <lib-ccbl-expression [expression]         = "newAction.affectation"
-                       [editable]           = "true"
-                       [program-versionner] = "progVersionner"
-                       (update) = "newAction.affectation = $event"
+  <lib-ccbl-expression [expression] = "newAction.affectation"
+                       [editable]   = "true"
+                       [program]    = "program"
+                       (update)     = "newAction.affectation = $event"
+                       (click)      = "exprCompo.edit()"
                        #exprCompo
-                       (click)              = "exprCompo.edit()"
   ></lib-ccbl-expression>
 </section>
 

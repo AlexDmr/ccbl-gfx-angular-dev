@@ -8,9 +8,9 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import {isAttributeAccessor, isOperatorUnary, ProgVersionner} from '../ccbl-gfx9.service';
+import {convertExpressionToNodes, isAttributeAccessor, isOperatorUnary, ProgVersionner} from '../ccbl-gfx9.service';
 import {ParsedExprNode} from '../dataParsedExpr';
-import {VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MatDialog} from '@angular/material/dialog';
 import {DataEditExpression, DialogEditExpressionComponent} from '../dialog-edit-expression/dialog-edit-expression.component';
 import {MathNode} from 'mathjs';
@@ -44,7 +44,7 @@ export class CcblExpressionComponent implements OnInit {
   @Input() acceptEvents = false;
   @Input() vocabulary: VariableDescription[] = [];
   @Input() canExpressTransition = false;
-  @Input('program-versionner') progVersionner: ProgVersionner;
+  @Input() program: HumanReadableProgram;
   @Output('update')            private newExpression = new EventEmitter<string>();
 
   pEditing = false;
@@ -94,18 +94,14 @@ export class CcblExpressionComponent implements OnInit {
   }
 
   get parsedExprNodes(): ParsedExprNode[] {
-    return this.progVersionner.convertExpressionToNodes(this.expression, this.acceptEvents, ...this.vocabulary);
-  }
-
-  get parsedHTML(): string {
-    return this.progVersionner.convertExpressionToHTML( this.getExpression() );
+    return convertExpressionToNodes(this.program, this.expression, this.acceptEvents, ...this.vocabulary);
   }
 
   async edit(vocabulary: VariableDescription[] = []) {
     if (this.editable) {
       const data: DataEditExpression = {
         expression: this.expression,
-        progV: this.progVersionner,
+        program: this.program,
         acceptEvents: this.acceptEvents,
         canExpressTransition: this.canExpressTransition,
         vocabulary

@@ -1,23 +1,24 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {
-  copyHumanReadableStateActions,
+  copyHumanReadableStateActions, HumanReadableProgram,
   HumanReadableStateAction,
   HumanReadableStateContext,
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
-import {ProgVersionner} from '../ccbl-gfx9.service';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
 export interface DataActionState {
   action: HumanReadableStateAction;
   context: HumanReadableStateContext;
-  progV: ProgVersionner;
+  program: HumanReadableProgram;
+  // progV: ProgVersionner;
 }
 
 @Component({
   selector: 'lib-dialog-edit-action-state',
   templateUrl: './dialog-edit-action-state.component.html',
-  styleUrls: ['./dialog-edit-action-state.component.scss']
+  styleUrls: ['./dialog-edit-action-state.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogEditActionStateComponent implements OnInit {
   newAction: HumanReadableStateAction;
@@ -26,15 +27,25 @@ export class DialogEditActionStateComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<DialogEditActionStateComponent>,
               @Inject(MAT_DIALOG_DATA) public data: DataActionState) {
     this.newAction = copyHumanReadableStateActions(this.data.action, false);
-    this.alreadyUsedChannels = this.data.context.actions.map(a => a.channel).filter(c => c !== this.data.action.channel);
-    console.log(this.data.progV.getChannels(), this.alreadyUsedChannels);
+    const actions: HumanReadableStateAction[] = this.data.context.actions || [];
+    this.alreadyUsedChannels = actions.map(a => a.channel).filter(c => c !== this.data.action.channel);
   }
 
   ngOnInit(): void {
   }
 
+  get program(): HumanReadableProgram {
+    return this.data.program;
+  }
+
   get channels(): VariableDescription[] {
-    return this.data.progV.getChannels();
+    const P = this.data.program;
+    return [
+      ...(P.dependencies?.import?.channels || []),
+      ...(P.dependencies?.export?.emitters || []),
+      ...(P.dependencies?.export?.channels || []),
+      ...(P.localChannels || []),
+    ];
   }
 
   isAvailable(chan: VariableDescription): boolean {

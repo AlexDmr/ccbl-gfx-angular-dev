@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {HumanReadableEventTriggerAction} from 'ccbl-js/lib/ProgramObjectInterface';
+import {HumanReadableEventTriggerAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 
 @Component({
@@ -10,7 +10,7 @@ import {ProgVersionner} from '../ccbl-gfx9.service';
 })
 export class CcblEventTriggerActionComponent implements OnInit {
   @Input() action: HumanReadableEventTriggerAction;
-  @Input('program-versionner') progVersionner: ProgVersionner;
+  @Input() program: HumanReadableProgram;
 
   constructor() { }
 

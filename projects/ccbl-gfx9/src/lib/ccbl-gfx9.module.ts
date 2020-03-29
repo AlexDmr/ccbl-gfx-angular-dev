@@ -32,6 +32,9 @@ import { EditProgramDescrComponent } from './edit-program-descr/edit-program-des
 import {MatTabsModule} from '@angular/material/tabs';
 import { CcblProgramApiComponent } from './ccbl-program-api/ccbl-program-api.component';
 import { CcblVariableDescriptionComponent } from './ccbl-variable-description/ccbl-variable-description.component';
+import { DialogAppendDependencyComponent } from './dialog-append-dependency/dialog-append-dependency.component';
+import {MatInputModule} from '@angular/material/input';
+import { DialogEditSubProgramComponent } from './dialog-edit-sub-program/dialog-edit-sub-program.component';
 
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {
@@ -65,7 +68,9 @@ export class SafeHtmlPipe implements PipeTransform  {
     DialogEditActionStateComponent,
     EditProgramDescrComponent,
     CcblProgramApiComponent,
-    CcblVariableDescriptionComponent
+    CcblVariableDescriptionComponent,
+    DialogAppendDependencyComponent,
+    DialogEditSubProgramComponent
   ],
     imports: [
         CommonModule,
@@ -76,7 +81,8 @@ export class SafeHtmlPipe implements PipeTransform  {
         MatToolbarModule,
         MatSelectModule,
         MatCheckboxModule,
-        MatTabsModule
+        MatTabsModule,
+        MatInputModule
     ],
   exports: [CcblGfx9Component],
   providers: [CcblGfx9Service, ClipboardService],

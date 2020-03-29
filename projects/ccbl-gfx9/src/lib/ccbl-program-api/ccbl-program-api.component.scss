@@ -1,0 +1,52 @@
+:host {
+  position: relative;
+  display: block;
+
+  section.noClick {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: aqua;
+    opacity: 0.3;
+  }
+
+  table {
+    border-collapse: collapse;
+
+    thead {
+      th {
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+      }
+
+      th:nth-of-type(1) {
+        border: none;
+      }
+    }
+
+    td, th {
+      position: relative;
+      border: solid black 1px;
+
+      section.empty {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      section.vd:hover {
+        padding-left: 1em;
+        transition: padding-left .3s;
+      }
+    }
+
+    .highlight {
+      background: yellow;
+    }
+  }
+
+}
