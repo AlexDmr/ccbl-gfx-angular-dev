@@ -23,6 +23,8 @@
                                  [program-versionner] = "programVersionner"
                                  [action] = "action"
                                  (update) = "updateAction(action, $event)"
+                                 [mat-menu-trigger-for] = "matMenuChannelAction"
+                                 [matMenuTriggerData]   = "{action: action}"
   ></lib-ccbl-event-channel-action>
   <lib-ccbl-event-trigger-action *ngFor    = "let action of eventTriggerActions"
                                  [program] = "program"
@@ -47,4 +49,15 @@
   <button mat-menu-item (click)="deleteContext()">
     Delete context
   </button>
+</mat-menu>
+
+<mat-menu #matMenuChannelAction="matMenu">
+  <ng-template matMenuContent let-action="action">
+    <button mat-menu-item (click)="editChannelAction(action)">
+      Edit
+    </button>
+    <button mat-menu-item (click)="deleteChannelAction(action)">
+      Delete
+    </button>
+  </ng-template>
 </mat-menu>

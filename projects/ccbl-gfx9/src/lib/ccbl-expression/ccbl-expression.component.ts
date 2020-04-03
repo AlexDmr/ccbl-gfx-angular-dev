@@ -37,7 +37,7 @@ export class CcblExpressionComponent implements OnInit {
       }
     } catch (err) {
       this.nodeRoot = undefined;
-      console.error('CcblExpressionComponent::setExpression: error in parsing expression', e);
+      // console.error('CcblExpressionComponent::setExpression: error in parsing expression', e);
     }
   }
   @Input() editable = true;
@@ -94,7 +94,7 @@ export class CcblExpressionComponent implements OnInit {
   }
 
   get parsedExprNodes(): ParsedExprNode[] {
-    return convertExpressionToNodes(this.program, this.expression, this.acceptEvents, ...this.vocabulary);
+    return this.expression ? convertExpressionToNodes(this.program, this.expression, this.acceptEvents, ...this.vocabulary) : [];
   }
 
   async edit(vocabulary: VariableDescription[] = []) {

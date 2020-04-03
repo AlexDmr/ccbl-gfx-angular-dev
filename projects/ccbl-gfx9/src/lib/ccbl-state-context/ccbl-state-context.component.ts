@@ -1,13 +1,14 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner, stringToAllen} from '../ccbl-gfx9.service';
 import {
-  ContextOrProgram, copyHumanReadableStateContext,
+  ContextOrProgram, copyHumanReadableEventContext, copyHumanReadableStateContext,
   HumanReadableContext,
   HumanReadableEventAction, HumanReadableEventChannelAction,
   HumanReadableEventContext, HumanReadableProgram,
   HumanReadableStateAction,
   HumanReadableStateContext,
-  VariableDescription
+  VariableDescription,
+  ProgramReference
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {BehaviorSubject} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
@@ -20,6 +21,8 @@ import {AllenType} from 'ccbl-js/lib/AllenInterface';
 import {CcblActionStateComponent} from '../ccbl-action-state/ccbl-action-state.component';
 import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl-event-channel-action.component';
 import {DataEditProgramDescr, EditProgramDescrComponent} from '../edit-program-descr/edit-program-descr.component';
+import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/dialog-edit-prog-instance.component';
+import { DataEditSubProgram } from '../dialog-edit-sub-program/dialog-edit-sub-program.component';
 
 @Component({
   selector: 'lib-ccbl-state-context',
@@ -69,6 +72,10 @@ export class CcblStateContextComponent implements OnInit {
 
   get program(): HumanReadableProgram {
     return this.progVersionner.getCurrent();
+  }
+
+  get hasSubProg(): boolean {
+    return !!this.program.subPrograms && Object.keys(this.program.subPrograms).length > 0;
   }
 
   get hasNoCondition(): boolean {
@@ -151,6 +158,14 @@ export class CcblStateContextComponent implements OnInit {
     return this.context.actionsOnEnd ? this.context.actionsOnEnd : [];
   }
 
+  asHumanReadableEventChannelAction(action: HumanReadableEventAction): HumanReadableEventChannelAction {
+    return action as HumanReadableEventChannelAction;
+  }
+
+  asHumanReadableStateContext(c: ContextOrProgram): HumanReadableStateContext {
+    return c as HumanReadableStateContext;
+  }
+
   getDuringContexts(): ContextOrProgram[] {
     if (this.context.allen && this.context.allen.During) {
       return this.context.allen.During;
@@ -227,11 +242,11 @@ export class CcblStateContextComponent implements OnInit {
     console.log(...L);
   }
 
-  get draggedContext(): HumanReadableContext {
+  get draggedContext(): ContextOrProgram {
     return this.progVersionner.draggedContext;
   }
 
-  appendContext(allen: string, context: HumanReadableContext, after?: HumanReadableContext) {
+  appendContext(allen: string, context: ContextOrProgram, after?: ContextOrProgram) {
     // console.log('Append context', allen, context, after);
     this.progVersionner.moveContext({
       context,
@@ -259,7 +274,7 @@ export class CcblStateContextComponent implements OnInit {
       contextName: 'C',
       state: ''
     };
-    this.progVersionner.appendContext({
+    this.progVersionner.appendContextOrProgram({
       context: newContext,
       parent: this.context,
       via: stringToAllen(conf.allen),
@@ -287,7 +302,7 @@ export class CcblStateContextComponent implements OnInit {
         actions: []
       };
     }
-    this.progVersionner.appendContext( {
+    this.progVersionner.appendContextOrProgram( {
       context,
       parent: this.context,
       via: stringToAllen(conf.allen),
@@ -375,4 +390,48 @@ export class CcblStateContextComponent implements OnInit {
   appendProgramReference(conf: {allen: string, after?: HumanReadableContext}) {
     console.error('appendProgramReference NOT YET IMPLEMENTED');
   }
+
+  async editChannelAction(action: HumanReadableEventChannelAction, start: boolean): Promise<void> {
+    const newA = await CcblEventChannelActionComponent.staticEditAction(this.dialog, {
+      action, progVersionner: this.progVersionner
+    });
+    if (newA) {
+      const newContext = copyHumanReadableStateContext(this.context);
+      if (start) {
+        newContext.actionsOnStart = this.context.actionsOnStart.map( a => a === action ? newA : a);
+      } else {
+        newContext.actionsOnEnd   = this.context.actionsOnEnd  .map( a => a === action ? newA : a);
+      }
+      this.programVersionner.updateContext(this.context, newContext);
+    }
+  }
+
+  deleteChannelAction(action: HumanReadableEventChannelAction): void {
+    const newContext = copyHumanReadableStateContext(this.context);
+    newContext.actionsOnStart = this.context.actionsOnStart.filter( a => a !== action );
+    newContext.actionsOnEnd   = this.context.actionsOnEnd  .filter( a => a !== action );
+    this.programVersionner.updateContext(this.context, newContext);
+  }
+
+  async newProgInstance() {
+    const data: DataEditSubProgram = {
+      parentProgram: this.program,
+      program: {}
+    };
+    const dialogRef = this.dialog.open(DialogEditProgInstanceComponent, {
+      data,
+      closeOnNavigation: false
+    });
+    const refP: ProgramReference = await dialogRef.afterClosed().toPromise();
+    if (refP) {
+      const L = this.context.allen?.During || [];
+      this.progVersionner.appendContextOrProgram({
+        context: refP,
+        parent: this.context,
+        via: AllenType.During,
+        after: L[L.length-1]
+      });
+    }
+  }
+
 }

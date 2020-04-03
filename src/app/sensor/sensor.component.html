@@ -1,11 +1,11 @@
 <app-eventer *ngIf="isEvent" [data]="data">
 </app-eventer>
 
-<app-sensor-boolean *ngIf="isBooleanSensor" [data]="data">
+<app-sensor-boolean *ngIf="isBooleanSensor" [data]="asBooleanSensor()">
 </app-sensor-boolean>
 
-<app-sensor-scalar *ngIf="isScalarSensor" [data]="data">
+<app-sensor-scalar *ngIf="isScalarSensor" [data]="asScalarSensor()">
 </app-sensor-scalar>
 
-<app-sensor-color *ngIf="isColorSensor" [data]="data">
+<app-sensor-color *ngIf="isColorSensor" [data]="asColorSensor()">
 </app-sensor-color>

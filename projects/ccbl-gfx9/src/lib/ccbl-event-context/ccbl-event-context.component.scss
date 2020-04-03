@@ -22,11 +22,19 @@
     }
   }
 
+  header:hover {
+    background-color: lightgreen;
+  }
+
   section.actions {
     column-width: 300px;
     background-color: #eeffaa;
     padding-left: 1em;
     border: solid black 1px;
+
+    > *:hover {
+      background-color: lightgreen;
+    }
   }
 
 }

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
 import {EventTrigger, HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {DataDialogTrigger, DialogTriggerComponent} from '../dialog-trigger/dialog-trigger.component';
@@ -7,7 +7,8 @@ import {MatDialog} from '@angular/material/dialog';
 @Component({
   selector: 'lib-ccbl-event-expression',
   templateUrl: './ccbl-event-expression.component.html',
-  styleUrls: ['./ccbl-event-expression.component.scss']
+  styleUrls: ['./ccbl-event-expression.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblEventExpressionComponent implements OnInit {
   @Input() evt: EventTrigger;
@@ -38,7 +39,7 @@ export class CcblEventExpressionComponent implements OnInit {
   }
 
   get labelEventExpressionChange(): string {
-    if (this.evt.eventFilter) {
+    if (this.evt?.eventFilter) {
       const L = this.evt.eventFilter.split(' ');
       return `becomes ${L[L.length - 1]}`;
     } else {
@@ -55,6 +56,6 @@ export class CcblEventExpressionComponent implements OnInit {
   }
 
   get filterForEvent(): string {
-    return this.evt.eventFilter.replace(/event\.value/gi, this.evt.eventSource);
+    return this.evt.eventFilter?.replace(/event\.value/gi, this.evt.eventSource);
   }
 }

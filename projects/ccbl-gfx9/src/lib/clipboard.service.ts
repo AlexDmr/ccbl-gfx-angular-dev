@@ -23,7 +23,7 @@ export class ClipboardService {
 
   paste(progV: ProgVersionner, to: HumanReadableStateContext) {
     if (this.canPaste) {
-      progV.appendContext({
+      progV.appendContextOrProgram({
         parent: to,
         via: AllenType.During,
         context: this.context

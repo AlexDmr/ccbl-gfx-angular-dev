@@ -1,15 +1,7 @@
-<section [mat-menu-trigger-for]="matMenuGeneral">
+<section>
   <label class="override">Overhides</label>
   <lib-ccbl-expression [expression]="action.channel" [program]="program" ></lib-ccbl-expression>
   <label class="with">with</label>
   <lib-ccbl-expression [expression]="action.affectation" [program]="program" ></lib-ccbl-expression>
 </section>
 
-<mat-menu #matMenuGeneral="matMenu">
-  <button mat-menu-item (click)="editAction()">
-    Edit
-  </button>
-  <button mat-menu-item (click)="deleteAction()">
-    Delete
-  </button>
-</mat-menu>

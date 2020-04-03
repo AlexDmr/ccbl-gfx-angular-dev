@@ -53,5 +53,4 @@ export class CcblEventChannelActionComponent implements OnInit {
   deleteAction() {
     this.progVersionner.removeEventAction(this.action);
   }
-
 }

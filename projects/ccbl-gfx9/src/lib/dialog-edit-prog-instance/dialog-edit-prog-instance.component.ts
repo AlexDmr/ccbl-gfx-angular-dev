@@ -1,6 +1,12 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {copyContextOrProgram, HumanReadableProgram, ProgramReference, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {
+  HumanReadableProgram,
+  ProgramReference,
+  VariableDescription,
+  EventTrigger,
+  isNameUsedInProg,
+} from 'ccbl-js/lib/ProgramObjectInterface';
 
 export interface DataEditProgramRef {
   parentProgram: HumanReadableProgram;
@@ -41,6 +47,43 @@ export class DialogEditProgInstanceComponent implements OnInit {
 
   ok(): void {
     this.dialogRef.close( this.newProgRef );
+  }
+
+  getEvent(name: string): EventTrigger {
+    if (this.newProgRef.mapInputs[name] as EventTrigger) {
+      return this.newProgRef.mapInputs[name] as EventTrigger;
+    } else {
+      const dep = this.data.parentProgram.dependencies;
+      const L: VariableDescription[] = [
+        ...(dep?.import?.events || []),
+        ...(dep?.export?.events || []),
+      ];
+      const n = L.find(e => e.name === name)?.name || '';
+      return {eventSource: n};
+    }
+  }
+
+  getEmitter(name: string): string {
+    const M = this.newProgRef.mapInputs[name];
+    if (M) {
+      return M as string;
+    } else {
+      const dep = this.data.parentProgram.dependencies;
+      const L: VariableDescription[] = [
+        ...(dep?.import?.emitters || []),
+        ...(dep?.export?.emitters || []),
+        ...(dep?.import?.channels || []),
+        ...(dep?.export?.channels || []),
+        ...(this.data.parentProgram?.localChannels)
+      ];
+      const n = L.find(e => e.name === name)?.name || '';
+      return n;
+    }
+  }
+
+  getChannel(name: string): string {
+    const M = this.newProgRef.mapInputs[name];
+    return M as string;
   }
 
   get parentProgram(): HumanReadableProgram {
@@ -88,28 +131,22 @@ export class DialogEditProgInstanceComponent implements OnInit {
     return this.subProg?.dependencies?.import?.channels || [];
   }
 
-  get eventMappings(): [string, string][] {
-    const L: VariableDescription[] = this.subProg?.dependencies?.import?.events || [];
-    return L.map( ({name, type}) => {
-      const mapId = this.newProgRef.mapInputs[name];
-      if (mapId !== undefined) {
-        return [name, mapId];
-      } else {
-        if ( this.availableEvents.find(vd => vd.name === name) ) {
-          return [name, name];
-        } else {
-          return [name, undefined];
-        }
-      }
-    }) as [string, string][];
+  get channels(): VariableDescription[] {
+    const P = this.parentProgram;
+    return [
+      ...(P.dependencies?.import?.channels || []),
+      ...(P.dependencies?.export?.channels || []),
+      ...(P.localChannels || []),
+    ];
   }
 
-  get emitterMappings(): [string, string][] {
-    return [];
-  }
-
-  get channelMappings(): [string, string][] {
-    return [];
+  get canValidate(): boolean {
+    const SPs = this.data.parentProgram.subPrograms || {};
+    return !isNameUsedInProg( this.newProgRef.as, this.data.parentProgram ) &&
+           !this.eventsToMap  .find( e => !this.newProgRef.mapInputs[e.name] ) &&
+           !this.emittersToMap.find( e => !this.newProgRef.mapInputs[e.name] ) &&
+           !this.channelsToMap.find( e => !this.newProgRef.mapInputs[e.name] )
+           ;
   }
 
 }

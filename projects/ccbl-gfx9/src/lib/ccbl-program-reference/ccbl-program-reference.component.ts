@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner} from '../ccbl-gfx9.service';
-import {HumanReadableProgram, ProgramReference, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {HumanReadableProgram, ProgramReference, VariableDescription, ProgramInput} from 'ccbl-js/lib/ProgramObjectInterface';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 
 @Component({
@@ -66,7 +66,7 @@ export class CcblProgramReferenceComponent implements OnInit {
     ).sort( (a, b) => a.label > b.label ? 1 : -1 );
   }
 
-  getValueOfInput(name: string): string {
+  getValueOfInput(name: string): ProgramInput {
     const map = this.data.mapInputs[name];
     return map ? map : name;
   }

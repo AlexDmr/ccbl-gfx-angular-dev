@@ -51,4 +51,13 @@ export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
   updateDescription(description: string): void {
     this.progV.updateWith({...this.progV.getCurrent(), description});
   }
+
+  updateDescriptionFromRaw(str: string) {
+    try {
+      const json = JSON.parse(str) as HumanReadableProgram;
+      this.progV.updateWith( json );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }

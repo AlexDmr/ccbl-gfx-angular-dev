@@ -2,6 +2,30 @@
 
   .block {
     display: block;
+    width: 100%;
+  }
+
+  table.inputs {
+    border-collapse: collapse;
+    border: solid black 1px;
+
+    th {
+      font-weight: bold;
+      background-color: lightyellow;
+    }
+
+    td, th {
+      border: solid black 1px;
+      padding: 3px;
+    }
+
+    tr.unspecified {
+      background-color: lightcoral;
+    }
+
+    tr.emitter.unspecified > td:nth-child(2) > * {
+      opacity: 0;
+    }
   }
 
   section.okcancel {

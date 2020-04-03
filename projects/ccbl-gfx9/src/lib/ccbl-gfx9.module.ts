@@ -35,6 +35,7 @@ import { CcblVariableDescriptionComponent } from './ccbl-variable-description/cc
 import { DialogAppendDependencyComponent } from './dialog-append-dependency/dialog-append-dependency.component';
 import {MatInputModule} from '@angular/material/input';
 import { DialogEditSubProgramComponent } from './dialog-edit-sub-program/dialog-edit-sub-program.component';
+import { DialogEditProgInstanceComponent } from './dialog-edit-prog-instance/dialog-edit-prog-instance.component';
 
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {
@@ -70,7 +71,8 @@ export class SafeHtmlPipe implements PipeTransform  {
     CcblProgramApiComponent,
     CcblVariableDescriptionComponent,
     DialogAppendDependencyComponent,
-    DialogEditSubProgramComponent
+    DialogEditSubProgramComponent,
+    DialogEditProgInstanceComponent
   ],
     imports: [
         CommonModule,

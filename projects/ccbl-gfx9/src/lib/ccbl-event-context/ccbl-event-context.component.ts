@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {
+  copyHumanReadableEventContext,
   EventTrigger,
   HumanReadableEventAction,
   HumanReadableEventChannelAction,
@@ -9,6 +10,8 @@ import {
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {EditableOptionType} from '../editable-option/editable-option.component';
+import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl-event-channel-action.component';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'lib-ccbl-event-context',
@@ -20,7 +23,7 @@ export class CcblEventContextComponent implements OnInit {
   @Input() context: HumanReadableEventContext;
   @Input('program-versionner') private progVersionner: ProgVersionner;
 
-  constructor() { }
+  constructor(private matDialog: MatDialog) { }
 
   ngOnInit() {
   }
@@ -136,4 +139,21 @@ export class CcblEventContextComponent implements OnInit {
     };
     this.programVersionner.updateContext(this.context, newC);
   }
+
+
+  async editChannelAction(action: HumanReadableEventChannelAction): Promise<void> {
+    const newA = await CcblEventChannelActionComponent.staticEditAction(this.matDialog, {
+      action, progVersionner: this.progVersionner
+    });
+    if (newA) {
+      this.updateAction(action, newA);
+    }
+  }
+
+  deleteChannelAction(action: HumanReadableEventChannelAction): void {
+    const newContext = copyHumanReadableEventContext(this.context);
+    newContext.actions = newContext.actions.filter(a => a !== action);
+    this.programVersionner.updateContext(this.context, newContext);
+  }
+
 }

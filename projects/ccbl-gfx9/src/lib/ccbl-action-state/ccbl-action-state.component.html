@@ -3,10 +3,10 @@
          [mat-menu-trigger-for] = "menuGeneral"
 >
 
-  <lib-ccbl-expression [expression]         = "channel"
-                       [program-versionner] = "programVersionner"
-                       [editable]           = "false"
-                       class                = "channel"
+  <lib-ccbl-expression [expression] = "channel"
+                       [program]    = "program"
+                       [editable]   = "false"
+                       class        = "channel"
   ></lib-ccbl-expression>
 
   <label class="operation">
@@ -14,17 +14,17 @@
   </label>
 
   <section class="value">
-    <lib-ccbl-expression [program-versionner] = "programVersionner"
-                         [expression]         = "action.affectation.value"
-                         [overrided]          = "!!(overridedWith | async)"
-                         (update)             = "updateAffectation($event)"
-                         class                = "orginal"
+    <lib-ccbl-expression [program]    = "program"
+                         [expression] = "action.affectation.value"
+                         [overrided]  = "!!(overridedWith | async)"
+                         (update)     = "updateAffectation($event)"
+                         class        = "orginal"
     ></lib-ccbl-expression>
 
-    <lib-ccbl-expression [program-versionner] = "programVersionner"
-                         [expression]         = "overridedValue"
-                         *ngIf = "overridedWith | async as overridedValue"
-                         class                = "override"
+    <lib-ccbl-expression [program]    = "program"
+                         [expression] = "overridedValue"
+                         *ngIf        = "overridedWith | async as overridedValue"
+                         class        = "override"
     ></lib-ccbl-expression>
   </section>
 

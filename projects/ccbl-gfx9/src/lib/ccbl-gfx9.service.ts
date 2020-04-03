@@ -39,7 +39,7 @@ export class CcblGfx9Service {
 }
 
 export class ProgVersionner {
-  draggedContext: HumanReadableContext = undefined;
+  draggedContext: ContextOrProgram = undefined;
 
   constructor(private original: HumanReadableProgram) {
     original.localChannels = original.localChannels || [];
@@ -332,7 +332,7 @@ export class ProgVersionner {
     }
   }
 
-  removeContext(context: HumanReadableContext, updateProg = true): {
+  removeContext(context: ContextOrProgram, updateProg = true): {
     old: HumanReadableContext[],
     now: HumanReadableContext[]
   } {
@@ -340,8 +340,8 @@ export class ProgVersionner {
     return this.updateAncestors(undefined, path, updateProg);
   }
 
-  appendContext( conf: {
-    context?: HumanReadableContext,
+  appendContextOrProgram( conf: {
+    context?: ContextOrProgram,
     parent: HumanReadableStateContext,
     via: AllenType,
     after?: ContextOrProgram
@@ -350,7 +350,7 @@ export class ProgVersionner {
     const {context, parent, via} = conf;
     const position: number = conf.after ? conf.parent.allen[AllenToString(via)].indexOf(conf.after) + 1 : 0;
     const path = this.getPathToContext(parent);
-    const contextToAppend: HumanReadableContext = !!context ? context : {
+    const contextToAppend: ContextOrProgram = !!context ? context : {
       contextName: 'new context'
     };
     const newParent: HumanReadableStateContext = {
@@ -361,12 +361,12 @@ export class ProgVersionner {
     };
 
     switch (via) {
-      case AllenType.During   : newParent.allen.During    = appendContext(newParent.allen.During,    contextToAppend, position); break;
-      case AllenType.StartWith: newParent.allen.StartWith = appendContext(newParent.allen.StartWith, contextToAppend, position); break;
-      case AllenType.EndWith  : newParent.allen.EndWith   = appendContext(newParent.allen.EndWith,   contextToAppend, position); break;
+      case AllenType.During   : newParent.allen.During    = appendContextOrProgram(newParent.allen.During,    contextToAppend, position); break;
+      case AllenType.StartWith: newParent.allen.StartWith = appendContextOrProgram(newParent.allen.StartWith, contextToAppend, position); break;
+      case AllenType.EndWith  : newParent.allen.EndWith   = appendContextOrProgram(newParent.allen.EndWith,   contextToAppend, position); break;
       case AllenType.Meet     : newParent.allen.Meet = {
         ...newParent.allen.Meet,
-        contextsSequence: appendContext(newParent.allen.Meet.contextsSequence, contextToAppend, position) as HumanReadableStateContext[]
+        contextsSequence: appendContextOrProgram(newParent.allen.Meet.contextsSequence, contextToAppend, position) as HumanReadableStateContext[]
       };
                                 break;
     }
@@ -375,11 +375,11 @@ export class ProgVersionner {
   }
 
   moveContext( conf: {
-    context: HumanReadableContext,
+    context: ContextOrProgram,
     to: {
       parent: HumanReadableStateContext,
       via: AllenType,
-      after?: HumanReadableContext
+      after?: ContextOrProgram
     }
   }) {
     // Remove context without updateing program then append it to its new parent
@@ -389,7 +389,7 @@ export class ProgVersionner {
     if (i >= 0) {
       conf.to.parent = now[i] as HumanReadableStateContext;
     }
-    this.appendContext({...conf.to, context: conf.context} );
+    this.appendContextOrProgram({...conf.to, context: conf.context} );
   }
 
   updateContext(prev: HumanReadableContext, next: HumanReadableContext) {
@@ -805,7 +805,7 @@ export interface PathStep {
   via?: AllenType;
 }
 
-function appendContext(L: ContextOrProgram[], c: HumanReadableContext, position: number): ContextOrProgram[] {
+function appendContextOrProgram(L: ContextOrProgram[], c: ContextOrProgram, position: number): ContextOrProgram[] {
   const Lres: ContextOrProgram[] = L ? [...L] : [];
   Lres.splice(position, 0, c);
   return Lres;

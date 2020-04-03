@@ -1,9 +1,12 @@
-import {AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
-import {convertExpressionToNodes, isOperatorUnary, ProgVersionner} from '../ccbl-gfx9.service';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
+import {convertExpressionToNodes} from '../ccbl-gfx9.service';
 import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MathNode} from 'mathjs';
-import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
+import {MathJsStatic, MathNode, create, all} from 'mathjs';
+// import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
+import {BehaviorSubject} from 'rxjs';
+
+const mathjs: Partial<MathJsStatic> = create(all, {});
 
 export interface DataEditExpression {
   expression: string;
@@ -16,12 +19,13 @@ export interface DataEditExpression {
 @Component({
   selector: 'lib-dialog-edit-expression',
   templateUrl: './dialog-edit-expression.component.html',
-  styleUrls: ['./dialog-edit-expression.component.scss']
+  styleUrls: ['./dialog-edit-expression.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   tmpExpr: string;
   pNewExpr: string;
-  errorIndication: string;
+  errorIndicationSubj = new BehaviorSubject<string>(undefined);
   cursorPos = -1;
   cursorErrorPos = -1;
   @ViewChild('inputExpr') inputExpr: ElementRef<HTMLInputElement>;
@@ -49,17 +53,6 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    /*
-    const input = this.inputExpr.nativeElement;
-    input.onclick = input.onkeydown = input.onkeyup = () => {
-      const carAt = input.selectionStart;
-      // Compute fake cursor position
-      this.fakeLabel.nativeElement.textContent = this.pNewExpr.slice(0, carAt);
-      this.cursorPos = this.fakeLabel.nativeElement.clientWidth;
-    };
-    input.onblur = () => {
-      this.cursorPos = -1;
-    };*/
   }
 
   cancel() {
@@ -73,7 +66,7 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   }
 
   updateInput() {
-    if (!this.errorIndication) {
+    if (!this.errorIndicationSubj.getValue()) {
       this.tmpExpr = this.newExpr;
     }
   }
@@ -100,6 +93,13 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   }
 
   set newExpr(s: string) {
+    // console.log('setNewExpr = ', s);
+    try {
+      mathjs.parse(s);
+    } catch(err) {
+      this.errorIndicationSubj.next( err.toString() );
+      return;
+    }
     try {
       this.mathNodeRoot = mathjs.parse(s);
       // this.pNewExpr = n.toString();
@@ -113,18 +113,19 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
           // this.inputExpr.nativeElement.value = this.pNewExpr;
         }
         if (Lerr.length > 0) {
-          this.errorIndication = 'Undefined variables: ' + Lerr.join(', ');
+          this.errorIndicationSubj.next( 'Undefined variables: ' + Lerr.join(', ') );
         } else {
-          this.errorIndication = undefined;
+          this.errorIndicationSubj.next(undefined );
         }
       }
     } catch (err) {
-      this.errorIndication = err.toString();
+      this.errorIndicationSubj.next( err.toString() );
       this.pNewExpr = s;
-      const res = /\(char ([0-9]*)\)$/.exec(this.errorIndication);
+      const res = /\(char ([0-9]*)\)$/.exec(this.errorIndicationSubj.getValue());
       const carAt = res ? +res[1] : -1;
       this.fakeLabel.nativeElement.textContent = this.pNewExpr.slice(0, carAt);
       this.cursorErrorPos = this.fakeLabel.nativeElement.clientWidth;
     }
   }
+
 }

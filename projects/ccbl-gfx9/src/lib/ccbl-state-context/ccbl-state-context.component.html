@@ -23,7 +23,7 @@
       <lib-ccbl-expression [program]    = "program"
                            [expression] = "context.state"
                            (update)     = "updateState($event)"
-                           *ngIf        = "!isProgramRoot"
+                           *ngIf        = "!isProgramRoot && context.state"
       ></lib-ccbl-expression>
     </section>
     <section class="event finish" *ngIf="!!context.eventFinish">
@@ -39,9 +39,11 @@
            [dndDropzone]="dndDropZoneAll"
            (dndDrop)="appendContext('During', this.draggedContext )"
   >
-    <lib-ccbl-event-channel-action  *ngFor               = "let action of startActions"
-                                    [program-versionner] = "programVersionner"
-                                    [action]             = "action"
+    <lib-ccbl-event-channel-action  *ngFor                 = "let action of startActions"
+                                    [program-versionner]   = "programVersionner"
+                                    [action]               = "asHumanReadableEventChannelAction(action)"
+                                    [mat-menu-trigger-for] = "matMenuChannelAction"
+                                    [matMenuTriggerData]   = "{action: action, atStart: true}"
     ></lib-ccbl-event-channel-action>
   </section>
   <section class="actions"
@@ -84,7 +86,7 @@
     ></section>
     <section class="StartWith"
              *ngFor         = "let c of getStartWithContexts()">
-      <lib-ccbl-state-context [context]="c" class="StartWith"
+      <lib-ccbl-state-context [context]="asHumanReadableStateContext(c)" class="StartWith"
                               [program-versionner]  = "programVersionner"
                               [from]                = "AllenTypeStartWith"
       ></lib-ccbl-state-context>
@@ -95,7 +97,7 @@
     <section class="EndWith first separator" [class.alone]="getEndWithContexts().length === 0"></section>
     <section class="EndWith"
              *ngFor="let c of getEndWithContexts()">
-      <lib-ccbl-state-context [context]="c" class="EndWith"
+      <lib-ccbl-state-context [context]="asHumanReadableStateContext(c)" class="EndWith"
                               [program-versionner]  = "programVersionner"
                               [from]                = "AllenTypeEndWith"
       ></lib-ccbl-state-context>
@@ -105,14 +107,16 @@
     <section class="cover"></section>
   </section>
 
-  <section class="finishActions"
-           *ngIf="finishActions.length > 0"
-           [dndDropzone]="dndDropZoneAll"
-           (dndDrop)="appendContext('During', this.draggedContext )"
+  <section class         = "finishActions"
+           *ngIf         = "finishActions.length > 0"
+           [dndDropzone] = "dndDropZoneAll"
+           (dndDrop)     = "appendContext('During', this.draggedContext )"
   >
-    <lib-ccbl-event-channel-action  *ngFor               = "let action of finishActions"
-                                    [program-versionner] = "programVersionner"
-                                    [action]             = "action"
+    <lib-ccbl-event-channel-action  *ngFor                 = "let action of finishActions"
+                                    [program-versionner]   = "programVersionner"
+                                    [action]               = "asHumanReadableEventChannelAction(action)"
+                                    [mat-menu-trigger-for] = "matMenuChannelAction"
+                                    [matMenuTriggerData]   = "{action: action, atStart: false}"
                                     #actFin
     ></lib-ccbl-event-channel-action>
   </section>
@@ -138,7 +142,7 @@
   <button mat-menu-item [mat-menu-trigger-for]="menuContextType" [disabled]="hasNoCondition">
     New context
   </button>
-  <button mat-menu-item disabled>
+  <button mat-menu-item (click)="newProgInstance()" [disabled]="!hasSubProg">
     New program instance
   </button>
   <hr/>
@@ -196,3 +200,14 @@
 
 </mat-menu>
 
+
+<mat-menu #matMenuChannelAction="matMenu">
+  <ng-template matMenuContent let-action="action" let-atStart="atStart">
+    <button mat-menu-item (click)="editChannelAction(action, atStart)">
+      Edit
+    </button>
+    <button mat-menu-item (click)="deleteChannelAction(action)">
+      Delete
+    </button>
+  </ng-template>
+</mat-menu>
