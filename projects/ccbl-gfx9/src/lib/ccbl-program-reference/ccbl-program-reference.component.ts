@@ -1,7 +1,8 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {HumanReadableProgram, ProgramReference, VariableDescription, ProgramInput} from 'ccbl-js/lib/ProgramObjectInterface';
-import {EditableOptionType} from '../editable-option/editable-option.component';
+import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/dialog-edit-prog-instance.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'lib-ccbl-program-reference',
@@ -12,70 +13,35 @@ import {EditableOptionType} from '../editable-option/editable-option.component';
 export class CcblProgramReferenceComponent implements OnInit {
   @Input('program-versionner') private progVersionner: ProgVersionner;
   @Input() data: ProgramReference;
+  extendedMode = false;
 
-  constructor() { }
+  constructor(private matDialog: MatDialog) { }
 
   ngOnInit() {
   }
 
   get inputChannels(): VariableDescription[] {
-    return this.getInput('channels');
+    return this.program?.dependencies?.import?.channels || [];
   }
 
   get inputEmitters(): VariableDescription[] {
-    return this.getInput('emitters');
+    return this.program?.dependencies?.import?.emitters || [];
   }
 
   get inputEvents(): VariableDescription[] {
-    return this.getInput('events');
+    return this.program?.dependencies?.import?.events || [];
   }
 
   get outputChannels(): VariableDescription[] {
-    return this.getOutput('channels');
+    return this.program?.dependencies?.export?.channels || [];
   }
 
   get outputEmitters(): VariableDescription[] {
-    return this.getOutput('emitters');
+    return this.program?.dependencies?.export?.emitters || [];
   }
 
   get outputEvents(): VariableDescription[] {
-    return this.getOutput('events');
-  }
-
-  get possibleEmitters(): EditableOptionType<string>[] {
-    return [...this.inputEmitters, ...this.inputChannels].map( vd => ({
-        label: vd.name,
-        value: vd.name
-      })
-    ).sort( (a, b) => a.label > b.label ? 1 : -1 );
-  }
-
-  get possibleChannels(): EditableOptionType<string>[] {
-    return [...this.inputChannels].map( vd => ({
-        label: vd.name,
-        value: vd.name
-      })
-    ).sort( (a, b) => a.label > b.label ? 1 : -1 );
-  }
-
-  get possibleEvents(): EditableOptionType<string>[] {
-    return [...this.inputEvents].map( vd => ({
-        label: vd.name,
-        value: vd.name
-      })
-    ).sort( (a, b) => a.label > b.label ? 1 : -1 );
-  }
-
-  getValueOfInput(name: string): ProgramInput {
-    const map = this.data.mapInputs[name];
-    return map ? map : name;
-  }
-
-  updateInput(type: varType, id: string, value: string) {
-    const newProgRef = {...this.data};
-    newProgRef.mapInputs = newProgRef.mapInputs ? {...newProgRef.mapInputs} : {};
-    newProgRef.mapInputs[id] = value;
-    this.progVersionner.updateProrgamReference(this.data, newProgRef);
+    return this.program?.dependencies?.export?.events || [];
   }
 
   private get program(): HumanReadableProgram {
@@ -83,23 +49,45 @@ export class CcblProgramReferenceComponent implements OnInit {
     return subPrograms ? subPrograms[this.data.programId] : undefined;
   }
 
-  private getInput(from: varType): VariableDescription[] {
-    const dep = this.program.dependencies;
-    if (dep && dep.import && dep.import[from]) {
-      return dep.import[from];
-    } else {
-      return [];
+  getMapValue(n: string): string {
+    const m = this.data.mapInputs[n];
+    return m !== undefined ? m.toString() : n;
+  }
+
+  shortInputs(): PARAM[] {
+    return [
+      ...this.inputChannels.map(c => ({class: 'channel', label: c.name, value: this.getMapValue(c.name)})),
+      ...this.inputEmitters.map(c => ({class: 'emitter', label: c.name, value: this.getMapValue(c.name)})),
+      ...this.inputEvents  .map(c => ({class: 'event'  , label: c.name, value: this.getMapValue(c.name)})),
+    ];
+  }
+
+  shortOuputs(): PARAM[] {
+    return [
+      ...this.outputChannels.map(c => ({class: 'channel', label: c.name, value: c.name})),
+      ...this.outputEmitters.map(c => ({class: 'emitter', label: c.name, value: c.name})),
+      ...this.outputEvents  .map(c => ({class: 'event'  , label: c.name, value: c.name})),
+    ];
+  }
+
+  async edit() {
+    const progRef = await DialogEditProgInstanceComponent.editProgRef(this.matDialog, {
+      progRef: this.data,
+      parentProgram: this.progVersionner.getCurrent(),
+      editMode: true
+    } );
+    if (progRef) {
+      this.progVersionner.updateProrgamReference(this.data, progRef);
     }
   }
 
-  private getOutput(from: varType): VariableDescription[] {
-    const dep = this.program.dependencies;
-    if (dep && dep.export && dep.export[from]) {
-      return dep.export[from];
-    } else {
-      return [];
-    }
+  delete() {
+    this.progVersionner.removeContext(this.data);
   }
 }
 
-export type varType = 'channels' | 'emitters' | 'events';
+export interface PARAM {
+  class: string;
+  label: string;
+  value: string;
+}

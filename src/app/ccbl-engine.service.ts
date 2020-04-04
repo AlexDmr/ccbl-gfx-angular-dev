@@ -39,7 +39,7 @@ export class CcblEngineService {
         const prog: HumanReadableProgram = JSON.parse(localStorage.getItem(localProgramKey));
         const CP = copyHumanReadableProgram(prog, false);
         this.setRootProgram( CP );
-        console.log(prog, CP);
+        // console.log(prog, CP);
       }
     } catch (err) {
       console.error(err);
@@ -143,9 +143,9 @@ export class CcblEngineService {
       const copy = copyHumanReadableProgram(prog, false);
       localStorage.setItem(localProgramKey, JSON.stringify( copy ) );
       const obj = JSON.parse( localStorage.getItem(localProgramKey) );
-      console.log(`${localProgramKey}:`, obj );
-      console.log('original', prog );
-      console.log('copy', copy );
+      // console.log(`${localProgramKey}:`, obj );
+      // console.log('original', prog );
+      // console.log('copy', copy );
     });
   }
 

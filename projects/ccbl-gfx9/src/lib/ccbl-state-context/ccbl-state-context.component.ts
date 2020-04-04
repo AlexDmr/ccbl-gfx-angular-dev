@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {ProgVersionner, stringToAllen} from '../ccbl-gfx9.service';
+import {ProgVersionner, stringToAllen, CcblGfx9Service} from '../ccbl-gfx9.service';
 import {
   ContextOrProgram, copyHumanReadableEventContext, copyHumanReadableStateContext,
   HumanReadableContext,
@@ -31,6 +31,7 @@ import { DataEditSubProgram } from '../dialog-edit-sub-program/dialog-edit-sub-p
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblStateContextComponent implements OnInit {
+  currentContext = new BehaviorSubject<HumanReadableStateContext>(undefined);
   hide = false;
   active = new BehaviorSubject<boolean>(false);
   pContext: HumanReadableStateContext;
@@ -48,6 +49,7 @@ export class CcblStateContextComponent implements OnInit {
       c.ccblContext.onActiveUpdated( this.cbCCBL );
       this.cbCCBL( c.ccblContext.getActive() );
     }
+    this.currentContext.next(c);
   }
   @Input('program-versionner') private progVersionner: ProgVersionner;
   @Input() isProgramRoot = false;
@@ -64,8 +66,15 @@ export class CcblStateContextComponent implements OnInit {
   cbCCBL = a => {
     this.active.next(a);
   }
+  private pCurrentIndexInSequence = 1;
+  private pCurrentContext: HumanReadableStateContext;
 
-  constructor(private clipboard: ClipboardService, private dialog: MatDialog) { }
+  constructor(
+    private clipboard: ClipboardService,
+    private dialog: MatDialog
+  ) {
+    this.currentContext.subscribe( c => this.pCurrentContext = c);
+  }
 
   ngOnInit() {
   }
@@ -79,7 +88,7 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   get hasNoCondition(): boolean {
-    return !this.isProgramRoot && !this.context.eventStart && !this.context.eventFinish && !this.context.state;
+    return !this.isProgramRoot && !this.pCurrentContext.eventStart && !this.pCurrentContext.eventFinish && !this.pCurrentContext.state;
   }
 
   async editProgram() {
@@ -94,7 +103,7 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   async editCondition(context?: HumanReadableStateContext) {
-    context = context || this.context;
+    context = context || this.pCurrentContext;
     const data: DataEditionContextState = {
       context,
       progV: this.progVersionner,
@@ -115,7 +124,7 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   get displayState(): boolean {
-    return !!this.context.state || (this.context.eventStart === undefined && this.context.eventFinish === undefined);
+    return !!this.pCurrentContext.state || (this.pCurrentContext.eventStart === undefined && this.pCurrentContext.eventFinish === undefined);
   }
 
   get channels(): VariableDescription[] {
@@ -147,15 +156,15 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   get actions(): HumanReadableStateAction[] {
-    return this.context.actions ? this.context.actions : [];
+    return this.pCurrentContext.actions ? this.pCurrentContext.actions : [];
   }
 
   get startActions(): HumanReadableEventAction[] {
-    return this.context.actionsOnStart ? this.context.actionsOnStart : [];
+    return this.pCurrentContext.actionsOnStart ? this.pCurrentContext.actionsOnStart : [];
   }
 
   get finishActions(): HumanReadableEventAction[] {
-    return this.context.actionsOnEnd ? this.context.actionsOnEnd : [];
+    return this.pCurrentContext.actionsOnEnd ? this.pCurrentContext.actionsOnEnd : [];
   }
 
   asHumanReadableEventChannelAction(action: HumanReadableEventAction): HumanReadableEventChannelAction {
@@ -167,42 +176,42 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   getDuringContexts(): ContextOrProgram[] {
-    if (this.context.allen && this.context.allen.During) {
-      return this.context.allen.During;
+    if (this.pCurrentContext.allen && this.pCurrentContext.allen.During) {
+      return this.pCurrentContext.allen.During;
     } else {
       return [];
     }
   }
 
   getStartWithContexts(): ContextOrProgram[] {
-    if (this.context.allen && this.context.allen.StartWith) {
-      return this.context.allen.StartWith;
+    if (this.pCurrentContext.allen && this.pCurrentContext.allen.StartWith) {
+      return this.pCurrentContext.allen.StartWith;
     } else {
       return [];
     }
   }
 
   getEndWithContexts(): ContextOrProgram[] {
-    if (this.context.allen && this.context.allen.EndWith) {
-      return this.context.allen.EndWith;
+    if (this.pCurrentContext.allen && this.pCurrentContext.allen.EndWith) {
+      return this.pCurrentContext.allen.EndWith;
     } else {
       return [];
     }
   }
 
   updateLabel(label: string) {
-    this.programVersionner.updateContext(this.context, {
-      ...this.context,
+    this.programVersionner.updateContext(this.pCurrentContext, {
+      ...this.pCurrentContext,
       contextName: label
     });
   }
 
   updateState(expr: string) {
-    this.progVersionner.updateStateInContext(this.context, expr);
+    this.progVersionner.updateStateInContext(this.pCurrentContext, expr);
   }
 
   startDragging() {
-    this.progVersionner.draggedContext = this.context;
+    this.progVersionner.draggedContext = this.pCurrentContext;
     this.hide = true;
   }
 
@@ -212,11 +221,11 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   cut() {
-    this.clipboard.cut(this.progVersionner, this.context);
+    this.clipboard.cut(this.progVersionner, this.pCurrentContext);
   }
 
   copy() {
-    this.clipboard.copy(this.progVersionner, this.context);
+    this.clipboard.copy(this.progVersionner, this.pCurrentContext);
   }
 
   get canPaste(): boolean {
@@ -224,11 +233,11 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   paste() {
-    this.clipboard.paste(this.progVersionner, this.context);
+    this.clipboard.paste(this.progVersionner, this.pCurrentContext);
   }
 
   deleteContext() {
-    this.progVersionner.removeContext(this.context);
+    this.progVersionner.removeContext(this.pCurrentContext);
   }
 
   newContext(allen: string, contextType: 'STATE' | 'EVENT') {
@@ -251,7 +260,7 @@ export class CcblStateContextComponent implements OnInit {
     this.progVersionner.moveContext({
       context,
       to: {
-        parent: this.context,
+        parent: this.pCurrentContext,
         via: stringToAllen(allen),
         after
       }
@@ -261,30 +270,36 @@ export class CcblStateContextComponent implements OnInit {
   canDrop = (context: HumanReadableContext): boolean => {
     // Can drop if it is a context AND this state is not part of subcontexts
     if (context && context.contextName) {
-      return !this.progVersionner.isContextNestedIn(this.context, context as HumanReadableStateContext);
+      return !this.progVersionner.isContextNestedIn(this.pCurrentContext, context as HumanReadableStateContext);
     }
     return false;
   }
 
   async appendStateContext(conf: {allen: string, after?: HumanReadableContext}) {
-    const A = this.context.allen;
-    const LC: ContextOrProgram[] = A ? A[conf.allen] : [];
-    const lastSubContext = LC[LC.length - 1];
+    const A = this.pCurrentContext.allen;
+    let lastSubContext: ContextOrProgram;
+    if (conf.allen === 'Meet') {
+      const LC: ContextOrProgram[] = A?.Meet?.contextsSequence || [];
+      lastSubContext = LC[LC.length - 1];
+    } else {
+      const LC: ContextOrProgram[] = A ? A[conf.allen] : [];
+      lastSubContext = LC[LC.length - 1];
+    }
     const newContext: HumanReadableStateContext = {
       contextName: 'C',
       state: ''
     };
+    await this.editCondition(newContext);;
     this.progVersionner.appendContextOrProgram({
       context: newContext,
-      parent: this.context,
+      parent: this.pCurrentContext,
       via: stringToAllen(conf.allen),
       after: conf.after || lastSubContext
     });
-    return this.editCondition(newContext);
   }
 
   appendEventContext(conf: {allen: string, after?: HumanReadableContext}) {
-    const LC: ContextOrProgram[] = this.context.allen[conf.allen];
+    const LC: ContextOrProgram[] = this.pCurrentContext.allen[conf.allen];
     const lastSubContext = LC[LC.length - 1];
     const events = this.progVersionner.getEvents();
     let context: HumanReadableEventContext;
@@ -304,7 +319,7 @@ export class CcblStateContextComponent implements OnInit {
     }
     this.progVersionner.appendContextOrProgram( {
       context,
-      parent: this.context,
+      parent: this.pCurrentContext,
       via: stringToAllen(conf.allen),
       after: conf.after || lastSubContext
     } );
@@ -316,8 +331,8 @@ export class CcblStateContextComponent implements OnInit {
 
   getAvailableChannels(): VariableDescription[] {
     let L = this.progVersionner.getChannels();
-    if (this.context.actions) {
-      L = L.filter(c => !this.context.actions.find((a: HumanReadableStateAction) => a.channel === c.name));
+    if (this.pCurrentContext.actions) {
+      L = L.filter(c => !this.pCurrentContext.actions.find((a: HumanReadableStateAction) => a.channel === c.name));
     }
     const LC = L.sort((v1, v2) => v1.name.toLowerCase() > v2.name.toLowerCase() ? 1 : -1);
     return LC;
@@ -332,12 +347,12 @@ export class CcblStateContextComponent implements OnInit {
     const A: HumanReadableStateAction = await CcblActionStateComponent.staticEdit(this.dialog, {
       action,
       program: this.program,
-      context: this.context
+      context: this.pCurrentContext
     });
     if (A) {
-      const newContext = copyHumanReadableStateContext(this.context);
+      const newContext = copyHumanReadableStateContext(this.pCurrentContext);
       newContext.actions = newContext.actions ? [...newContext.actions, A] : [A];
-      this.programVersionner.updateContext(this.context, newContext);
+      this.programVersionner.updateContext(this.pCurrentContext, newContext);
     }
   }
 
@@ -352,13 +367,13 @@ export class CcblStateContextComponent implements OnInit {
       progVersionner: this.programVersionner
     });
     if (newAction) {
-      const newContext = copyHumanReadableStateContext(this.context);
+      const newContext = copyHumanReadableStateContext(this.pCurrentContext);
       if (position === 'start') {
         newContext.actionsOnStart = newContext.actionsOnStart ? [...newContext.actionsOnStart, newAction] : [newAction];
       } else {
         newContext.actionsOnEnd = newContext.actionsOnEnd ? [...newContext.actionsOnEnd, newAction] : [newAction];
       }
-      this.programVersionner.updateContext(this.context, newContext);
+      this.programVersionner.updateContext(this.pCurrentContext, newContext);
     }
   }
 
@@ -370,12 +385,12 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   appendStatedAction(vd: VariableDescription) {
-    this.progVersionner.appendStateAction(this.context, {channel: vd.name, affectation: {value: ''}});
+    this.progVersionner.appendStateAction(this.pCurrentContext, {channel: vd.name, affectation: {value: ''}});
   }
 
   appendEventAction(vd: VariableDescription, pos: 'start' | 'finish') {
     this.progVersionner.appendEventActionOnStateContext(
-      this.context, {
+      this.pCurrentContext, {
         channel: vd.name,
         affectation: 'undefined'
       },
@@ -396,21 +411,21 @@ export class CcblStateContextComponent implements OnInit {
       action, progVersionner: this.progVersionner
     });
     if (newA) {
-      const newContext = copyHumanReadableStateContext(this.context);
+      const newContext = copyHumanReadableStateContext(this.pCurrentContext);
       if (start) {
-        newContext.actionsOnStart = this.context.actionsOnStart.map( a => a === action ? newA : a);
+        newContext.actionsOnStart = this.pCurrentContext.actionsOnStart.map( a => a === action ? newA : a);
       } else {
-        newContext.actionsOnEnd   = this.context.actionsOnEnd  .map( a => a === action ? newA : a);
+        newContext.actionsOnEnd   = this.pCurrentContext.actionsOnEnd  .map( a => a === action ? newA : a);
       }
-      this.programVersionner.updateContext(this.context, newContext);
+      this.programVersionner.updateContext(this.pCurrentContext, newContext);
     }
   }
 
   deleteChannelAction(action: HumanReadableEventChannelAction): void {
-    const newContext = copyHumanReadableStateContext(this.context);
-    newContext.actionsOnStart = this.context.actionsOnStart.filter( a => a !== action );
-    newContext.actionsOnEnd   = this.context.actionsOnEnd  .filter( a => a !== action );
-    this.programVersionner.updateContext(this.context, newContext);
+    const newContext = copyHumanReadableStateContext(this.pCurrentContext);
+    newContext.actionsOnStart = this.pCurrentContext.actionsOnStart.filter( a => a !== action );
+    newContext.actionsOnEnd   = this.pCurrentContext.actionsOnEnd  .filter( a => a !== action );
+    this.programVersionner.updateContext(this.pCurrentContext, newContext);
   }
 
   async newProgInstance() {
@@ -424,14 +439,35 @@ export class CcblStateContextComponent implements OnInit {
     });
     const refP: ProgramReference = await dialogRef.afterClosed().toPromise();
     if (refP) {
-      const L = this.context.allen?.During || [];
+      const L = this.pCurrentContext.allen?.During || [];
       this.progVersionner.appendContextOrProgram({
         context: refP,
-        parent: this.context,
+        parent: this.pCurrentContext,
         via: AllenType.During,
         after: L[L.length-1]
       });
     }
   }
 
+  // Managing sequence
+  get startSequence(): boolean {
+    return !! this.context.allen?.Meet;
+  }
+
+  get contextSequenceRest(): ContextOrProgram[] {
+    return this.context.allen?.Meet?.contextsSequence || [];
+  }
+
+  get loopAt(): number {
+    return this.context.allen?.Meet?.loop;
+  }
+
+  get currentIndexInSequence(): number {
+    return this.pCurrentIndexInSequence;
+  }
+
+  set currentIndexInSequence(i: number) {
+    this.pCurrentIndexInSequence = i;
+    this.currentContext.next( i === 1 ? this.context : this.context.allen.Meet.contextsSequence[i-2] );
+  }
 }

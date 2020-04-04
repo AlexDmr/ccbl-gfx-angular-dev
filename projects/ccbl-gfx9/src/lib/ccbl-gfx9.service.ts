@@ -360,13 +360,14 @@ export class ProgVersionner {
       }
     };
 
+    newParent.allen = newParent.allen || {};
     switch (via) {
       case AllenType.During   : newParent.allen.During    = appendContextOrProgram(newParent.allen.During,    contextToAppend, position); break;
       case AllenType.StartWith: newParent.allen.StartWith = appendContextOrProgram(newParent.allen.StartWith, contextToAppend, position); break;
       case AllenType.EndWith  : newParent.allen.EndWith   = appendContextOrProgram(newParent.allen.EndWith,   contextToAppend, position); break;
       case AllenType.Meet     : newParent.allen.Meet = {
         ...newParent.allen.Meet,
-        contextsSequence: appendContextOrProgram(newParent.allen.Meet.contextsSequence, contextToAppend, position) as HumanReadableStateContext[]
+        contextsSequence: appendContextOrProgram(newParent.allen.Meet?.contextsSequence || [], contextToAppend, position) as HumanReadableStateContext[]
       };
                                 break;
     }
@@ -581,7 +582,7 @@ export class ProgVersionner {
     return LP.find( ap => ap.action === action );
   }
 
-  private getPathToContext(context: ContextOrProgram): PathStep[] {
+  getPathToContext(context: ContextOrProgram): PathStep[] {
     const LP = this.asActionsAndPaths();
 
     // Find one ActionAndPath that is about this context

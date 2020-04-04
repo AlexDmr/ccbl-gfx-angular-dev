@@ -14,6 +14,38 @@ $eventActionsColor: #eeffaa;
   background: white;
   position: relative;
 
+  section.sequence {
+    display: flex;
+    flex-flow: row;
+
+    > label {
+      border-bottom: solid black 3px;
+      background-color: lightgrey;
+      flex: 0 1 2em;
+      border-right: solid black 1px;
+      text-align: center;
+    }
+
+    > label.currentStep {
+      background-color: white;
+      border-bottom: solid white 3px;
+    }
+
+    > label:hover {
+      background-color: lightgreen;
+    }
+
+    > label.currentStep:hover {
+      border-bottom: solid lightgreen 3px;
+    }
+
+    > label:last-of-type {
+      flex: 1 1;
+      background-color: grey;
+    }
+
+  }
+
   section.cover {
     display: none;
     background-color: rgba(0, 0, 0, 0.8);

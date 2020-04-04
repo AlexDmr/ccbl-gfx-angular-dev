@@ -1,16 +1,18 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef, MatDialog} from '@angular/material/dialog';
 import {
   HumanReadableProgram,
   ProgramReference,
   VariableDescription,
   EventTrigger,
   isNameUsedInProg,
+  copyProgRef,
 } from 'ccbl-js/lib/ProgramObjectInterface';
 
 export interface DataEditProgramRef {
   parentProgram: HumanReadableProgram;
   progRef?: ProgramReference;
+  editMode?: boolean;
 }
 
 @Component({
@@ -21,12 +23,23 @@ export interface DataEditProgramRef {
 })
 export class DialogEditProgInstanceComponent implements OnInit {
   newProgRef: ProgramReference;
+  originalName: string;
+
+  static async editProgRef(dialog: MatDialog, data: DataEditProgramRef): Promise<ProgramReference> {
+    const dialogRef = dialog.open<DialogEditProgInstanceComponent, DataEditProgramRef, ProgramReference>(
+      DialogEditProgInstanceComponent, {
+      data,
+      closeOnNavigation: false
+    });
+    return dialogRef.afterClosed().toPromise();
+  }
 
   constructor(private dialogRef: MatDialogRef<DialogEditProgInstanceComponent, ProgramReference>,
               @Inject(MAT_DIALOG_DATA) private data: DataEditProgramRef) {
     const sPName = this.subProgramsId[0];
     if (this.data.progRef) {
-      this.newProgRef = this.data.progRef
+      this.newProgRef = copyProgRef( this.data.progRef );
+      this.originalName = this.data.progRef.as;
     } else {
       this.newProgRef = {
         programId: sPName,
@@ -39,6 +52,10 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  get editMode(): boolean {
+    return !!this.data.editMode;
   }
 
   cancel(): void {
@@ -142,7 +159,8 @@ export class DialogEditProgInstanceComponent implements OnInit {
 
   get canValidate(): boolean {
     const SPs = this.data.parentProgram.subPrograms || {};
-    return !isNameUsedInProg( this.newProgRef.as, this.data.parentProgram ) &&
+    const used = isNameUsedInProg( this.newProgRef.as, this.data.parentProgram );
+    return (!used || (this.editMode && this.newProgRef.as === this.originalName)) &&
            !this.eventsToMap  .find( e => !this.newProgRef.mapInputs[e.name] ) &&
            !this.emittersToMap.find( e => !this.newProgRef.mapInputs[e.name] ) &&
            !this.channelsToMap.find( e => !this.newProgRef.mapInputs[e.name] )
