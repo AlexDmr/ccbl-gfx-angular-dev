@@ -348,7 +348,15 @@ export class ProgVersionner {
   },             updateProg = true ) {
     // Create a new context state and insert it at the right place in parent.
     const {context, parent, via} = conf;
-    const position: number = conf.after ? conf.parent.allen[AllenToString(via)].indexOf(conf.after) + 1 : 0;
+    parent.allen = parent.allen || {};
+    if (via === AllenType.Meet) {
+      parent.allen.Meet = parent.allen.Meet || {loop: undefined, contextsSequence: []};
+    } else {
+      parent.allen[AllenToString(via)] = parent.allen[AllenToString(via)] || [];
+    }
+
+    const LC: ContextOrProgram[] = via === AllenType.Meet ? parent.allen?.Meet?.contextsSequence : parent.allen[AllenToString(via)];
+    const position: number = conf.after ? LC.indexOf(conf.after) + 1 : 0;
     const path = this.getPathToContext(parent);
     const contextToAppend: ContextOrProgram = !!context ? context : {
       contextName: 'new context'
@@ -634,17 +642,29 @@ export class ProgVersionner {
     // tslint:disable-next-line:no-conditional-assignment
     while ( step = path.pop() ) {
       // console.log("\tstep", step);
-      let viaStr;
-      let Lcontexts;
+      let viaStr: string;
+      let Lcontexts: ContextOrProgram[];
       const from = step.from as HumanReadableStateContext;
       switch (step.via) {
         case AllenType.EndWith  : viaStr = 'EndWith'  ; Lcontexts = from.allen.EndWith   ; break;
         case AllenType.StartWith: viaStr = 'StartWith'; Lcontexts = from.allen.StartWith ; break;
-        case AllenType.Meet     : viaStr = 'Meet'     ; Lcontexts = from.allen.Meet      ; break;
+        case AllenType.Meet     : viaStr = 'Meet'     ; Lcontexts = from.allen.Meet.contextsSequence; break;
         case AllenType.During   : viaStr = 'During'   ; Lcontexts = from.allen.During    ; break;
       }
       const tmp = {...from} as HumanReadableStateContext;
-      tmp.allen[viaStr] = Lcontexts.map( c => c !== step.to ? c : newContext).filter( c => !!c );
+      if (step.via === AllenType.Meet) {
+        if (Lcontexts.length > 1) {
+          const newSC = newContext as HumanReadableStateContext;
+          tmp.allen.Meet.contextsSequence = tmp.allen.Meet.contextsSequence.map( c => c !== step.to ? c : newSC).filter( c => !!c );
+        } else {
+          delete tmp.allen.Meet;
+        }
+      } else {
+        tmp.allen[viaStr] = Lcontexts.map( c => c !== step.to ? c : newContext).filter( c => !!c );
+        if (tmp.allen[viaStr].length === 0) {
+          delete tmp.allen[viaStr];
+        }
+      }
       // Go next
       newContext = tmp as HumanReadableStateContext;
       old.push(from);
