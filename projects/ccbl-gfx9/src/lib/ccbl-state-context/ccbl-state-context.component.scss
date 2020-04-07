@@ -8,6 +8,8 @@ $stateActionPadding: 1em;
 $eventActionsMargin: 2em;
 $eventActionsColor: #eeffaa;
 
+$canDropColor: lightgreen;
+
 :host {
   display: flex;
   flex-flow: column;
@@ -24,6 +26,7 @@ $eventActionsColor: #eeffaa;
       flex: 0 1 2em;
       border-right: solid black 1px;
       text-align: center;
+      transition: padding .3s;
     }
 
     > label.currentStep {
@@ -44,6 +47,11 @@ $eventActionsColor: #eeffaa;
       background-color: grey;
     }
 
+    > label.dndDragover {
+      background-color: $canDropColor;
+      padding-left: 1em;
+      transition: padding .3s;
+    }
   }
 
   section.cover {
@@ -69,7 +77,7 @@ $eventActionsColor: #eeffaa;
 
   header.dndDragover + section + section.allen > section.separator.During, section.separator.dndDragover {
     height: 1em;
-    background-color: lightgreen;
+    background-color: $canDropColor;
     transition: height .3s;
   }
 
@@ -126,7 +134,7 @@ $eventActionsColor: #eeffaa;
       border-radius: 50%;
       background-color: orangered;
       padding: 2px;
-      height: 1em;
+      // height: 1em;
       flex: 0 1 1em;
       text-align: center;
       font-size: 8px;

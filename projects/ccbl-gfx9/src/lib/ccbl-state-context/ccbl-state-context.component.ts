@@ -80,6 +80,7 @@ export class CcblStateContextComponent implements OnInit {
   }
 
 
+
   // Constructor
   constructor(
     private clipboard: ClipboardService,
@@ -268,7 +269,7 @@ export class CcblStateContextComponent implements OnInit {
     this.progVersionner.moveContext({
       context,
       to: {
-        parent: this.context,// this.pCurrentContext,
+        parent: this.context,
         via: stringToAllen(allen),
         after
       }
@@ -281,6 +282,27 @@ export class CcblStateContextComponent implements OnInit {
       return !this.progVersionner.isContextNestedIn(this.pCurrentContext, context as HumanReadableStateContext);
     }
     return false;
+  }
+
+  moveContextInSequence(i: number, cop: ContextOrProgram): void {
+    const C = cop as HumanReadableStateContext;
+    const {now: LcontextWithoutC, old} = this.progVersionner.removeContext(C, false);
+    const posOld = old.findIndex(c => c === this.context);
+    let parentContext = this.context;
+    if (posOld >= 0) {
+      parentContext = LcontextWithoutC[posOld] as HumanReadableStateContext;
+    }
+    const contextWithoutC = LcontextWithoutC[LcontextWithoutC.length - 1];
+    if (i === 1) {
+      // Replace root context with the new one, copy the sequence in the new one
+      // Insert previous root context as first child of the sequence
+
+    } else {
+      // Position in the sequence
+      const newC = copyHumanReadableStateContext(parentContext as HumanReadableStateContext);
+      newC.allen.Meet.contextsSequence.splice(i - 2, 0, C);
+      this.progVersionner.updateContext(parentContext, newC);
+    }
   }
 
   async appendStateContext(conf: {allen: string, after?: HumanReadableContext}) {

@@ -540,22 +540,6 @@ export class ProgVersionner {
     } as HumanReadableStateContext, path);
   }
 
-  /*updateEventAction(previous: HumanReadableEventChannelAction, updated: HumanReadableEventChannelAction) {
-    const LP = this.asActionsAndPaths();
-
-    // Find the ActionAndPath that is about this affectation
-    const AP = LP.find( ap => ap.action === previous );
-
-    const PS = AP.path.pop() as PathStep;
-    const from = PS.from as HumanReadableEventContext;
-    const newContext = {...from, actions: (from.actions as HumanReadableEventChannelAction[]).map(
-        a => a === previous ? updated : a
-      ) } as HumanReadableEventContext;
-
-    // Update ancestors
-    this.updateEventeContextAncestors(newContext, AP.path); // XXX
-  }*/
-
   updateAffectation(affectation: Affectation, value: string) {
     const LP = this.asActionsAndPaths();
 
@@ -653,7 +637,7 @@ export class ProgVersionner {
       }
       const tmp = {...from} as HumanReadableStateContext;
       if (step.via === AllenType.Meet) {
-        if (Lcontexts.length > 1) {
+        if (Lcontexts.length > 0) {
           const newSC = newContext as HumanReadableStateContext;
           tmp.allen.Meet.contextsSequence = tmp.allen.Meet.contextsSequence.map( c => c !== step.to ? c : newSC).filter( c => !!c );
         } else {
