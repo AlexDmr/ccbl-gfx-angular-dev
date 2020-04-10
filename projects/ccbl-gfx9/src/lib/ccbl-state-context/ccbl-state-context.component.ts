@@ -296,7 +296,14 @@ export class CcblStateContextComponent implements OnInit {
     if (i === 1) {
       // Replace root context with the new one, copy the sequence in the new one
       // Insert previous root context as first child of the sequence
-
+      const newParent = copyHumanReadableStateContext(C);
+      newParent.allen = newParent.allen || {};
+      const M = newParent.allen.Meet = newParent.allen.Meet || {loop: 1, contextsSequence: []};
+      M.loop = parentContext.allen.Meet.loop;
+      const F = copyHumanReadableStateContext(parentContext);
+      delete F.allen.Meet;
+      M.contextsSequence = [F, ...newParent.allen.Meet.contextsSequence, ...(parentContext.allen?.Meet?.contextsSequence || [])];
+      this.progVersionner.updateContext(parentContext, newParent);
     } else {
       // Position in the sequence
       const newC = copyHumanReadableStateContext(parentContext as HumanReadableStateContext);
