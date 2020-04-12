@@ -9,6 +9,9 @@
   <button mat-menu-item (click)="openDialogDevice()">
     <span>Add device</span>
   </button>
+  <button mat-menu-item (click)="genEnvFromProg()">
+    Generate environment from program
+  </button>
   <button mat-menu-item (click)="reset()">
     <span>Delete program</span>
   </button>
@@ -16,14 +19,6 @@
     <span>Reset all</span>
   </button>
   <hr/>
-  <mat-form-field class="example-full-width">
-    <mat-label></mat-label>
-    <input matInput placeholder="nom de la configuration" #saveInput>
-    <button mat-menu-item (click)="save( saveInput.value )">
-      Save
-    </button>
-  </mat-form-field>
-
   <button mat-menu-item [matMenuTriggerFor]="menuCharger">
     Load
   </button>
@@ -39,7 +34,6 @@
 </mat-menu>
 <section class="gridRoot">
   <section class="pilotage">
-    Pilotage du moteur CCBL .................... <br/>
     <button mat-raised-button color="primary" (click)="initProgram()">
       Initialiser programme
     </button>
@@ -67,9 +61,3 @@
     ></lib-ccbl-program>
   </section>
 </section>
-
-<!--
-<section>
-  <lib-ccbl-program [program-versionner] = "getProgVersionner()"></lib-ccbl-program>
-</section>
--->

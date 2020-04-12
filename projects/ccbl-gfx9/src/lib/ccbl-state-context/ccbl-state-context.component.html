@@ -18,16 +18,11 @@
     <label  class="expand"
             [dndDropzone]          = "['HumanReadableStateContext']"
             (dndDrop)              = "moveContextInSequence(2 + contextSequenceRest.length, this.draggedContext )"
->
-  </label>
+            [mat-menu-trigger-for] = "matMenuLoopAt"
+            >
+      {{loopAt > 0 ? "loop at " + loopAt : "no loop"}}
+    </label>
   </section>
-
-  <pre *ngIf="startSequence">
-    Problème rechargement du programme, on perd la position dans la séquence
-      => donner un nom identifiant et aller chercher dans localStorage un état ?
-    Afficher et éditer loop
-    Générer à partir du programme les appareils de simulations du contexte
-  </pre>
 
   <section [class.isActive]="active | async"
            [class.hide]="hide"
@@ -249,4 +244,14 @@
       Delete
     </button>
   </ng-template>
+</mat-menu>
+
+<mat-menu #matMenuLoopAt="matMenu">
+  <button mat-menu-item (click)="loopAt = undefined">No loop</button>
+  <button mat-menu-item
+          *ngFor  = "let i of genLoop"
+          (click) = "loopAt = i"
+  >
+    loop at {{i}}
+  </button>
 </mat-menu>

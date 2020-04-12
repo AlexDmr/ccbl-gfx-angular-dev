@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {ProgVersionner, stringToAllen, CcblGfx9Service} from '../ccbl-gfx9.service';
+import {ProgVersionner, stringToAllen, CcblGfx9Service, getUID} from '../ccbl-gfx9.service';
 import {
   ContextOrProgram, copyHumanReadableEventContext, copyHumanReadableStateContext,
   HumanReadableContext,
@@ -49,6 +49,8 @@ export class CcblStateContextComponent implements OnInit {
       c.ccblContext.onActiveUpdated( this.cbCCBL );
       this.cbCCBL( c.ccblContext.getActive() );
     }
+    c.id = c.id || getUID('SC');
+    this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
     this.currentContext.next(c);
   }
   @Input('program-versionner') private progVersionner: ProgVersionner;
@@ -80,7 +82,6 @@ export class CcblStateContextComponent implements OnInit {
   }
 
 
-
   // Constructor
   constructor(
     private clipboard: ClipboardService,
@@ -90,6 +91,7 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
   }
 
   get program(): HumanReadableProgram {
@@ -501,12 +503,49 @@ export class CcblStateContextComponent implements OnInit {
     return this.context.allen?.Meet?.loop;
   }
 
+  set loopAt(v: number) {
+    const cp = copyHumanReadableStateContext(this.context);
+    cp.allen.Meet.loop = v;
+    this.progVersionner.updateContext(this.context, cp);
+  }
+
   get currentIndexInSequence(): number {
     return this.pCurrentIndexInSequence;
   }
 
   set currentIndexInSequence(i: number) {
     this.pCurrentIndexInSequence = i;
-    this.currentContext.next( i === 1 ? this.context : this.context.allen.Meet.contextsSequence[i-2] );
+    updateDisplay(this.context, {currentIndexInSequence: i});
+    if (this.context.allen?.Meet?.contextsSequence) {
+      this.currentContext.next( i === 1 ? this.context : this.context.allen.Meet.contextsSequence[i-2] );
+    }
   }
+
+  get genLoop(): Generator<number, void, void> {
+    const context = this.context;
+    function* gen(nb: number) {
+      for (let i = 1; i <= nb; i++) {
+        yield i;
+      }
+    }
+    const nb = this.context.allen?.Meet?.contextsSequence?.length || -1;
+    return gen(nb + 1);
+  }
+}
+
+
+// Stuff to remember display state for sequence
+type CONF = {[key: string]: any};
+type IdCONF = string;
+const mapDisplay = new Map<IdCONF, CONF>();
+
+function getDisplay(c: HumanReadableStateContext): CONF {
+  return mapDisplay.get(c.id);
+}
+
+function updateDisplay(c: HumanReadableStateContext, update: CONF): CONF {
+  const conf: CONF = mapDisplay.get(c.id) || {};
+  const newConf = {...conf, ...update};
+  mapDisplay.set(c.id, newConf);
+  return newConf;
 }

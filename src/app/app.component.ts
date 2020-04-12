@@ -12,6 +12,7 @@ import {
   ImportExportConfig,
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
+import { DataEnvGenerator, EnvGeneratorComponent, SensorImplem } from './env-generator/env-generator.component';
 
 @Component({
   selector: 'app-root',
@@ -123,4 +124,20 @@ export class AppComponent implements OnInit {
     this.ccblEngineService.deleteProgram();
   }
 
+  async genEnvFromProg() {
+    const prog = this.progVersionner.getCurrent();
+    const events:   VariableDescription[] = prog.dependencies?.import?.events   || [];
+    const emitters: VariableDescription[] = prog.dependencies?.import?.emitters || [];
+    const channels: VariableDescription[] = prog.dependencies?.import?.channels || [];
+    const data: DataEnvGenerator = {
+      program: prog,
+      events, emitters, channels
+    };
+    const dialogRef = this.dialog.open<EnvGeneratorComponent, DataEnvGenerator, SensorImplem[]>(
+      EnvGeneratorComponent,
+      {data, width: "100%", height: "100%", maxWidth: "100%"}
+      );
+    const sensors = await dialogRef.afterClosed().toPromise();
+    this.ccblEngineService.sensors = sensors.map(s => s.sensor );
+  }
 }

@@ -22,7 +22,7 @@
     "@angular/platform-browser": "~9.1.0",
     "@angular/platform-browser-dynamic": "~9.1.0",
     "@angular/router": "~9.1.0",
-    "ccbl-js": "1.1.1",
+    "ccbl-js": "1.1.2",
     "mathjs": "~6.6.1",
     "ngx-drag-drop": "2.0.0",
     "rxjs": "~6.5.4",

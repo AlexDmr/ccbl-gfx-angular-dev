@@ -25,6 +25,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatStepperModule} from '@angular/material/stepper';
 import {MatRadioModule} from '@angular/material/radio';
 import { EventerComponent } from './eventer/eventer.component';
+import { EnvGeneratorComponent } from './env-generator/env-generator.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { EventerComponent } from './eventer/eventer.component';
     SensorComponent,
     SensorScalarComponent,
     DialogDeviceComponent,
-    EventerComponent
+    EventerComponent,
+    EnvGeneratorComponent
   ],
   imports: [
     BrowserModule,

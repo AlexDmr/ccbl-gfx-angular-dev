@@ -17,6 +17,11 @@ import {scopeInterpolator, mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEn
 import {MathNode} from 'mathjs';
 import {ParsedExprNode} from './dataParsedExpr';
 
+let uid = 0;
+export function getUID(prefix: string = 'UID'): string {
+  return `${prefix}:${uid++}`;
+}
+
 @Injectable({
   providedIn: 'root'
 })

@@ -27,6 +27,8 @@ $canDropColor: lightgreen;
       border-right: solid black 1px;
       text-align: center;
       transition: padding .3s;
+      padding-left: 3px;
+      padding-right: 3px;
     }
 
     > label.currentStep {
@@ -45,6 +47,8 @@ $canDropColor: lightgreen;
     > label:last-of-type {
       flex: 1 1;
       background-color: grey;
+      word-wrap: normal;
+      white-space: nowrap;
     }
 
     > label.dndDragover {
