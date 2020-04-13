@@ -6,14 +6,14 @@
 </mat-toolbar>
 
 <mat-menu #menuGeneral="matMenu">
-  <button mat-menu-item (click)="openDialogDevice()">
-    <span>Add device</span>
-  </button>
   <button mat-menu-item (click)="genEnvFromProg()">
     Generate environment from program
   </button>
   <button mat-menu-item (click)="reset()">
     <span>Delete program</span>
+  </button>
+  <button mat-menu-item (click)="deleteSensors()">
+    <span>Delete sensors</span>
   </button>
   <button mat-menu-item (click)="deleteProgram()">
     <span>Reset all</span>

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {Sensor, SensorDataType, SensorVarType} from '../data/setup';
-import {MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-dialog-device',
@@ -13,7 +13,13 @@ export class DialogDeviceComponent implements OnInit {
   name = '';
   deviceType: SensorVarType;
 
-  constructor( private dialogRef: MatDialogRef<DialogDeviceComponent>) { }
+  constructor( private dialogRef: MatDialogRef<DialogDeviceComponent>
+             , @Inject(MAT_DIALOG_DATA) private data: Sensor
+  ) {
+    this.dataType   = data.type;
+    this.name       = data.name;
+    this.deviceType = data.varType
+  }
 
   ngOnInit(): void {
   }

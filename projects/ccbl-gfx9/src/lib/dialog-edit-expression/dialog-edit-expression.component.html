@@ -13,13 +13,13 @@
                        ></lib-ccbl-expression>
   <div class="cursorError" *ngIf="cursorErrorPos >= 0" [style.left]="cursorErrorPos + 'px'"></div>
   <div class="cursor" *ngIf="cursorPos >= 0" [style.left]="cursorPos + 'px'"></div>
-  <!--<form (ngSubmit)="updateInput()">-->
+  <form (ngSubmit)="updateInput()">
     <input class="inputExpr"
            #inputExpr name="inputExpr"
            [ngModel] = "tmpExpr"
            (ngModelChange) = "newExpr = $event"
     />
-  <!--</form>-->
+  </form>
 </section>
 
 <section class="transition" *ngIf="isTransition">

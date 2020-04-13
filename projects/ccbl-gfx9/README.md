@@ -3,11 +3,18 @@
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.3.
 
 ## Todo
-* Sous-programmes et références à des sous-programmes
-* Représenter la relation de séquence, avec la notion de boucle, un menu spécial pour cette relation ?
+* Drag & Drop des instances de programmes
+* Instance de programme => simple click pour éditer
+* Instance de programme => le nom de l'instance doit être réductible à un seul symbole ! Sinon pas valide.
+* Quand on édite un evénement pour la première fois => se placer sur la sous partie évennement et pas condition.
+* Trouver un moyen de représenter le vocabulaire accessible lors de l'édition d'un programme.
+* Composant expression : Appuie sur Entrer => On valide si c'est possible et on sort.
+* COmposant expression : régler bug des transitions.
 * Couper, copier, coller : des menus à placer aux endroits des zones de drops ?
 
 ## Fait
+* Sous-programmes et références à des sous-programmes
+* Représenter la relation de séquence, avec la notion de boucle, un menu spécial pour cette relation ?
 * Contextes évennementiels
     * Exprimer "une expression devient vraie"
     * Exprimer "un évennement se déclenche", avec la notion de filtre qui est gérée par CCBL

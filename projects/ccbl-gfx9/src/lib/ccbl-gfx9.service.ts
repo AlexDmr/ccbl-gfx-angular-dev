@@ -937,8 +937,8 @@ export function mathNodeToArray(
   }
   if (node.isFunctionNode) {
     const LA: ParsedExprNode[][] = node.args.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
-    L.push( {label: name, type: 'function', mathNode: node}
-      ,  {label: '(', type: 'parenthesis', mathNode: node}
+    L.push( {label: node.name, type: 'function', mathNode: node}
+      ,  {label: '( ', type: 'parenthesis', mathNode: node}
       , ...LA.reduce( (acc, LE) => [...acc, {label: ', ', type: 'comma', mathNode: node}, ...LE] )
       ,  {label: ') ', type: 'parenthesis', mathNode: node}
     );

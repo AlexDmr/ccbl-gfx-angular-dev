@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HumanReadableProgram, VariableDescription } from 'ccbl-js/lib/ProgramObjectInterface';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { Sensor, SensorVarType } from '../data/setup';
+import {Sensor, SensorDataType, SensorVarType} from '../data/setup';
 import { DialogDeviceComponent } from '../dialog-device/dialog-device.component';
 
 export interface DataEnvGenerator {
@@ -30,9 +30,15 @@ export class EnvGeneratorComponent implements OnInit {
              ) {
     const D = this.data;
     this.pInputs = [
-      ...D.channels.map( vd => ({...vd, sensor: undefined, varType: 'channel'} as SensorImplem) ),
-      ...D.emitters.map( vd => ({...vd, sensor: undefined, varType: 'emitter'} as SensorImplem) ),
-      ...D.events  .map( vd => ({...vd, sensor: undefined, varType: 'event'  } as SensorImplem) )
+      ...D.channels.map( vd => ({...vd,
+                                 sensor: {varType: 'channel', name: vd.name, label: vd.name, type: vd.type, userCanControl: true},
+                                 varType: 'channel'} as SensorImplem) ),
+      ...D.emitters.map( vd => ({...vd,
+                                 sensor: {varType: 'emitter', name: vd.name, label: vd.name, type: vd.type, userCanControl: true},
+                                 varType: 'emitter'} as SensorImplem) ),
+      ...D.events  .map( vd => ({...vd,
+                                 sensor: {varType: 'event', name: vd.name, label: vd.name, type: vd.type, userCanControl: true},
+                                 varType: 'event'} as SensorImplem) )
     ];
   }
 
@@ -56,7 +62,10 @@ export class EnvGeneratorComponent implements OnInit {
   }
 
   async setSensor(si: SensorImplem) {
-    const dialogRef = this.dialog.open(DialogDeviceComponent);
+    const dialogRef = this.dialog.open<DialogDeviceComponent, Sensor, Sensor>(
+      DialogDeviceComponent, {
+        data: {varType: si.varType, name: si.name, label: si.name, type: si.type as SensorDataType, userCanControl: true}
+      });
     si.sensor = await dialogRef.afterClosed().toPromise();
   }
 }

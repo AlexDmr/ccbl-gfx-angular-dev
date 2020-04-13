@@ -124,6 +124,10 @@ export class AppComponent implements OnInit {
     this.ccblEngineService.deleteProgram();
   }
 
+  deleteSensors() {
+    this.ccblEngineService.deleteSensors();
+  }
+
   async genEnvFromProg() {
     const prog = this.progVersionner.getCurrent();
     const events:   VariableDescription[] = prog.dependencies?.import?.events   || [];
@@ -135,9 +139,10 @@ export class AppComponent implements OnInit {
     };
     const dialogRef = this.dialog.open<EnvGeneratorComponent, DataEnvGenerator, SensorImplem[]>(
       EnvGeneratorComponent,
-      {data, width: "100%", height: "100%", maxWidth: "100%"}
+      {data, width: '100%', height: '100%', maxWidth: '100%'}
       );
     const sensors = await dialogRef.afterClosed().toPromise();
-    this.ccblEngineService.sensors = sensors.map(s => s.sensor );
+    this.ccblEngineService.unregister( ...this.ccblEngineService.sensors );
+    sensors.forEach(s => this.ccblEngineService.register(s.sensor) );
   }
 }

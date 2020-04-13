@@ -1,3 +1,4 @@
+/* tslint:disable:member-ordering */
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner, stringToAllen, CcblGfx9Service, getUID} from '../ccbl-gfx9.service';
 import {
@@ -53,6 +54,7 @@ export class CcblStateContextComponent implements OnInit {
     this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
     this.currentContext.next(c);
   }
+  // tslint:disable-next-line:no-input-rename
   @Input('program-versionner') private progVersionner: ProgVersionner;
   @Input() isProgramRoot = false;
   cbCCBL = a => {
@@ -74,7 +76,8 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   static async staticEditCondition(dialog: MatDialog, data: DataEditionContextState): Promise<HumanReadableStateContext | undefined> {
-    const dialogRef = dialog.open<DialogEditContextStateConditionComponent, DataEditionContextState, HumanReadableStateContext>(DialogEditContextStateConditionComponent, {
+    const dialogRef = dialog.open<DialogEditContextStateConditionComponent, DataEditionContextState, HumanReadableStateContext>(
+      DialogEditContextStateConditionComponent, {
       data,
       closeOnNavigation: false
     });
@@ -135,7 +138,8 @@ export class CcblStateContextComponent implements OnInit {
   }
 
   get displayState(): boolean {
-    return !!this.pCurrentContext.state || (this.pCurrentContext.eventStart === undefined && this.pCurrentContext.eventFinish === undefined);
+    const C = this.pCurrentContext;
+    return !!C.state || (C.eventStart === undefined && C.eventFinish === undefined);
   }
 
   get channels(): VariableDescription[] {
@@ -523,8 +527,8 @@ export class CcblStateContextComponent implements OnInit {
 
   get genLoop(): Generator<number, void, void> {
     const context = this.context;
-    function* gen(nb: number) {
-      for (let i = 1; i <= nb; i++) {
+    function* gen(N: number) {
+      for (let i = 1; i <= N; i++) {
         yield i;
       }
     }

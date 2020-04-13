@@ -108,7 +108,6 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
         const Lerr = L.filter(w => w.type.indexOf('error') >= 0).map(w => w.label);
         this.pNewExpr = L.map(w => w.label).join('');
         this.cursorErrorPos = -1;
-        // console.log(this.pNewExpr);
         if (this.inputExpr) {
           // this.inputExpr.nativeElement.value = this.pNewExpr;
         }

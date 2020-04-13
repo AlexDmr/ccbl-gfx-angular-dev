@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {copyHumanReadableProgram, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {Sensor, SensorDataType, SensorVarType} from './data/setup';
 import {initCCBL} from 'ccbl-js/lib/main';
-import {Observable} from 'rxjs';
+import {Observable, Subject, interval, ConnectableObservable, of} from 'rxjs';
 import {ProgVersionner} from '../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.service';
 import {CCBLEnvironmentExecutionInterface} from 'ccbl-js/lib/ExecutionEnvironmentInterface';
 import {CCBLEnvironmentExecution} from 'ccbl-js/lib/ExecutionEnvironment';
@@ -11,6 +11,7 @@ import {CCBLEmitterValue} from 'ccbl-js/lib/EmitterValue';
 import {Channel, commitStateActions} from 'ccbl-js/lib/Channel';
 import {CCBLProgramObject} from 'ccbl-js/lib/ProgramObject';
 import {CCBLEvent} from 'ccbl-js/lib/Event';
+import { delay, multicast, distinctUntilChanged, switchMap, takeWhile, tap } from 'rxjs/operators';
 
 initCCBL();
 
@@ -27,6 +28,20 @@ export class CcblEngineService {
   mapObs = new Map<string, Observable<any>>();
   sensors: Sensor[] = [];
   ccblProg: CCBLProgramObject;
+  obsClock = new Observable( observer => {
+    this.clock.on( ms => observer.next(ms) );
+  }).pipe(
+    distinctUntilChanged(),
+    // tap( (ms) => console.log('clock', ms) ),
+    tap( (ms) => this.ccblProg?.UpdateChannelsActions() ),
+    switchMap( () =>
+      of( undefined ).pipe(
+        delay(20),
+        tap( () => {if (this.clock.nextForeseenUpdate !== undefined) this.clock.goto( Date.now() )} )
+      )
+    ),
+    multicast( () => new Subject() )
+  ) as ConnectableObservable<any>;
 
   constructor() {
     this.env = new CCBLEnvironmentExecution( this.clock );
@@ -44,6 +59,11 @@ export class CcblEngineService {
     } catch (err) {
       console.error(err);
     }
+
+    this.obsClock.connect();
+    /*this.obsClock.subscribe( () => {
+      console.log('yo');
+    });*/
   }
 
   load(name: string) {
@@ -86,6 +106,11 @@ export class CcblEngineService {
     this.deleteProgram();
   }
 
+  deleteSensors() {
+    localStorage.removeItem(localSensorsKey);
+    location.reload();
+  }
+
   deleteProgram() {
     localStorage.removeItem(localProgramKey);
     location.reload();
@@ -115,9 +140,6 @@ export class CcblEngineService {
         break;
       case 'emitter':
         this.env.register_CCBLEmitterValue(sensor.name, emitter);
-        emitter.on( v => {
-          setTimeout( () => this.ccblProg?.UpdateChannelsActions() );
-        } );
         break;
       case 'event':
         const eventer = new CCBLEvent({
@@ -125,9 +147,6 @@ export class CcblEngineService {
           env: this.env,
         });
         this.env.registerCCBLEvent( sensor.name, eventer );
-        eventer.on( v => {
-          setTimeout( () => this.ccblProg?.UpdateChannelsActions() );
-        } );
         break;
     }
     this.sensors.push(sensor);
@@ -143,9 +162,6 @@ export class CcblEngineService {
       const copy = copyHumanReadableProgram(prog, false);
       localStorage.setItem(localProgramKey, JSON.stringify( copy ) );
       const obj = JSON.parse( localStorage.getItem(localProgramKey) );
-      // console.log(`${localProgramKey}:`, obj );
-      // console.log('original', prog );
-      // console.log('copy', copy );
     });
   }
 
@@ -172,10 +188,11 @@ export class CcblEngineService {
     const ms = Date.now();
     this.clock.set(ms);
     switch (type) {
-      case 'channel': return this.env.get_Channel_FromId(varName)?.getValueEmitter().set(value);
-      case 'emitter': return this.env.get_CCBLEmitterValue_FromId(varName)?.set(value);
-      case 'event': return this.env.getCCBLEvent(varName)?.trigger( {value, ms} );
+      case 'channel': this.env.get_Channel_FromId(varName)?.getValueEmitter().set(value); break;
+      case 'emitter': this.env.get_CCBLEmitterValue_FromId(varName)?.set(value);          break;
+      case 'event':   this.env.getCCBLEvent(varName)?.trigger( {value, ms} );             break;
     }
+    setTimeout( () => this.ccblProg?.UpdateChannelsActions() );
   }
 
   getValue(id: string): any {
