@@ -85,7 +85,7 @@ $canDropColor: lightgreen;
     transition: height .3s;
   }
 
-  > section.isActive {
+  section.isActive {
     > header {
       background-color: yellow;
     }

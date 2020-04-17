@@ -1,8 +1,9 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {ProgVersionner} from '../ccbl-gfx9.service';
+import {ProgVersionner, getUID, getDisplay, updateDisplay} from '../ccbl-gfx9.service';
 import {HumanReadableProgram, ProgramReference, VariableDescription, ProgramInput} from 'ccbl-js/lib/ProgramObjectInterface';
 import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/dialog-edit-prog-instance.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'lib-ccbl-program-reference',
@@ -17,7 +18,23 @@ export class CcblProgramReferenceComponent implements OnInit {
 
   constructor(private matDialog: MatDialog) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.data.id = this.data.id || getUID('progRef');
+    if (!getDisplay(this.data)) {
+      updateDisplay(this.data, {details: false});
+    }
+  }
+
+  get details(): boolean {
+    return getDisplay(this.data).details || false;
+  }
+
+  set details(d: boolean) {
+    updateDisplay(this.data, {details: d});
+  }
+
+  get parentProgramObs(): Observable<HumanReadableProgram> {
+    return this.progVersionner.asObservable();
   }
 
   get inputChannels(): VariableDescription[] {
@@ -49,6 +66,10 @@ export class CcblProgramReferenceComponent implements OnInit {
     return subPrograms ? subPrograms[this.data.programId] : undefined;
   }
 
+  get description(): string {
+    return this.program?.description;
+  }
+
   getMapValue(n: string): string {
     const m = this.data.mapInputs[n];
     return m !== undefined ? m.toString() : n;
@@ -76,6 +97,10 @@ export class CcblProgramReferenceComponent implements OnInit {
       parentProgram: this.progVersionner.getCurrent(),
       editMode: true
     } );
+    this.updateWith(progRef);
+  }
+
+  updateWith(progRef: ProgramReference) {
     if (progRef) {
       this.progVersionner.updateProrgamReference(this.data, progRef);
     }
@@ -84,6 +109,15 @@ export class CcblProgramReferenceComponent implements OnInit {
   delete() {
     this.progVersionner.removeContext(this.data);
   }
+
+  startDragging() {
+    this.progVersionner.draggedContext = this.data;
+  }
+
+  stopDragging() {
+    this.progVersionner.draggedContext = undefined;
+  }
+
 }
 
 export interface PARAM {

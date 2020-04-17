@@ -1,32 +1,35 @@
-<header [mat-menu-trigger-for]="menuGeneral">
+<header [mat-menu-trigger-for] = "menuGeneral"
+        dndDraggable
+        dndType       = "HumanReadableStateContext"
+        (dndStart)    = "startDragging()"
+        (dndEnd)      = "stopDragging()"
+        (dndCanceled) = "stopDragging()"
+>
   {{data.as}}
 </header>
-<section *ngIf = "!extendedMode">
-  <table>
-    <tbody>
-      <tr>
-        <td>In</td>
-        <td>
-          <label *ngFor="let p of shortInputs(); let isLast = last" [class]="p.class">
-            {{p.value}}
-            {{!isLast ? ', ' : ''}}
-          </label>
-        </td>
-      </tr>
-      <tr>
-        <td>Out</td>
-        <td>
-          <label *ngFor="let p of shortOuputs(); let isLast = last" [class]="p.class">
-            {{p.label}}
-            {{!isLast ? ', ' : ''}}
-          </label>
-        </td>
-      </tr>
-    </tbody>
+
+<section>
+  <div (pointerdown) = "details = !details">
+    <label *ngIf="!details" class="minidescr">► description</label>
+    <label *ngIf=" details">▼</label>
+  </div>
+  <table *ngIf="details">
+    <tr>
+      <td [innerHTML]="description"></td>
+      <td>
+        <lib-prog-instance-parameters [initialProgRef] = "data"
+                                      [parentProgram]  = "parentProgramObs | async"
+                                      (update)         = "updateWith($event)"
+        ></lib-prog-instance-parameters>
+      </td>
+    </tr>
   </table>
 </section>
 
 <mat-menu #menuGeneral="matMenu">
+  <button mat-menu-item (click)="details = !details">
+    {{details ? "Hide" : "Show"}} details
+  </button>
   <button mat-menu-item (click)="edit()">
     Edit
   </button>

@@ -45,7 +45,8 @@ export class CcblExpressionComponent implements OnInit {
   @Input() vocabulary: VariableDescription[] = [];
   @Input() canExpressTransition = false;
   @Input() program: HumanReadableProgram;
-  @Output('update')            private newExpression = new EventEmitter<string>();
+  // tslint:disable-next-line: no-output-rename
+  @Output('update') private newExpression = new EventEmitter<string>();
 
   pEditing = false;
   private pExpression: string;

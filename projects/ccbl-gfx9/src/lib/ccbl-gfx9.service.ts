@@ -17,10 +17,7 @@ import {scopeInterpolator, mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEn
 import {MathNode} from 'mathjs';
 import {ParsedExprNode} from './dataParsedExpr';
 
-let uid = 0;
-export function getUID(prefix: string = 'UID'): string {
-  return `${prefix}:${uid++}`;
-}
+
 
 @Injectable({
   providedIn: 'root'
@@ -929,7 +926,7 @@ export function mathNodeToArray(
       ...Latt.reduce( (acc, n) => [
         ...acc,
         {label: dotNotation ? '.' : '[', type: 'attribute', mathNode: node},
-        {label: n.value, type: 'attribute accessor'},
+        ...( n.value !== undefined ? [{label: n.value, type: 'attribute accessor'}] : mathNodeToArray(P, n, acceptEvent, ...vocabulary) ),
         {label: dotNotation ? '' : ']', type: 'attribute', mathNode: node},
       ], [])
     );
@@ -950,4 +947,28 @@ export function mathNodeToArray(
   }
 
   return L;
+}
+
+
+
+
+// Stuff to remember display state
+let uid = 0;
+export function getUID(prefix: string = 'UID'): string {
+  return `${prefix}:${uid++}`;
+}
+
+export type CONF = {[key: string]: any};
+export type IdCONF = string;
+const mapDisplay = new Map<IdCONF, CONF>();
+
+export function getDisplay(c: {id?: string}): CONF {
+  return mapDisplay.get(c.id);
+}
+
+export function updateDisplay(c: {id?: string}, update: CONF): CONF {
+  const conf: CONF = mapDisplay.get(c.id) || {};
+  const newConf = {...conf, ...update};
+  mapDisplay.set(c.id, newConf);
+  return newConf;
 }

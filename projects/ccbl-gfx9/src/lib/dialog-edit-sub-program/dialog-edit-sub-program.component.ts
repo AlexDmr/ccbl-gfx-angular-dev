@@ -1,8 +1,10 @@
 import {ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialog} from '@angular/material/dialog';
-import {copyHumanReadableProgram, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
+import {copyHumanReadableProgram, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {Observable} from 'rxjs';
 import {ProgVersionner} from '../ccbl-gfx9.service';
+import { map } from 'rxjs/operators';
+import { DataAppendDependency, DialogAppendDependencyComponent } from '../dialog-append-dependency/dialog-append-dependency.component';
 
 export interface DataEditSubProgram {
   parentProgram: HumanReadableProgram;
@@ -18,9 +20,11 @@ export interface DataEditSubProgram {
 export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
   progV: ProgVersionner;
   progObs: Observable<HumanReadableProgram>;
+  _localChannelsObs: Observable<VariableDescription[]>;
 
   constructor(private dialogRef: MatDialogRef<DialogEditSubProgramComponent, HumanReadableProgram>,
-              @Inject(MAT_DIALOG_DATA) private data: DataEditSubProgram) {
+              @Inject(MAT_DIALOG_DATA) private data: DataEditSubProgram,
+              private matDialog: MatDialog ) {
     this.progV = new ProgVersionner( copyHumanReadableProgram(this.data.program) );
     this.progObs = this.progV.asObservable();
   }
@@ -41,7 +45,10 @@ export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
   }
 
   updateAPI(P: HumanReadableProgram) {
-    this.progV.updateWith(P);
+    this.progV.updateWith({
+      ...this.progV.getCurrent(),
+      dependencies: P.dependencies || {}
+    });
   }
 
   updateTitle(title: string) {
@@ -60,4 +67,26 @@ export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
       console.error(err);
     }
   }
+
+  deleteLocalChannel(chan: VariableDescription): void {
+    this.progV.removeVariableDescription(chan);
+  }
+
+  async appendLocalChannel(): Promise<VariableDescription> {
+    const data: DataAppendDependency = {
+      program: this.data.program,
+      vType: 'channels',
+      inOut: undefined
+    };
+    const dialogRef = this.matDialog.open(DialogAppendDependencyComponent, {
+      data,
+      closeOnNavigation: false
+    });
+    const vd: VariableDescription = await dialogRef.afterClosed().toPromise();
+    if (vd) {
+      this.progV.appendLocalChannel(vd);
+    }
+    return vd;
+  }
+
 }

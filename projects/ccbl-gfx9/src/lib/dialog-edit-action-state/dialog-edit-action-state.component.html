@@ -32,10 +32,12 @@
   <tr>
     <td>Expression:</td>
     <td>
-      <lib-ccbl-expression [expression]="newAction.affectation.value" [program]="program"
-                           [acceptEvents]="false"
-                           #exprAction (click)="exprAction.edit()"
-                           (update)="newAction.affectation.value = $event"
+      <lib-ccbl-expression [expression]           = "newAction.affectation.value"
+                           [program]              = "program"
+                           [acceptEvents]         = "false"
+                           [canExpressTransition] = "true"
+                           #exprAction (click)    = "exprAction.edit()"
+                           (update)               = "newAction.affectation.value = $event"
                            ></lib-ccbl-expression>
     </td>
   </tr>

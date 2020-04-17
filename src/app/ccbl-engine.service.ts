@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {copyHumanReadableProgram, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {Sensor, SensorDataType, SensorVarType} from './data/setup';
 import {initCCBL} from 'ccbl-js/lib/main';
-import {Observable, Subject, interval, ConnectableObservable, of} from 'rxjs';
+import {Observable, Subject, interval, ConnectableObservable, of, Subscription} from 'rxjs';
 import {ProgVersionner} from '../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.service';
 import {CCBLEnvironmentExecutionInterface} from 'ccbl-js/lib/ExecutionEnvironmentInterface';
 import {CCBLEnvironmentExecution} from 'ccbl-js/lib/ExecutionEnvironment';
@@ -42,6 +42,7 @@ export class CcblEngineService {
     ),
     multicast( () => new Subject() )
   ) as ConnectableObservable<any>;
+  private clockSubscription: Subscription;
 
   constructor() {
     this.env = new CCBLEnvironmentExecution( this.clock );
@@ -60,7 +61,7 @@ export class CcblEngineService {
       console.error(err);
     }
 
-    this.obsClock.connect();
+    this.clockSubscription = this.obsClock.connect();
     /*this.obsClock.subscribe( () => {
       console.log('yo');
     });*/
@@ -90,6 +91,7 @@ export class CcblEngineService {
 
   startProgram() {
     if (this.ccblProg) {
+      this.clockSubscription.unsubscribe();
       this.ccblProg.dispose();
     }
     this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
@@ -99,6 +101,7 @@ export class CcblEngineService {
 
     const prog = this.ccblProg.toHumanReadableProgram();
     this.progVersionner.updateWith( prog );
+    this.clockSubscription = this.obsClock.connect();
   }
 
   reset() {

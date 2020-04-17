@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit, Input} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialog} from '@angular/material/dialog';
 import {
   HumanReadableProgram,
@@ -8,6 +8,10 @@ import {
   isNameUsedInProg,
   copyProgRef,
 } from 'ccbl-js/lib/ProgramObjectInterface';
+import { mathjs } from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
+import { BehaviorSubject } from 'rxjs';
+
+const errorName = 'Program name should be reductible to a symbol';
 
 export interface DataEditProgramRef {
   parentProgram: HumanReadableProgram;
@@ -24,12 +28,16 @@ export interface DataEditProgramRef {
 export class DialogEditProgInstanceComponent implements OnInit {
   newProgRef: ProgramReference;
   originalName: string;
+  private errorMessage: string[];
+  errorObs = new BehaviorSubject<string>('');
 
   static async editProgRef(dialog: MatDialog, data: DataEditProgramRef): Promise<ProgramReference> {
     const dialogRef = dialog.open<DialogEditProgInstanceComponent, DataEditProgramRef, ProgramReference>(
       DialogEditProgInstanceComponent, {
       data,
-      closeOnNavigation: false
+      closeOnNavigation: false,
+      width: '80%',
+      position: {bottom: '10px'}
     });
     return dialogRef.afterClosed().toPromise();
   }
@@ -52,6 +60,7 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
   }
 
   get editMode(): boolean {
@@ -157,14 +166,38 @@ export class DialogEditProgInstanceComponent implements OnInit {
     ];
   }
 
+  updateName(n: string) {
+    this.newProgRef.as = n;
+    this.canValidate;
+  }
+
   get canValidate(): boolean {
+    this.errorMessage = [];
+    try {
+      const N = mathjs.parse( this.newProgRef.as );
+      if (!N.isSymbolNode) {
+        this.errorMessage.push(errorName);
+      }
+    } catch(err) {
+      this.errorMessage.push(errorName);
+    }
+
     const SPs = this.data.parentProgram.subPrograms || {};
     const used = isNameUsedInProg( this.newProgRef.as, this.data.parentProgram );
-    return (!used || (this.editMode && this.newProgRef.as === this.originalName)) &&
-           !this.eventsToMap  .find( e => !this.newProgRef.mapInputs[e.name] ) &&
-           !this.emittersToMap.find( e => !this.newProgRef.mapInputs[e.name] ) &&
-           !this.channelsToMap.find( e => !this.newProgRef.mapInputs[e.name] )
-           ;
+
+    if (used && !(this.editMode && this.newProgRef.as === this.originalName)) {
+      this.errorMessage.push(`This program name is already used as ${used.location} ${used.varRange}`);
+    }
+
+    if (this.eventsToMap  .find( e => !this.newProgRef.mapInputs[e.name] ) ||
+        this.emittersToMap.find( e => !this.newProgRef.mapInputs[e.name] ) ||
+        this.channelsToMap.find( e => !this.newProgRef.mapInputs[e.name] )
+    ) {
+      this.errorMessage.push(`Some inputs are not specified`);
+    }
+
+    this.errorObs.next( this.errorMessage.join(`\n`) );
+    return this.errorMessage.length === 0;
   }
 
 }

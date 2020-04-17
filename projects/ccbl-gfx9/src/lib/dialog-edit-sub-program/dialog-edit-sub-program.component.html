@@ -11,11 +11,26 @@
               (blur)="updateDescription(tDescr.value)"></textarea>
   </mat-form-field>
 
+
   <lib-ccbl-program-api [program]  = "prog"
                         [editable] = "true"
                         (update)   = "updateAPI($event)"
   ></lib-ccbl-program-api>
+
+  <ul>
+    <li *ngFor="let chan of prog?.localChannels">
+      <lib-ccbl-expression [expression]="chan.name" [program]="progObs | async"
+                           [editable]="false"></lib-ccbl-expression>
+      ({{chan.type}})
+      <button mat-raised-button color="warn" (click)="deleteLocalChannel(chan)">Delete</button>
+    </li>
+  </ul>
+  <button mat-raised-button color="primary" (click)="appendLocalChannel()">
+    Append new local channel
+  </button>
+
   <lib-ccbl-program [program-versionner] = "progV"></lib-ccbl-program>
+
 
   <mat-form-field appearance="fill">
     <mat-label>Raw</mat-label>
@@ -35,7 +50,9 @@
   <button mat-raised-button color="primary" (click)="ok()">OK</button>
 </section>
 
+<!--
 <hr/>
 <pre>
   {{progObs | async | json}}
 </pre>
+-->

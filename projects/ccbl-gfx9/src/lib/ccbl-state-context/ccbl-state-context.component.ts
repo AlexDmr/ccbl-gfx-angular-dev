@@ -1,6 +1,6 @@
 /* tslint:disable:member-ordering */
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {ProgVersionner, stringToAllen, CcblGfx9Service, getUID} from '../ccbl-gfx9.service';
+import {ProgVersionner, stringToAllen, getUID, updateDisplay, getDisplay} from '../ccbl-gfx9.service';
 import {
   ContextOrProgram, copyHumanReadableEventContext, copyHumanReadableStateContext,
   HumanReadableContext,
@@ -496,7 +496,7 @@ export class CcblStateContextComponent implements OnInit {
 
   // Managing sequence
   get startSequence(): boolean {
-    return !!(this.context.allen?.Meet?.contextsSequence?.length > 0);
+    return !!(this.context.allen?.Meet?.contextsSequence !== undefined);
   }
 
   get contextSequenceRest(): ContextOrProgram[] {
@@ -538,18 +538,3 @@ export class CcblStateContextComponent implements OnInit {
 }
 
 
-// Stuff to remember display state for sequence
-type CONF = {[key: string]: any};
-type IdCONF = string;
-const mapDisplay = new Map<IdCONF, CONF>();
-
-function getDisplay(c: HumanReadableStateContext): CONF {
-  return mapDisplay.get(c.id);
-}
-
-function updateDisplay(c: HumanReadableStateContext, update: CONF): CONF {
-  const conf: CONF = mapDisplay.get(c.id) || {};
-  const newConf = {...conf, ...update};
-  mapDisplay.set(c.id, newConf);
-  return newConf;
-}
