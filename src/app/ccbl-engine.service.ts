@@ -96,6 +96,11 @@ export class CcblEngineService {
     }
     this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
     this.ccblProg.loadHumanReadableProgram(this.progVersionner.getCurrent(), this.env, {});
+
+    const P = copyHumanReadableProgram( this.ccblProg.toHumanReadableProgram(), false );
+    console.log( P );
+
+    this.clock.goto( Date.now() );
     this.ccblProg.activate();
     this.ccblProg.UpdateChannelsActions(); // commitStateActions();
 

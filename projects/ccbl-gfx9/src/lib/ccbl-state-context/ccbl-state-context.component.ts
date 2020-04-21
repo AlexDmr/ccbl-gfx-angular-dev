@@ -318,6 +318,16 @@ export class CcblStateContextComponent implements OnInit {
     }
   }
 
+  loopOnSelf() {
+    const newC = copyHumanReadableStateContext(this.context);
+    newC.allen = newC.allen || {};
+    newC.allen.Meet = {
+      loop: 0,
+      contextsSequence: []
+    };
+    this.progVersionner.updateContext(this.context, newC);
+  }
+
   async appendStateContext(conf: {allen: string, after?: HumanReadableContext}) {
     let C: HumanReadableStateContext;
     let lastSubContext: ContextOrProgram;
@@ -509,7 +519,9 @@ export class CcblStateContextComponent implements OnInit {
 
   set loopAt(v: number) {
     const cp = copyHumanReadableStateContext(this.context);
-    cp.allen.Meet.loop = v;
+    cp.allen = cp.allen || {};
+    cp.allen.Meet = cp.allen.Meet || {contextsSequence: []};
+    cp.allen.Meet.loop = v !== undefined ? Math.min(v, 1 + cp.allen.Meet.contextsSequence.length) : undefined;
     this.progVersionner.updateContext(this.context, cp);
   }
 
@@ -528,11 +540,11 @@ export class CcblStateContextComponent implements OnInit {
   get genLoop(): Generator<number, void, void> {
     const context = this.context;
     function* gen(N: number) {
-      for (let i = 1; i <= N; i++) {
+      for (let i = 0; i < N; i++) {
         yield i;
       }
     }
-    const nb = this.context.allen?.Meet?.contextsSequence?.length || -1;
+    const nb = this.context.allen?.Meet?.contextsSequence?.length || 0;
     return gen(nb + 1);
   }
 }

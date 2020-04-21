@@ -10,14 +10,15 @@ import { getUID, getDisplay, updateDisplay } from '../ccbl-gfx9.service';
 })
 export class ProgInstanceParametersComponent implements OnInit {
   @Input() parentProgram: HumanReadableProgram;
-  @Input() private initialProgRef: ProgramReference;
+  @Input() private set initialProgRef(pg: ProgramReference) {
+    this.progRef = copyContextOrProgram(pg) as ProgramReference;
+  };
   progRef: ProgramReference;
   @Output() update = new EventEmitter<ProgramReference>();
 
   constructor() { }
 
   ngOnInit(): void {
-    this.progRef = copyContextOrProgram(this.initialProgRef) as ProgramReference;
   }
 
   updateParameter(name: string, value: ProgramInput) {
@@ -81,7 +82,7 @@ export class ProgInstanceParametersComponent implements OnInit {
         ...(dep?.export?.emitters || []),
         ...(dep?.import?.channels || []),
         ...(dep?.export?.channels || []),
-        ...(this.parentProgram?.localChannels)
+        ...(this.parentProgram?.localChannels || [])
       ];
       const n = L.find(e => e.name === name)?.name || '';
       return n;

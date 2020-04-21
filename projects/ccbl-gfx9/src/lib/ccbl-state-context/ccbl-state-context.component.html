@@ -20,7 +20,7 @@
             (dndDrop)              = "moveContextInSequence(2 + contextSequenceRest.length, this.draggedContext )"
             [mat-menu-trigger-for] = "matMenuLoopAt"
             >
-      {{loopAt > 0 ? "loop at " + loopAt : "no loop"}}
+      {{loopAt !== undefined ? "loop at " + (loopAt + 1) : "no loop"}}
     </label>
   </section>
 
@@ -227,13 +227,20 @@
     <button mat-menu-item (click)="newContext('EndWith', contextType)">
       End
     </button>
-    <button mat-menu-item (click)="newContext('Meet', contextType)">
-      Meet
+    <button mat-menu-item [mat-menu-trigger-for]="menuSequence">
+      After
     </button>
   </ng-template>
-
 </mat-menu>
 
+<mat-menu #menuSequence="matMenu">
+  <button mat-menu-item (click)="newContext('Meet', 'STATE')">
+    new context
+  </button>
+  <button mat-menu-item (click)="loopOnSelf()" [disabled]="startSequence">
+    Loop on self
+  </button>
+</mat-menu>
 
 <mat-menu #matMenuChannelAction="matMenu">
   <ng-template matMenuContent let-action="action" let-atStart="atStart">
@@ -252,6 +259,6 @@
           *ngFor  = "let i of genLoop"
           (click) = "loopAt = i"
   >
-    loop at {{i}}
+    loop at {{i + 1}}
   </button>
 </mat-menu>

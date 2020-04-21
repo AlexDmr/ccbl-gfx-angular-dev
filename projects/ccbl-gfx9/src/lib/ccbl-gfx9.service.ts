@@ -934,10 +934,13 @@ export function mathNodeToArray(
   }
   if (node.isFunctionNode) {
     const LA: ParsedExprNode[][] = node.args.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
-    L.push( {label: node.name, type: 'function', mathNode: node}
-      ,  {label: '( ', type: 'parenthesis', mathNode: node}
-      , ...LA.reduce( (acc, LE) => [...acc, {label: ', ', type: 'comma', mathNode: node}, ...LE] )
-      ,  {label: ') ', type: 'parenthesis', mathNode: node}
+    const F = mathNodeToArray(P, (node as any).fn, acceptEvent, ...vocabulary);
+    F[0].type = 'function';
+    L.push(
+      ...F,
+      {label: '( ', type: 'parenthesis', mathNode: node},
+      ...LA.reduce( (acc, LE) => [...acc, {label: ', ', type: 'comma', mathNode: node}, ...LE] ),
+      {label: ') ', type: 'parenthesis', mathNode: node}
     );
   }
   if (node.isBlockNode) {

@@ -26,6 +26,7 @@ import {MatStepperModule} from '@angular/material/stepper';
 import {MatRadioModule} from '@angular/material/radio';
 import { EventerComponent } from './eventer/eventer.component';
 import { EnvGeneratorComponent } from './env-generator/env-generator.component';
+import { SceneComponent } from './scene/scene.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { EnvGeneratorComponent } from './env-generator/env-generator.component';
     SensorScalarComponent,
     DialogDeviceComponent,
     EventerComponent,
-    EnvGeneratorComponent
+    EnvGeneratorComponent,
+    SceneComponent
   ],
   imports: [
     BrowserModule,
