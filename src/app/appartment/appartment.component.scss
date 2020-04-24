@@ -1,0 +1,23 @@
+:host {
+  display: inline-block;
+  position: relative;
+
+  div {
+    display: inline;
+  }
+
+  div.peoples {
+    display: flex;
+    flex-flow: row;
+    position: relative;
+    left: 0px;
+    bottom: 0;
+  }
+
+  div.objects {
+    position: relative;
+    top: 0px;
+    display: inline-flex;
+    flex-flow: row-reverse;
+  }
+}

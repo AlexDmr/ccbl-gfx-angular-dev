@@ -68,7 +68,17 @@ export class ProgInstanceParametersComponent implements OnInit {
 
   getChannel(name: string): string {
     const M = this.progRef.mapInputs[name];
-    return M as string;
+    if (M) {
+      return M as string;
+    } else {
+      const dep = this.parentProgram.dependencies;
+      const L: VariableDescription[] = [
+        ...(dep?.import?.channels || []),
+        ...(dep?.export?.channels || []),
+        ...(this.parentProgram?.localChannels || [])
+      ];
+      return L.find(e => e.name === name)?.name || '';
+    }
   }
 
   getEmitter(name: string): string {

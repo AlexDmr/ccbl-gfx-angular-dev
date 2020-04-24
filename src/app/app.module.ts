@@ -27,6 +27,11 @@ import {MatRadioModule} from '@angular/material/radio';
 import { EventerComponent } from './eventer/eventer.component';
 import { EnvGeneratorComponent } from './env-generator/env-generator.component';
 import { SceneComponent } from './scene/scene.component';
+import { DndModule } from 'ngx-drag-drop';
+import { PeopleComponent } from './people/people.component';
+import { AppartmentComponent } from './appartment/appartment.component';
+import { DeviceComponent } from './device/device.component';
+import { DeviceLampComponent } from './device-lamp/device-lamp.component';
 
 @NgModule({
   declarations: [
@@ -38,11 +43,16 @@ import { SceneComponent } from './scene/scene.component';
     DialogDeviceComponent,
     EventerComponent,
     EnvGeneratorComponent,
-    SceneComponent
+    SceneComponent,
+    PeopleComponent,
+    AppartmentComponent,
+    DeviceComponent,
+    DeviceLampComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    DndModule,
     CcblGfx9Module,
     BrowserAnimationsModule,
     MatFormFieldModule,

@@ -1,0 +1,23 @@
+:host {
+  display: inline-block;
+
+  > section {
+    display: inline-flex;
+    flex-flow: column;
+    align-items: center;
+
+    .ampoule {
+      width: 50px;
+      height: 50px;
+      border: solid black 1px;
+      border-radius: 50%;
+    }
+    .socle {
+      width: 25px;
+      height: 30px;
+      border-width: 15px;
+      border: solid black 1px;
+      background-color: blue;
+    }
+  }
+}

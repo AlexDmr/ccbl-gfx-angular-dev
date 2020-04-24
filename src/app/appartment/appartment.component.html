@@ -1,0 +1,10 @@
+<div class="root">
+  <div class="peoples">
+    <app-people *ngFor = "let people of peoples; trackBy: trackByName"
+                [data] = "people"
+    ></app-people>
+  </div>
+  <div class="objects">
+    <ng-content></ng-content>
+  </div>
+</div>

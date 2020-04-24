@@ -1,0 +1,19 @@
+:host {
+  display: inline-flex;
+  flex-flow: column;
+
+  > section {
+    display: inline-flex;
+    flex-flow: column;
+
+    > img {
+      width: 50px;
+    }
+    > label {
+      border: solid black 1px;
+      background: black;
+      color: white;
+      text-align: center;
+    }
+  }
+}
