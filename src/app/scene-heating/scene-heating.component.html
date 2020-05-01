@@ -1,0 +1,67 @@
+<section class="scene">
+  <img  [src]         = "houseURL" class="house"
+        [dndDropzone] = "allowDndList"
+        (dndDrop)     = "drop($event, locHome)"
+        />
+
+  <div class       = "window left"
+      [class.open] = "openWindows | async"
+      (click)      = "openWindows.next( !openWindows.getValue() )"
+      ><div></div></div>
+  <div class       = "window right"
+      [class.open] = "openWindows | async"
+      ><div></div></div>
+
+  <section class="outside">
+    <app-appartment class         = "peopleOutside"
+                    [location]    = "Outside | async"
+                    [peoples]     = "OutsidePeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, locOutside)"
+    ></app-appartment>
+    <section class="thermometer outside">
+      <img [src]="thermometerURL" />
+      <input type="range" min="0" max="30" list="tickmarks"
+             [ngModel]       = "outsideTempSubj | async"
+             (ngModelChange) = "outsideTempSubj.next($event)"
+             />
+      <output>{{outsideTempSubj | async}}°C</output>
+    </section>
+  </section>
+
+  <app-appartment class         = "peopleInside"
+                  [location]    = "Home | async"
+                  [peoples]     = "InsidePeoples | async"
+                  [dndDropzone] = "allowDndList"
+                  (dndDrop)     = "drop($event, locHome)"
+                  ></app-appartment>
+
+  <section class="thermometer inside">
+    <img [src]="thermometerURL" />
+    <output>{{insideTempSubj | async}}°C</output>
+  </section>
+
+  <div class="Avatar" [style.backgroundColor]="(Avatar | async).color">
+  </div>
+
+  <img [src]          = "heatingURL"
+       class          = "Heating"
+       [class.active] = "Heating | async"
+       (click)        = "Heating.next( !Heating.getValue() )"
+  />
+
+  <datalist id="tickmarks">
+    <option value= "0" label= "0°C" >
+    <option value="18" label="18°C" >
+    <option value="25" label="25°C">
+    <option value="30" label="30°C">
+  </datalist>
+</section>
+
+<section class="program">
+  <section>
+    <button (click)="start()">Start</button>
+  </section>
+  <lib-ccbl-program [program-versionner]="subProgV"></lib-ccbl-program>
+  <lib-ccbl-program [program-versionner]="progV"   ></lib-ccbl-program>
+</section>

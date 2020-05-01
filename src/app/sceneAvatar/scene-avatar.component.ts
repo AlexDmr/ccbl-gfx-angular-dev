@@ -11,17 +11,16 @@ import {map} from 'rxjs/operators';
 export type PossibleLocations = 'AliceHome' | 'BobHome' | 'elsewhere';
 
 @Component({
-  selector: 'app-scene',
-  templateUrl: './scene.component.html',
-  styleUrls: ['./scene.component.scss'],
+  selector: 'app-scene-avatar',
+  templateUrl: './scene-avatar.component.html',
+  styleUrls: ['./scene-avatar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [SceneService]
 })
-export class SceneComponent implements OnInit, AfterViewInit {
+export class SceneAvatarComponent implements OnInit, AfterViewInit {
   SLAliceHome: PossibleLocations = 'AliceHome';
   SLBobHome:   PossibleLocations = 'BobHome'  ;
   SLelsewhere: PossibleLocations = 'elsewhere';
-  @ViewChild('svgRoot') svgRoot: ElementRef<HTMLElement>;
   @Input() width = 640;
   @Input() height = 480;
   BobHome = new BehaviorSubject<SceneLocation>( {
@@ -51,7 +50,7 @@ export class SceneComponent implements OnInit, AfterViewInit {
         phoning: true,
         location: 'AliceHome',
         metadata: {}
-      },{
+      }, {
         imgURL: `assets/Bob.png`,
         name: 'Bob',
         phoning: true,

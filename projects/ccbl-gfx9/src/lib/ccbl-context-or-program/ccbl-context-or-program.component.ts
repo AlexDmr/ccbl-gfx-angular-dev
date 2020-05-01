@@ -12,6 +12,7 @@ import {AllenType} from 'ccbl-js/lib/AllenInterface';
 })
 export class CcblContextOrProgramComponent implements OnInit {
   @Input() data: ContextOrProgram;
+  // tslint:disable-next-line: no-input-rename
   @Input('program-versionner') private progVersionner: ProgVersionner;
   @Input() isProgramRoot = false;
   @Input() from: AllenType;

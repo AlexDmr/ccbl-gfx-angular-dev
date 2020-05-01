@@ -15,6 +15,7 @@ import {CcblGfx9Service, ProgVersionner} from './ccbl-gfx9.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblGfx9Component implements OnInit, OnChanges {
+  // tslint:disable-next-line: no-input-rename
   @Input('program-versionner') private progVersionner: ProgVersionner;
   updateObs = new BehaviorSubject<boolean>(true);
   private program: HumanReadableProgram;

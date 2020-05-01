@@ -1,19 +1,28 @@
 :host {
-  display: inline-flex;
-  flex-flow: column;
+  position: relative;
 
   > section {
-    display: inline-flex;
-    flex-flow: column;
+    > section {
+      display: inline-flex;
+      flex-flow: column;
 
-    > img {
-      width: 50px;
+      > img {
+        width: 50px;
+      }
+
+      > label {
+        border: solid black 1px;
+        background: black;
+        color: white;
+        text-align: center;
+      }
     }
-    > label {
-      border: solid black 1px;
-      background: black;
-      color: white;
-      text-align: center;
+
+    img.phoning {
+      position: absolute;
+      top: 0;
+      right: -10px;
+      width: 30px;
     }
   }
 }

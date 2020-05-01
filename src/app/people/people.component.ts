@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import {Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
 import { People } from '../data/Scene';
 
 @Component({
@@ -10,11 +10,17 @@ import { People } from '../data/Scene';
 export class PeopleComponent implements OnInit {
   @Input() data: People<any>;
   @Input() height = 100;
+  @Output() update = new EventEmitter<People<any>>();
+  imgPhoning = '/assets/phoning.png';
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  togglePhoning() {
+    this.data.phoning = !this.data.phoning;
+    this.update.emit({...this.data} );
+  }
 }
 

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SceneAvatarComponent } from './scene-avatar.component';
+import { SceneHeatingComponent } from './scene-heating.component';
 
-describe('SceneComponent', () => {
-  let component: SceneAvatarComponent;
-  let fixture: ComponentFixture<SceneAvatarComponent>;
+describe('SceneHeatingComponent', () => {
+  let component: SceneHeatingComponent;
+  let fixture: ComponentFixture<SceneHeatingComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SceneAvatarComponent ]
+      declarations: [ SceneHeatingComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SceneAvatarComponent);
+    fixture = TestBed.createComponent(SceneHeatingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

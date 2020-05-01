@@ -9,8 +9,8 @@
     "@angular/core": "~9.1.0",
     "@angular/forms": "~9.1.0",
     "@angular/material": "^9.2.0",
-    "ccbl-js": "1.1.7",
-    "mathjs": "~6.6.1",
+    "ccbl-js": "1.1.11",
+    "mathjs": "~6.6.4",
     "ngx-drag-drop": "2.0.0",
     "tslib": "^1.10.0"
   }

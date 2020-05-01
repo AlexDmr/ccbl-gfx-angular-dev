@@ -42,8 +42,10 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
       this.pAction.ccblAction.getIsActivated().on( this.cbCcblActivation );
       this.active.next( this.pAction.ccblAction.getIsActivated().get() );
     }
+    this.overridedWith.next( this.pAction?.ccblAction?.getOverrideExpression() );
     this.pAction?.ccblAction?.onOverride( this.cbCcblOverridedWith );
   }
+  // tslint:disable-next-line: no-input-rename
   @Input('program-versionner') private progVersionner: ProgVersionner;
   static async staticEdit(matDialog: MatDialog, data: DataActionState): Promise<HumanReadableStateAction> {
     const dialogRef = matDialog.open<DialogEditActionStateComponent, DataActionState, HumanReadableStateAction>(

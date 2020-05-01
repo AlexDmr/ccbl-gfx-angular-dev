@@ -94,6 +94,10 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
 
   set newExpr(s: string) {
     // console.log('setNewExpr = ', s);
+    if (s.trim() === '') {
+      this.errorIndicationSubj.next('Expression cannot be empty');
+      return;
+    }
     try {
       mathjs.parse(s);
     } catch(err) {

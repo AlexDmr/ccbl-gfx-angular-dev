@@ -26,12 +26,14 @@ import {MatStepperModule} from '@angular/material/stepper';
 import {MatRadioModule} from '@angular/material/radio';
 import { EventerComponent } from './eventer/eventer.component';
 import { EnvGeneratorComponent } from './env-generator/env-generator.component';
-import { SceneComponent } from './scene/scene.component';
+import { SceneAvatarComponent } from './sceneAvatar/scene-avatar.component';
 import { DndModule } from 'ngx-drag-drop';
 import { PeopleComponent } from './people/people.component';
 import { AppartmentComponent } from './appartment/appartment.component';
 import { DeviceComponent } from './device/device.component';
 import { DeviceLampComponent } from './device-lamp/device-lamp.component';
+import {SceneHeatingComponent} from './scene-heating/scene-heating.component';
+import {MatTabsModule} from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,8 @@ import { DeviceLampComponent } from './device-lamp/device-lamp.component';
     DialogDeviceComponent,
     EventerComponent,
     EnvGeneratorComponent,
-    SceneComponent,
+    SceneAvatarComponent,
+    SceneHeatingComponent,
     PeopleComponent,
     AppartmentComponent,
     DeviceComponent,
@@ -68,7 +71,8 @@ import { DeviceLampComponent } from './device-lamp/device-lamp.component';
     MatListModule,
     MatGridListModule,
     MatStepperModule,
-    MatRadioModule
+    MatRadioModule,
+    MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -871,6 +871,16 @@ export function mathNodeToArray(
       mathNode: node
     });
   }
+  if ( (node as any).isConditionalNode ) {
+    const {condition, falseExpr, trueExpr}: {condition: MathNode, falseExpr: MathNode, trueExpr: MathNode} = node as any;
+    L.push(
+      ...mathNodeToArray(P, condition, acceptEvent, ...vocabulary),
+      {label: '? ', type: 'MathJS::OperatorNode binary', mathNode: node},
+      ...mathNodeToArray(P, trueExpr, acceptEvent, ...vocabulary),
+      {label: ': ', type: 'MathJS::OperatorNode binary', mathNode: node},
+      ...mathNodeToArray(P, falseExpr, acceptEvent, ...vocabulary),
+    );
+  }
   if (node.isArrayNode) {
     const items: MathNode[] = (node as any).items;
     const Litems: ParsedExprNode[][] = items.map( item => mathNodeToArray(P, item, acceptEvent, ...vocabulary) );
