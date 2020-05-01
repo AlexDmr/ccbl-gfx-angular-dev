@@ -1,13 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, AfterViewInit, Input } from '@angular/core';
 import { People, SceneLocation } from '../data/Scene';
-import {BehaviorSubject, combineLatest, merge, Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import { DndDropEvent } from 'ngx-drag-drop';
 import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
 import { DeviceLamp } from '../device-lamp/device-lamp.component';
 import {ProgVersionner} from '../../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.service';
-import {SceneService, StartEnvConfig} from '../scene.service';
-import {delay, map, tap} from 'rxjs/operators';
-import {CB_CCBLEmitter} from 'ccbl-js/lib/Emitter';
+import {SceneService} from '../scene.service';
+import {map} from 'rxjs/operators';
 
 export type PossibleLocations = 'AliceHome' | 'BobHome' | 'elsewhere';
 
@@ -25,20 +24,6 @@ export class SceneComponent implements OnInit, AfterViewInit {
   @ViewChild('svgRoot') svgRoot: ElementRef<HTMLElement>;
   @Input() width = 640;
   @Input() height = 480;
-  Bob = new BehaviorSubject<People<PossibleLocations>>({
-    imgURL: `assets/Bob.png`,
-    name: 'Bob',
-    phoning: false,
-    location: 'BobHome',
-    metadata: {}
-  });
-  Alice = new BehaviorSubject<People<PossibleLocations>>({
-    imgURL: `assets/Alice.png`,
-    name: 'Alice',
-    phoning: false,
-    location: 'AliceHome',
-    metadata: {}
-  });
   BobHome = new BehaviorSubject<SceneLocation>( {
     metadata: {}
   } );
@@ -48,33 +33,37 @@ export class SceneComponent implements OnInit, AfterViewInit {
   elsewhere = new BehaviorSubject<SceneLocation>( {
     metadata: {}
   } );
-  peoples: Observable<People<any>[]> = combineLatest([this.Alice, this.Bob]);
-  BobHomePeoples = this.peoples.pipe(
-    map( peoples => peoples.filter( people => people.location === 'BobHome') )
-  );
-  AliceHomePeoples = this.peoples.pipe(
-    map( peoples => peoples.filter( people => people.location === 'AliceHome') )
-  );
-  elsewhereHomePeoples = this.peoples.pipe(
-    map( peoples => peoples.filter( people => people.location === 'elsewhere') )
-  );
-  allowDndList: string[] = [
-    'People'
-  ];
+  BobHomePeoples:   Observable<People<PossibleLocations>[]>;
+  AliceHomePeoples: Observable<People<PossibleLocations>[]>
+  elsewhereHomePeoples: Observable<People<PossibleLocations>[]>;
+  allowDndList: string[] = ['People'];
   Avatar = new BehaviorSubject<DeviceLamp>({
     name: 'Avatar',
     color: 'red'
   });
   progV    = new ProgVersionner( this.initialRootProg    );
   subProgV = new ProgVersionner( this.initialSubProgUser );
-  simConf: StartEnvConfig;
 
   constructor(private sim: SceneService) {
-    const updateClock = () => this.sim.clock.goto( Date.now() );
-    this.simConf = {
+    sim.init([ {
+        imgURL: `assets/Alice.png`,
+        name: 'Alice',
+        phoning: true,
+        location: 'AliceHome',
+        metadata: {}
+      },{
+        imgURL: `assets/Bob.png`,
+        name: 'Bob',
+        phoning: true,
+        location: 'BobHome',
+        metadata: {}
+      }
+    ], [
+
+    ], () => ({
       inputs: {
-        AliceLocation: this.Alice.pipe( tap(updateClock), map(A => A.location)),
-        BobLocation:   this.Bob  .pipe( tap(updateClock), map(B => B.location))
+        Alice: sim.getPeopleObs('Alice'),
+        Bob: sim.getPeopleObs('Bob'  )
       },
       outputs: {
         Avatar: color => this.Avatar.next( {
@@ -82,9 +71,17 @@ export class SceneComponent implements OnInit, AfterViewInit {
           color
         } )
       }
-    };
-    merge(this.Alice, this.Bob).pipe(delay(10)).subscribe(
-      () => this.sim.ccblProg?.UpdateChannelsActions()
+    }));
+
+    // Create observables related to display
+    this.BobHomePeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'BobHome') )
+    );
+    this.AliceHomePeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'AliceHome') )
+    );
+    this.elsewhereHomePeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'elsewhere') )
     );
   }
 
@@ -95,7 +92,7 @@ export class SceneComponent implements OnInit, AfterViewInit {
   }
 
   start() {
-    const P = this.sim.start( this.progV.getCurrent(), this.simConf);
+    const P = this.sim.start( this.progV.getCurrent());
     this.progV.updateWith( P.toHumanReadableProgram() );
     const SP = P.getProgramInstance( 'subProgUser' );
     this.subProgV.updateWith( SP.toHumanReadableProgram() );
@@ -106,13 +103,9 @@ export class SceneComponent implements OnInit, AfterViewInit {
     this.progV   .updateWith( this.initialRootProg    );
   }
 
-  drop(evt: DndDropEvent, loc: PossibleLocations) {
+  drop(evt: DndDropEvent, location: PossibleLocations) {
     const people: People<any> = evt.data;
-    const U = [this.Bob, this.Alice].find( S => S.getValue().name === people.name );
-    U.next({
-      ...U.getValue(),
-      location: loc
-    });
+    this.sim.updatePeople(people.name, {location});
   }
 
   private get initialSubProgUser(): HumanReadableProgram {
@@ -160,8 +153,8 @@ export class SceneComponent implements OnInit, AfterViewInit {
         import: {
           events: [],
           emitters: [
-            {name: 'BobLocation'  , type: 'string'},
-            {name: 'AliceLocation', type: 'string'}
+            {name: 'Bob'  , type: 'People'},
+            {name: 'Alice', type: 'People'}
           ],
           channels: [
             {name: 'Avatar', type: 'COLOR'}
@@ -174,9 +167,9 @@ export class SceneComponent implements OnInit, AfterViewInit {
         {name: 'BobAtHome'     , type: 'boolean'},
       ],
       actions: [
-        {channel: 'AliceAtHome'   , affectation: {value: `AliceLocation == "AliceHome"`}},
-        {channel: 'BobAtHome'     , affectation: {value: `  BobLocation == "BobHome"  `}},
-        {channel: 'AliceAtBobHome', affectation: {value: `AliceLocation == "BobHome"  `}},
+        {channel: 'AliceAtHome'   , affectation: {value: `Alice.location == "AliceHome"`}},
+        {channel: 'BobAtHome'     , affectation: {value: `  Bob.location == "BobHome"  `}},
+        {channel: 'AliceAtBobHome', affectation: {value: `Alice.location == "BobHome"  `}},
         {channel: 'Avatar'        , affectation: {value: `"black"`                     }}
       ],
       subPrograms: {
