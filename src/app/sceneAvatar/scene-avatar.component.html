@@ -6,29 +6,40 @@
 </mat-toolbar>
 
 <section class="root">
-  <section class = "location bob">
+  <!-- Bob -->
+  <section class="location house Bob"
+          [dndDropzone] = "allowDndList"
+          (dndDrop)     = "drop($event, SLBobHome)"
+          >
+    <img  [src]="houseURL" class="house" />
     <app-appartment [location]    = "BobHome | async"
                     [peoples]     = "BobHomePeoples | async"
-                    [dndDropzone] = "allowDndList"
-                    (dndDrop)     = "drop($event, SLBobHome)"
-    ></app-appartment>
-    <app-device-lamp [lamp]="Avatar | async"></app-device-lamp>
-  </section>
+                    ></app-appartment>
+    <section class="Avatar">
+      <div class="back" [style.backgroundColor]="(Avatar | async).color"></div>
+      <img [src]="AvatarImgURL" />
+    </section>
+</section>
 
-  <section class = "location alice">
+  <section class = "location house Alice"
+           [dndDropzone] = "allowDndList"
+           (dndDrop)     = "drop($event, SLAliceHome)"
+           >
+    <img  [src]="houseURL" class="house"/>
     <app-appartment [location]    = "AliceHome | async"
                     [peoples]     = "AliceHomePeoples | async"
-                    [dndDropzone] = "allowDndList"
-                    (dndDrop)     = "drop($event, SLAliceHome)"
-    ></app-appartment>
+                    ></app-appartment>
   </section>
 
-  <section class = "location outside">
+  <section class         = "location outside"
+           [dndDropzone] = "allowDndList"
+           (dndDrop)     = "drop($event, SLelsewhere)"
+           >
     <app-appartment [location]    = "elsewhere | async"
                     [peoples]     = "elsewhereHomePeoples | async"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLelsewhere)"
-    ></app-appartment>
+             ></app-appartment>
   </section>
 </section>
 

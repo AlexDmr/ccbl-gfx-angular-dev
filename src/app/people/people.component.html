@@ -9,8 +9,8 @@
   <img [src]="imgPhoning" class="phoning" *ngIf="data.phoning"/>
 </section>
 
-<mat-menu #menuPeople="matMenu">
-  <button mat-menu-item (click)="togglePhoning">
+<mat-menu #menuPeople="matMenu" yPosition="above">
+  <button mat-menu-item (click)="togglePhoning()">
     {{data.phoning ? 'stop' : 'start'}} phoning
   </button>
 </mat-menu>

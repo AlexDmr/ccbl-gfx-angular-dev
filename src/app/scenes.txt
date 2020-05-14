@@ -1,0 +1,70 @@
+Eclairage dans la maison.
+Les pièces sont équipées de capteurs de mouvements, de lampes, et d'interupteurs et commandes vocales.
+Il y a des volets pilotable dans certaines pièces (salon, chambres, cuisine).
+Capteurs de pression sur canapés/fauteuils et lits.
+
+On définit éclairageActif comme étant le boolean qui est vrai si la luminosité à l'extérieur est faible.
+Voir capteur de luminosité extérieur PLUS ephéméride => capteur agrégé.
+
+On définit modeCinéma comme le booléen étant vrai si
+  - habitant demande à l'activer
+  - TV film
+
+Tempête / fort vent ou pluie dehors
+  - Capteur de pluie
+  - service météo
+  - capteur de vent
+  => aggrégat super capteur ?
+
+Mode sommeil :
+  On ne veut pas déranger les dormeurs pendant la nuit
+  => ne pas allumer les chambres si on se lève
+  => Volume max pour la TV poru éviter les surprises.
+
+_____________________
+Etape par étape :
+  * modeEclairage
+  * mode sommeil
+  * modeCinéma
+  * Tempête
+
+
+_____________________
+Mode éclairagesActifs
+si éclairagesActifs
+  | Pour chaque pièce :
+  | Quand présence dans la pièce alors lumière allumée
+  | Lorsque appuie sur bouton alors
+  |    Lumière  = non lumière
+  | Pensez qu'on peut lire tranquillement => capteur de présence ne va plus réagir
+  |
+  | On peut dire de laisser allumer avec voix ou interupteurs
+  | Si lumière depuis 30mns => éteindre... ?
+
+_____________________
+Mode modeCinéma
+Dans le salon et la cuisine : lumières éteintes pendant le film
+Si le film est sur pause pendant au moins 10s alors on sort du mode
+
+modeFilm
+  lumSalon: false;
+  lumCuisine: false;
+
+
+_____________________
+mode Tempête:
+volets fermés et activation du mode éclairage éclairagesActifs
+éclairage actif |= Tempête
+
+
+
+_____________________
+Mode sommeil
+Dans les chambres:
+  * la lumière reste éteinte
+  * Si appuie sur interupteur, alors allumer la lumière du couloir
+  * Si appuie long et que personne dans le lit (compagnon) alors allumer lumière
+  * Si demande vocale alors faut assumer => allume la lumière
+
+Ailleurs => on allume si présence (genre aller aux toilettes, aller boire dans la cuisine, ...)
+

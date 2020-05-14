@@ -23,6 +23,9 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
   SLelsewhere: PossibleLocations = 'elsewhere';
   @Input() width = 640;
   @Input() height = 480;
+  houseURL       = '/assets/House.svg';
+  AvatarImgURL   = '/assets/smiley.svg'
+
   BobHome = new BehaviorSubject<SceneLocation>( {
     metadata: {}
   } );
@@ -47,13 +50,13 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
     sim.init([ {
         imgURL: `assets/Alice.png`,
         name: 'Alice',
-        phoning: true,
+        phoning: false,
         location: 'AliceHome',
         metadata: {}
       }, {
         imgURL: `assets/Bob.png`,
         name: 'Bob',
-        phoning: true,
+        phoning: false,
         location: 'BobHome',
         metadata: {}
       }
@@ -112,6 +115,7 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
       dependencies: {
         import: {
           emitters: [
+            {name: 'AliceAvailable', type: 'boolean'},
             {name: 'AliceAtHome'   , type: 'boolean'},
             {name: 'AliceAtBobHome', type: 'boolean'},
             {name: 'BobAtHome'     , type: 'boolean'},
@@ -121,6 +125,9 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
           ]
         }
       },
+      actions: [
+        {channel: 'Avatar', affectation: {value: `"black"`}}
+      ],
       allen: {
         During: [
           {
@@ -132,11 +139,20 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
                   contextName: 'Alice at her home',
                   state: 'AliceAtHome',
                   actions: [{channel: 'Avatar', affectation: {value: '"orange"'}}],
+                  allen: {
+                    During: [
+                      {
+                        contextName: 'Alice is available if not phoning',
+                        state: 'AliceAvailable',
+                        actions: [{channel: 'Avatar', affectation: {value: '"lightgreen"'}}],
+                      }
+                    ]
+                  }
                 },
                 {
                   contextName: 'Alice at Bob home',
                   state: 'AliceAtBobHome',
-                  actions: [{channel: 'Avatar', affectation: {value: '"lightgreen"'}}],
+                  actions: [{channel: 'Avatar', affectation: {value: '"yellow"'}}],
                 }
               ]
             }
@@ -163,13 +179,15 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
       localChannels: [
         {name: 'AliceAtHome'   , type: 'boolean'},
         {name: 'AliceAtBobHome', type: 'boolean'},
+        {name: 'AliceAvailable', type: 'boolean'},
         {name: 'BobAtHome'     , type: 'boolean'},
       ],
       actions: [
         {channel: 'AliceAtHome'   , affectation: {value: `Alice.location == "AliceHome"`}},
-        {channel: 'BobAtHome'     , affectation: {value: `  Bob.location == "BobHome"  `}},
+        {channel: 'AliceAvailable', affectation: {value: `not Alice.phoning`                }},
         {channel: 'AliceAtBobHome', affectation: {value: `Alice.location == "BobHome"  `}},
-        {channel: 'Avatar'        , affectation: {value: `"black"`                     }}
+        {channel: 'BobAtHome'     , affectation: {value: `  Bob.location == "BobHome"  `}},
+        {channel: 'Avatar'        , affectation: {value: `"red"`                        }}
       ],
       subPrograms: {
         subProgUser: this.initialSubProgUser

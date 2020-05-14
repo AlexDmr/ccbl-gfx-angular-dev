@@ -1,5 +1,6 @@
 import {Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
 import { People } from '../data/Scene';
+import { SceneService } from '../scene.service';
 
 @Component({
   selector: 'app-people',
@@ -10,17 +11,20 @@ import { People } from '../data/Scene';
 export class PeopleComponent implements OnInit {
   @Input() data: People<any>;
   @Input() height = 100;
-  @Output() update = new EventEmitter<People<any>>();
+  // @Output() update = new EventEmitter<People<any>>();
   imgPhoning = '/assets/phoning.png';
 
-  constructor() { }
+  constructor(private sim: SceneService) { }
 
   ngOnInit(): void {
   }
 
   togglePhoning() {
-    this.data.phoning = !this.data.phoning;
-    this.update.emit({...this.data} );
+    this.sim.updatePeople(this.data.name, {
+      ...this.data,
+      phoning: !this.data.phoning
+    });
+    // this.update.emit({...this.data} );
   }
 }
 

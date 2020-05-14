@@ -144,7 +144,9 @@ export class SceneHeatingComponent implements OnInit {
         {channel: 'openWindows', affectation: {value: `false`  }},
         {channel: 'Heating'    , affectation: {value: `false`  }},
         {channel: 'Avatar'     , affectation: {value: `"black"`}},
-        {channel: 'tempInside' , affectation: {value: `20`}}
+        {channel: 'tempInside' , affectation: {value: `20`}},
+        {channel: 'deltaTime', affectation: {value: '100'}},
+        {channel: 'deltaTemp', affectation: {value: 'sign(tempOutside - tempInside)'}}
       ],
       subPrograms: {
         subProgUser: this.initialSubProgUser
@@ -152,51 +154,39 @@ export class SceneHeatingComponent implements OnInit {
       allen: {
         During: [
           {
-            contextName: 'Temperature interne devient temperature externe plus ou moins vite',
-            state: 'true',
+            contextName: 'Fenêtres fermé => faut voir',
+            state: 'not openWindows',
             actions: [
-              {channel: 'deltaTime', affectation: {value: '100'}},
-              {channel: 'deltaTemp', affectation: {value: 'sign(tempOutside - tempInside)'}}
+              {channel: 'deltaTime', affectation: {value: '1000'}}
             ],
             allen: {
               During: [
                 {
-                  contextName: 'Fenêtres fermé => faut voir',
-                  state: 'not openWindows',
+                  contextName: 'chauffage',
+                  state: 'Heating',
                   actions: [
-                    {channel: 'deltaTime', affectation: {value: '1000'}}
+                    {channel: 'deltaTemp', affectation: {value: '1'}}
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            contextName: 'change température',
+            state: 'deltaTemp != 0',
+            allen: {
+              During: [
+                {
+                  contextName: 'Ajustement de temperature',
+                  state: 'true; false; deltaTime; waitEnd',
+                  actionsOnEnd: [
+                    {channel: 'tempInside', affectation: 'tempInside + deltaTemp'}
                   ],
                   allen: {
-                    During: [
-                      {
-                        contextName: 'chauffage',
-                        state: 'Heating',
-                        actions: [
-                          {channel: 'deltaTemp', affectation: {value: '1'}}
-                        ]
-                      }
-                    ]
-                  }
-                },
-                {
-                  contextName: 'change température',
-                  state: 'deltaTemp != 0',
-                  allen: {
-                    During: [
-                      {
-                        contextName: 'Ajustement de temperature',
-                        state: 'true; false; deltaTime; waitEnd',
-                        actionsOnEnd: [
-                          {channel: 'tempInside', affectation: 'tempInside + deltaTemp'}
-                        ],
-                        allen: {
-                          Meet: {
-                            contextsSequence: [],
-                            loop: 0
-                          }
-                        }
-                      }
-                    ]
+                    Meet: {
+                      contextsSequence: [],
+                      loop: 0
+                    }
                   }
                 }
               ]
