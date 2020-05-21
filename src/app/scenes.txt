@@ -46,7 +46,13 @@ Mode modeCinéma
 Dans le salon et la cuisine : lumières éteintes pendant le film
 Si le film est sur pause pendant au moins 10s alors on sort du mode
 
-modeFilm
+SousProg (import expr, duration, export V)
+  V: true
+  During duration ms
+    V: false
+
+pausedFor10s: SousProg(TV.state == 'Pause')
+modeFilm and not pausedFor10s
   lumSalon: false;
   lumCuisine: false;
 
