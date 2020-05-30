@@ -51,6 +51,7 @@ export class SceneHeatingComponent implements OnInit {
 
   // Time
   DayTimeSubj = new BehaviorSubject<Date>(new Date());
+  DayNight = new BehaviorSubject<boolean>( false );
 
   // CCBL programs
   progV    = new ProgVersionner( this.initialRootProg    );
@@ -76,7 +77,7 @@ export class SceneHeatingComponent implements OnInit {
         } ),
         openWindows: open => this.openWindows.next(open),
         Heating: onOff => this.Heating.next(onOff),
-        tempInside: t => this.insideTempSubj.next(t),
+        tempInside: t => this.insideTempSubj.next(t)
       }
     }));
     //update date every 1 second
@@ -84,13 +85,19 @@ export class SceneHeatingComponent implements OnInit {
     this.DayTimeSubj.subscribe( date =>{
       if( date.getHours()<18 && date.getHours()>7)//test if day
       {
-        this.openWindows.next(true);
+        this.DayNight.next(true);
       }
       else
       {
-        this.openWindows.next(false);
+        this.DayNight.next(false);
       }
     })
+    this.DayNight.subscribe(Day=>
+      {
+        this.openWindows.next(Day);
+      }
+
+    )
     this.InsidePeoples = this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === this.locHome) )
     );
@@ -157,7 +164,7 @@ export class SceneHeatingComponent implements OnInit {
         {name: 'deltaTemp', type: 'number'}
       ],
       actions: [
-        {channel: 'openWindows', affectation: {value: `false`  }},
+        {channel: 'openWindows', affectation: {value: (this.DayNight.getValue()?'true':'false')  }},
         {channel: 'Heating'    , affectation: {value: `false`  }},
         {channel: 'Avatar'     , affectation: {value: `"black"`}},
         {channel: 'tempInside' , affectation: {value: `20`}},
