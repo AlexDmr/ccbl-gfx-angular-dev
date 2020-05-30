@@ -34,6 +34,8 @@ import { DeviceComponent } from './device/device.component';
 import { DeviceLampComponent } from './device-lamp/device-lamp.component';
 import {SceneHeatingComponent} from './scene-heating/scene-heating.component';
 import {MatTabsModule} from '@angular/material/tabs';
+import { ClockComponent } from './clock/clock.component';
+import {DatePipe} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -50,7 +52,8 @@ import {MatTabsModule} from '@angular/material/tabs';
     PeopleComponent,
     AppartmentComponent,
     DeviceComponent,
-    DeviceLampComponent
+    DeviceLampComponent,
+    ClockComponent
   ],
   imports: [
     BrowserModule,
@@ -74,7 +77,7 @@ import {MatTabsModule} from '@angular/material/tabs';
     MatRadioModule,
     MatTabsModule
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

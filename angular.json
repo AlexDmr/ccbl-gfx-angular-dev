@@ -167,5 +167,8 @@
       }
     }
   },
-  "defaultProject": "ccbl-gfx-angular9"
+  "defaultProject": "ccbl-gfx-angular9",
+  "cli": {
+    "analytics": false
+  }
 }

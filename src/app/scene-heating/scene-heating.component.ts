@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {BehaviorSubject, Observable, timer} from 'rxjs';
 import { SceneLocation, People } from '../data/Scene';
 import { DeviceLamp } from '../device-lamp/device-lamp.component';
 import { ProgVersionner } from 'projects/ccbl-gfx9/src/public-api';
@@ -33,6 +33,7 @@ export class SceneHeatingComponent implements OnInit {
   OutsidePeoples: Observable<People<PossibleLocations>[]>;
   Peoples: Observable<People<PossibleLocations>[]>;
   allowDndList: string[] = ['People'];
+
   Avatar = new BehaviorSubject<DeviceLamp>({
     name: 'Avatar',
     color: 'grey'
@@ -47,6 +48,9 @@ export class SceneHeatingComponent implements OnInit {
   // Thermometers
   insideTempSubj  = new BehaviorSubject<number>(20);
   outsideTempSubj = new BehaviorSubject<number>(10);
+
+  // Time
+  DayTimeSubj = new BehaviorSubject<Date>(new Date());
 
   // CCBL programs
   progV    = new ProgVersionner( this.initialRootProg    );
@@ -72,9 +76,21 @@ export class SceneHeatingComponent implements OnInit {
         } ),
         openWindows: open => this.openWindows.next(open),
         Heating: onOff => this.Heating.next(onOff),
-        tempInside: t => this.insideTempSubj.next(t)
+        tempInside: t => this.insideTempSubj.next(t),
       }
     }));
+    //update date every 1 second
+    timer(0,1000).subscribe(()=> this.DayTimeSubj.next(new Date()));
+    this.DayTimeSubj.subscribe( date =>{
+      if( date.getHours()<18 && date.getHours()>7)//test if day
+      {
+        this.openWindows.next(true);
+      }
+      else
+      {
+        this.openWindows.next(false);
+      }
+    })
     this.InsidePeoples = this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === this.locHome) )
     );

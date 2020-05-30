@@ -10,6 +10,7 @@
       ><div></div></div>
   <div class       = "window right"
       [class.open] = "openWindows | async"
+       (click)      = "openWindows.next( !openWindows.getValue() )"
       ><div></div></div>
 
   <section class="outside">
@@ -37,10 +38,13 @@
                   ></app-appartment>
 
   <section class="thermometer inside">
+
     <img [src]="thermometerURL" />
     <output>{{insideTempSubj | async}}°C</output>
   </section>
-
+  <section class="clock"><span >
+  <cs-canvas-clock></cs-canvas-clock>
+</span></section>
   <div class="Avatar" [style.backgroundColor]="(Avatar | async).color">
   </div>
 
