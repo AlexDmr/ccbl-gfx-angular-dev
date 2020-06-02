@@ -41,12 +41,14 @@
 
     <img [src]="thermometerURL" />
     <output>{{insideTempSubj | async}}°C</output>
-  </section>
-  <section class="clock"><span >
-  <cs-canvas-clock [tdate]="(DayTimeSubj)"></cs-canvas-clock>
-<input type="time" [ngModel]="DayTimeSubj.value | date: 'HH:mm'" (ngModelChange)="changeDate($event) ">
-
-</span></section>
+    </section>
+    <section class="clock">
+      <span >
+        <cs-canvas-clock [tdate]="(DayTimeSubj)"></cs-canvas-clock>
+        <input type="time" [ngModel]="DayTimeSubj.value | date: 'HH:mm'" (ngModelChange)="changeDate($event) ">
+        <img [src]="imgDayNight" class="dayNight" />
+      </span>
+    </section>
   <div class="Avatar" [style.backgroundColor]="(Avatar | async).color">
   </div>
 

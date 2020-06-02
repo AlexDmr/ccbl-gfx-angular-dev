@@ -43,7 +43,6 @@ export class SceneHeatingComponent implements OnInit {
 
   // Windows
   openWindows = new BehaviorSubject<boolean>( true );
-
   // Heating
   Heating = new BehaviorSubject<boolean>( false );
 
@@ -72,6 +71,7 @@ export class SceneHeatingComponent implements OnInit {
   subProgV = new ProgVersionner( this.initialSubProgUser );
 
   constructor(private sim: SceneService) {
+
     sim.init([ {
         imgURL: `assets/Eve.png`,
         name: 'Eve',
@@ -102,8 +102,12 @@ export class SceneHeatingComponent implements OnInit {
 
     this.itIsDay.subscribe(Day=>
     {
-
       this.openWindows.next(Day);
+      if(Day)
+        this.imgDayNight="/assets/day.png";
+      else
+        this.imgDayNight="/assets/night.png";
+
 
     })
     /* Pas ici, on va justement essayer de programmer le comportement via CCBL
@@ -223,6 +227,7 @@ export class SceneHeatingComponent implements OnInit {
 //d'accord
   // OK faite ça après
   // Il reste juste un petit tour à faire côté CCBL pour ce soir je pense
+  imgDayNight: String;
 
   private get initialRootProg(): HumanReadableProgram {
     return {
