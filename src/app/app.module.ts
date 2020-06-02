@@ -38,23 +38,23 @@ import { ClockComponent } from './clock/clock.component';
 import {DatePipe} from "@angular/common";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SensorBooleanComponent,
-    SensorColorComponent,
-    SensorComponent,
-    SensorScalarComponent,
-    DialogDeviceComponent,
-    EventerComponent,
-    EnvGeneratorComponent,
-    SceneAvatarComponent,
-    SceneHeatingComponent,
-    PeopleComponent,
-    AppartmentComponent,
-    DeviceComponent,
-    DeviceLampComponent,
-    ClockComponent
-  ],
+    declarations: [
+        AppComponent,
+        SensorBooleanComponent,
+        SensorColorComponent,
+        SensorComponent,
+        SensorScalarComponent,
+        DialogDeviceComponent,
+        EventerComponent,
+        EnvGeneratorComponent,
+        SceneAvatarComponent,
+        SceneHeatingComponent,
+        PeopleComponent,
+        AppartmentComponent,
+        DeviceComponent,
+        DeviceLampComponent,
+        ClockComponent,
+    ],
   imports: [
     BrowserModule,
     AppRoutingModule,

@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
 })
 export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('mycanvas', { static: false, read: ElementRef }) canvasRef: ElementRef;
-  public tdate=new Date();
+  @Input() public tdate;
   @Input() public width = 100;
   @Input() public height = 100;
   canvasContext: CanvasRenderingContext2D;
@@ -75,7 +75,7 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
         .pipe(
           tap(t => {
             canvasContext.clearRect($this.width / 2 * -1, $this.height / 2 * -1, $this.height, $this.width);
-            date=new Date();
+            date=new Date(date.setSeconds(date.getSeconds()+1));
             canvasContext.drawImage(background, -50, -50, 100, 100);
             $this.drawTime(canvasContext, innerRadius,date);
           })
