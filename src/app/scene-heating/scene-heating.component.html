@@ -43,8 +43,8 @@
     <output>{{insideTempSubj | async}}°C</output>
   </section>
   <section class="clock"><span >
-  <cs-canvas-clock [tdate]=DayTimeSubj.getValue()></cs-canvas-clock>
-<input type="time" [ngModel]="DayTimeSubj.value | date: 'hh:mm'" (ngModelChange)="changeDate($event) ">
+  <cs-canvas-clock [tdate]="(DayTimeSubj)"></cs-canvas-clock>
+<input type="time" [ngModel]="DayTimeSubj.value | date: 'HH:mm'" (ngModelChange)="changeDate($event) ">
 
 </span></section>
   <div class="Avatar" [style.backgroundColor]="(Avatar | async).color">

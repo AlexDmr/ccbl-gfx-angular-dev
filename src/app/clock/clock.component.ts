@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, Input, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ChangeDetectionStrategy, NgZone } from '@angular/core';
-import { Observable, timer, Subscription } from 'rxjs';
+import {Observable, timer, Subscription, BehaviorSubject} from 'rxjs';
 import { timeInterval, tap, map } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { DatePipe } from '@angular/common';
@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
 })
 export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('mycanvas', { static: false, read: ElementRef }) canvasRef: ElementRef;
-  @Input() public tdate;
+  @Input() public tdate: BehaviorSubject<Date>;
   @Input() public width = 100;
   @Input() public height = 100;
   canvasContext: CanvasRenderingContext2D;
@@ -30,6 +30,9 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     this.canvasContext = canvasEl.getContext('2d');
     this.canvasContext.translate(radius, radius);
     this.ngZone.runOutsideAngular(() => this.draw(innerRadius));
+    this.tdate.subscribe(()=>    this.ngZone.runOutsideAngular(() => this.draw(innerRadius))
+  )
+
   }
   ngOnChanges(change) {
     if (this.subscription) {
@@ -57,27 +60,31 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   drawBackground(canvasContext, innerRadius) {
+
     var background = new Image();
-    let date =new Date(this.tdate) ;
     let dp= this.datePipe;
-    let am_pm=dp.transform(date,"a");
-    if(am_pm=='AM' && background.src != "/assets/clockAM.png")
-    {
-      background.src = "/assets/clockAM.png";
-    }
-    else if(am_pm=='PM' && background.src != "/assets/clockPM.png")
-    {
-      background.src = "/assets/clockPM.png";
-    }
+
+    let am_pm=dp.transform(this.tdate.value,"a");
+    this.tdate.subscribe( date=>{
+      am_pm=dp.transform(this.tdate.value,"a");
+      if(am_pm=='AM' && background.src != "/assets/clockAM.png")
+      {
+        background.src = "/assets/clockAM.png";
+      }
+      else if(am_pm=='PM' && background.src != "/assets/clockPM.png")
+      {
+        background.src = "/assets/clockPM.png";
+      }
+    })
+
     let $this = this;
     background.onload = function () {
       $this.subscription = timer(0, 1000)
         .pipe(
           tap(t => {
             canvasContext.clearRect($this.width / 2 * -1, $this.height / 2 * -1, $this.height, $this.width);
-            date=new Date(date.setSeconds(date.getSeconds()+1));
             canvasContext.drawImage(background, -50, -50, 100, 100);
-            $this.drawTime(canvasContext, innerRadius,date);
+            $this.drawTime(canvasContext, innerRadius,$this.tdate.value);
           })
         )
         .subscribe(s=>{

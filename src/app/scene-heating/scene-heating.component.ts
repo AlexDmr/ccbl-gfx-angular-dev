@@ -98,9 +98,7 @@ export class SceneHeatingComponent implements OnInit {
       }
     }));
     //update date every 1 second
-    timer(0,1000).subscribe(()=> {
-      this.DayTimeSubj.next(  new Date(this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)))
-    });
+
 
     this.itIsDay.subscribe(Day=>
     {
@@ -125,6 +123,9 @@ export class SceneHeatingComponent implements OnInit {
  }
 
   ngOnInit(): void {
+    timer(0,1000).subscribe(()=> {
+      this.DayTimeSubj.next(  new Date(this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)))
+    });
   }
 
   private get initialSubProgUser(): HumanReadableProgram {
