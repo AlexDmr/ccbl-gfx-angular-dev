@@ -29,30 +29,10 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
     const innerRadius = radius * 0.89;
     this.canvasContext = canvasEl.getContext('2d');
     this.canvasContext.translate(radius, radius);
-    this.ngZone.runOutsideAngular(() => this.draw(innerRadius));
-    this.tdate.subscribe(()=>    this.ngZone.runOutsideAngular(() => this.draw(innerRadius))
-  )
+    this.draw(innerRadius);
 
   }
-  ngOnChanges(change) {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    if (change.tdate) {
-      this.tdate = change.tdate.currentValue;
-      if(this.canvasRef)
-      {
-        const canvasEl: HTMLCanvasElement = this.canvasRef.nativeElement;
-        canvasEl.width = this.width;
-        canvasEl.height = this.height;
-        const radius = canvasEl.height / 2;
-        const innerRadius = radius * 0.89;
-        this.canvasContext = canvasEl.getContext('2d');
-        this.canvasContext.translate(radius, radius);
-        this.ngZone.runOutsideAngular(() => this.draw(innerRadius));
-      }
-    }
-  }
+
   ngOnDestroy() {
   }
   draw(innerRadius: number) {
@@ -75,58 +55,19 @@ export class ClockComponent implements OnInit, OnDestroy, AfterViewInit {
       {
         background.src = "/assets/clockPM.png";
       }
-    })
-
-    let $this = this;
-    background.onload = function () {
-      $this.subscription = timer(0, 1000)
+      timer(50, 1000)
         .pipe(
           tap(t => {
-            canvasContext.clearRect($this.width / 2 * -1, $this.height / 2 * -1, $this.height, $this.width);
+            canvasContext.clearRect(this.width / 2 * -1, this.height / 2 * -1, this.height, this.width);
             canvasContext.drawImage(background, -50, -50, 100, 100);
-            $this.drawTime(canvasContext, innerRadius,$this.tdate.value);
+            this.drawTime(canvasContext, innerRadius,this.tdate.value);
           })
         )
-        .subscribe(s=>{
-          }
+        .subscribe(s=>{         }
         );
-    }
-  }
-  drawFace(ctx, radius) {
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    const grad = ctx.createRadialGradient(0, 0, radius, 0.95, 0, 0, radius, 1.05);
-    grad.addColorStop(0.5, '#333');
-    grad.addColorStop(0, '#1ABB9C');
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = radius * 0.050;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0.1, 0, 2, Math.PI);
-    ctx.fillStyle = '#333';
-    ctx.fill();
-  }
+    })
 
-  drawNumbers(ctx, radius) {
-    let ang;
-    let num;
-    let dot = '.';
-    ctx.font = radius * 0.1 + 'px arial';
-    ctx.font = "10pt Courier";
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    for (num = 1; num < 13; num++) {
-      ang = num * Math.PI / 6;
-      ctx.rotate(ang);
-      ctx.translate(0, -radius * 0.85);
-      ctx.rotate(-ang);
-      ctx.fillText(dot, 0, 0);
-      ctx.rotate(ang);
-      ctx.translate(0, radius * 0.85);
-      ctx.rotate(-ang);
-    }
+
   }
 
   drawTime(ctx, radius,date) {
