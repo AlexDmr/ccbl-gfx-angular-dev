@@ -34,7 +34,6 @@ import { DeviceComponent } from './device/device.component';
 import { DeviceLampComponent } from './device-lamp/device-lamp.component';
 import {SceneHeatingComponent} from './scene-heating/scene-heating.component';
 import {MatTabsModule} from '@angular/material/tabs';
-import { ClockComponent } from './clock/clock.component';
 import {DatePipe} from "@angular/common";
 import { ClockDisplayComponent } from './clock-display/clock-display.component';
 
@@ -54,7 +53,6 @@ import { ClockDisplayComponent } from './clock-display/clock-display.component';
         AppartmentComponent,
         DeviceComponent,
         DeviceLampComponent,
-        ClockComponent,
         ClockDisplayComponent,
     ],
   imports: [
