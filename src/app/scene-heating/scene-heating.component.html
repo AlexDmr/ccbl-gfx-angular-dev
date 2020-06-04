@@ -10,6 +10,7 @@
       ><div></div></div>
   <div class       = "window right"
       [class.open] = "openWindows | async"
+       (click)      = "openWindows.next( !openWindows.getValue() )"
       ><div></div></div>
 
   <section class="outside">
@@ -37,10 +38,17 @@
                   ></app-appartment>
 
   <section class="thermometer inside">
+
     <img [src]="thermometerURL" />
     <output>{{insideTempSubj | async}}°C</output>
-  </section>
-
+    </section>
+    <section class="clock">
+      <span >
+        <app-clock-display [tdate]="(DayTimeSubj)"></app-clock-display>
+        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async).toLocaleTimeString()" (ngModelChange)="changeDate($event) ">
+        <img [src]="imgDayNight" class="dayNight" />
+      </span>
+    </section>
   <div class="Avatar" [style.backgroundColor]="(Avatar | async).color">
   </div>
 

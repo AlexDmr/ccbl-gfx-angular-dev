@@ -34,24 +34,27 @@ import { DeviceComponent } from './device/device.component';
 import { DeviceLampComponent } from './device-lamp/device-lamp.component';
 import {SceneHeatingComponent} from './scene-heating/scene-heating.component';
 import {MatTabsModule} from '@angular/material/tabs';
+import {DatePipe} from "@angular/common";
+import { ClockDisplayComponent } from './clock-display/clock-display.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SensorBooleanComponent,
-    SensorColorComponent,
-    SensorComponent,
-    SensorScalarComponent,
-    DialogDeviceComponent,
-    EventerComponent,
-    EnvGeneratorComponent,
-    SceneAvatarComponent,
-    SceneHeatingComponent,
-    PeopleComponent,
-    AppartmentComponent,
-    DeviceComponent,
-    DeviceLampComponent
-  ],
+    declarations: [
+        AppComponent,
+        SensorBooleanComponent,
+        SensorColorComponent,
+        SensorComponent,
+        SensorScalarComponent,
+        DialogDeviceComponent,
+        EventerComponent,
+        EnvGeneratorComponent,
+        SceneAvatarComponent,
+        SceneHeatingComponent,
+        PeopleComponent,
+        AppartmentComponent,
+        DeviceComponent,
+        DeviceLampComponent,
+        ClockDisplayComponent,
+    ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -74,7 +77,7 @@ import {MatTabsModule} from '@angular/material/tabs';
     MatRadioModule,
     MatTabsModule
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,12 +1,13 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {BehaviorSubject, Observable, timer} from 'rxjs';
 import { SceneLocation, People } from '../data/Scene';
 import { DeviceLamp } from '../device-lamp/device-lamp.component';
 import { ProgVersionner } from 'projects/ccbl-gfx9/src/public-api';
-import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
+import {Affectation, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import { SceneService } from '../scene.service';
-import { map } from 'rxjs/operators';
+import { map, distinctUntilChanged } from 'rxjs/operators';
 import { DndDropEvent } from 'ngx-drag-drop';
+import {Time} from "@angular/common";
 
 export type PossibleLocations = 'Home' | 'elsewhere';
 
@@ -29,10 +30,12 @@ export class SceneHeatingComponent implements OnInit {
   Outside = new BehaviorSubject<SceneLocation>( {
     metadata: {}
   } );
+
   InsidePeoples:  Observable<People<PossibleLocations>[]>;
   OutsidePeoples: Observable<People<PossibleLocations>[]>;
   Peoples: Observable<People<PossibleLocations>[]>;
   allowDndList: string[] = ['People'];
+
   Avatar = new BehaviorSubject<DeviceLamp>({
     name: 'Avatar',
     color: 'grey'
@@ -40,7 +43,6 @@ export class SceneHeatingComponent implements OnInit {
 
   // Windows
   openWindows = new BehaviorSubject<boolean>( true );
-
   // Heating
   Heating = new BehaviorSubject<boolean>( false );
 
@@ -48,11 +50,28 @@ export class SceneHeatingComponent implements OnInit {
   insideTempSubj  = new BehaviorSubject<number>(20);
   outsideTempSubj = new BehaviorSubject<number>(10);
 
+  // Time
+  DayTimeSubj = new BehaviorSubject<Date>(new Date()); // Cette variable doit permettre de régler l'heure (pas de synchro automatique avec l'horloge système)
+  itIsDay = this.DayTimeSubj.pipe(
+    map( date =>  date.getHours() < 20 && date.getHours() > 6 ),
+    distinctUntilChanged()
+    // Normalement il y a un système de dislogue textuel et vocal intégré dans LiveShare, vous avez la dernière version ?
+
+    // Venez voir ici : https://rxjs-dev.firebaseapp.com/guide/operators
+    // En particulier l'opérateur : distinctUntilChanged
+    // Ah d'accord c'est pratique ca evite de faire les test soit meme
+
+
+    // https://rxjs-dev.firebaseapp.com/api/operators/distinctUntilChanged
+  ); // Cette variable est dérivée de la précédente
+
+
   // CCBL programs
   progV    = new ProgVersionner( this.initialRootProg    );
   subProgV = new ProgVersionner( this.initialSubProgUser );
 
   constructor(private sim: SceneService) {
+
     sim.init([ {
         imgURL: `assets/Eve.png`,
         name: 'Eve',
@@ -61,11 +80,14 @@ export class SceneHeatingComponent implements OnInit {
         metadata: {}
       }
     ], [], () => ({
-      inputs: { // Angular -> CCBL
+      inputs: { // Angular -> CCBL XXX C'est ici qu'on peut passer en entrée des variables à CCBL
         Eve: sim.getPeopleObs('Eve'),
-        tempOutside: this.outsideTempSubj
+        tempOutside: this.outsideTempSubj,
+        itIsDay: this.itIsDay,
+        // XXX ah d'accord je comprend mieux le systeme maintenant
+        // Ce système est provisoire, il faudra que je mette ça au propre...
       },
-      outputs: { // CCBL -> Angular
+      outputs: { // CCBL -> Angular XXX Ici par contre c'est CCBL qui produit des valeurs et on les récupère
         Avatar: color => this.Avatar.next( {
           ...this.Avatar.getValue(),
           color
@@ -75,15 +97,33 @@ export class SceneHeatingComponent implements OnInit {
         tempInside: t => this.insideTempSubj.next(t)
       }
     }));
+
+
+    this.itIsDay.subscribe(Day=>
+    {
+      //this.openWindows.next(Day);
+      if(Day)
+        this.imgDayNight="/assets/day.png";
+      else
+        this.imgDayNight="/assets/night.png";
+
+
+    })
+
     this.InsidePeoples = this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === this.locHome) )
     );
     this.OutsidePeoples = this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === this.locOutside) )
     );
+
  }
 
   ngOnInit(): void {
+    timer(0,1000).subscribe(()=> {
+      this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)
+      this.DayTimeSubj.next(  this.DayTimeSubj.getValue())
+    });
   }
 
   private get initialSubProgUser(): HumanReadableProgram {
@@ -92,16 +132,30 @@ export class SceneHeatingComponent implements OnInit {
         import: {
           emitters: [
             {name: 'tempInside', type: 'number'},
-            {name: 'temp_min'  , type: 'number'},
-            {name: 'temp_max'  , type: 'number'},
+            {name: 'tempOutside', type: 'number'},
+            {name: 'itIsDay', type: 'boolean'} ,
+            {name: 'Eve', type: 'People'} // C'est purement déclaratif
+
           ],
           channels: [
-            {name: 'Heating'   , type: 'boolean'}
+            {name: 'Heating'   , type: 'boolean'},
+            {name: 'temp_min'  , type: 'number'},
+            {name: 'temp_max'  , type: 'number'},
+            {name: 'openWindows', type: 'boolean'},
+            {name: 'Avatar', type: 'COLOR'},
           ]
         }
       },
+      localChannels: [
+        {name: 'EveAtHome'   , type: 'boolean'},
+      ],
       actions: [
-        {channel: 'Heating'    , affectation: {value: `false`  }}
+        {channel: 'EveAtHome'   , affectation: {value: `Eve.location == "Home"`}},
+        {channel: 'Heating'    , affectation: {value: `false`  }},
+        {channel: 'temp_min'    , affectation: {value: `15`  }},
+        {channel: 'temp_max'    , affectation: {value: `18`  }},
+        {channel: 'openWindows', affectation: {value: 'false' }} // XXX Ajout du pilotage des volets => On repasse sur Discord ?//daccord
+
       ],
       allen: {
         During: [
@@ -113,11 +167,61 @@ export class SceneHeatingComponent implements OnInit {
             actions: [
               {channel: 'Heating'    , affectation: {value: `true`  }},
             ]
+          },{
+
+            contextName: 'eve home !',
+            state: 'EveAtHome',
+            actions: [
+
+            ],
+            allen: {
+              During: [
+
+                {
+
+                  contextName: 'jour levé !',
+                  state: 'itIsDay',
+                  actions: [
+                    {channel: 'openWindows'    , affectation: {value: `true`  }},
+                    {channel: 'temp_min'    , affectation: {value: `18`  }},
+                    {channel: 'temp_max'    , affectation: {value: `22`  }},
+                  ],
+                },{
+
+                  contextName: 'froid !',
+                  state: 'tempOutside < 16',
+                  actions: [
+                    {channel: 'Avatar'    , affectation: {value: `"blue"`  }},
+                  ]
+                },
+                {
+
+                  contextName: 'bon !',
+                  state: 'tempOutside > 15 & tempOutside<23',
+                  actions: [
+                    {channel: 'Avatar'    , affectation: {value: `"green"`  }},
+                  ]
+                },
+                {
+
+                  contextName: 'chaud !',
+                  state: 'tempOutside > 22',
+                  actions: [
+                    {channel: 'Avatar'    , affectation: {value: `"red"`  }},
+                  ]
+                },
+              ]
+
+            }
           }
         ]
       }
     };
   }
+//d'accord
+  // OK faite ça après
+  // Il reste juste un petit tour à faire côté CCBL pour ce soir je pense
+  imgDayNight: String;
 
   private get initialRootProg(): HumanReadableProgram {
     return {
@@ -127,25 +231,33 @@ export class SceneHeatingComponent implements OnInit {
           emitters: [
             {name: 'Eve', type: 'People'},
             {name: 'tempOutside', type: 'number' },
+            {name: 'itIsDay', type: 'boolean'} // C'est purement déclaratif
+                                              // Ca indique que le programme CCBL connaitra une variable ItIsDay
+                                              // dont il ne pourra pas fixer la valeur, mais seulement la consulter
+                                              // comme une variable en lecture seule
           ],
-          channels: [
+          channels: [                         // Ici par contre ce sont les variables que CCBL peut fixer et qui sont vues de l'extérieur
             {name: 'Avatar', type: 'COLOR'},
             {name: 'openWindows', type: 'boolean'},
             {name: 'Heating', type: 'boolean'},
+
             {name: 'tempInside' , type: 'number' },
           ]
         }
       },
-      localChannels: [
+      localChannels: [                      // Ici les variables locale, cachées de l'extérieur
         {name: 'deltaTime', type: 'number'},
-        {name: 'deltaTemp', type: 'number'}
+        {name: 'deltaTemp', type: 'number'},
+        {name: 'temp_min'  , type: 'number'},
+        {name: 'temp_max'  , type: 'number'},
       ],
       actions: [
-        {channel: 'openWindows', affectation: {value: `false`  }},
-        {channel: 'Heating'    , affectation: {value: `false`  }},
-        {channel: 'Avatar'     , affectation: {value: `"black"`}},
-        {channel: 'tempInside' , affectation: {value: `20`}},
+        {channel: 'openWindows', affectation: {value: 'true' }}, // XXX Ajout du pilotage des volets => On repasse sur Discord ?//daccord
+        {channel: 'Heating'    , affectation: {value: `false`  }},      // d'accord je comprend
+        {channel: 'Avatar'     , affectation: {value: `"black"`}},      // Oui normal ça n'est pas évident et pas standard, c'est un prototype de recherche
+        {channel: 'tempInside' , affectation: {value: `20`}},           // Oui en fait le pilotage des volets doit être spécifié dans le sous programme
         {channel: 'deltaTime', affectation: {value: '100'}},
+
         {channel: 'deltaTemp', affectation: {value: 'sign(tempOutside - tempInside)'}}
       ],
       subPrograms: {
@@ -195,8 +307,8 @@ export class SceneHeatingComponent implements OnInit {
           {
             as: 'subProgUser',
             mapInputs: {
-              temp_min: '18',
-              temp_max: '22'
+
+              openWindows: 'openWindows'
             },
             programId: 'subProgUser'
           }
@@ -220,5 +332,9 @@ export class SceneHeatingComponent implements OnInit {
   reset() {
     this.subProgV.updateWith( this.initialSubProgUser );
     this.progV   .updateWith( this.initialRootProg    );
+  }
+  changeDate(d:string){
+    var tokens = d.split(':');
+    this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),Number(tokens[2]))));
   }
 }

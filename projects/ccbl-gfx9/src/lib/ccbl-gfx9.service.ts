@@ -737,6 +737,7 @@ export class ProgVersionner {
   }
 
   private getEmitterFromName(name: string): VariableDescription | undefined {
+
     return this.getEmitters().find(c => c.name === name);
   }
 
