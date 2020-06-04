@@ -44,8 +44,8 @@
     </section>
     <section class="clock">
       <span >
-        <cs-canvas-clock [tdate]="(DayTimeSubj)"></cs-canvas-clock>
-        <input type="time" [ngModel]="DayTimeSubj.value | date: 'HH:mm'" (ngModelChange)="changeDate($event) ">
+        <app-clock-display [tdate]="(DayTimeSubj)"></app-clock-display>
+        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj.getValue().toLocaleTimeString())" (ngModelChange)="changeDate($event) ">
         <img [src]="imgDayNight" class="dayNight" />
       </span>
     </section>

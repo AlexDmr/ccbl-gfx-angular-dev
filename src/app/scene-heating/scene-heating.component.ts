@@ -97,12 +97,11 @@ export class SceneHeatingComponent implements OnInit {
         tempInside: t => this.insideTempSubj.next(t)
       }
     }));
-    //update date every 1 second
 
 
     this.itIsDay.subscribe(Day=>
     {
-      this.openWindows.next(Day);
+      //this.openWindows.next(Day);
       if(Day)
         this.imgDayNight="/assets/day.png";
       else
@@ -110,13 +109,7 @@ export class SceneHeatingComponent implements OnInit {
 
 
     })
-    /* Pas ici, on va justement essayer de programmer le comportement via CCBL
-     * Donc la prochaine étape est d'éditer le programme CCBL
 
-    this.DayNight.subscribe(
-
-    )
-    */
     this.InsidePeoples = this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === this.locHome) )
     );
@@ -128,7 +121,8 @@ export class SceneHeatingComponent implements OnInit {
 
   ngOnInit(): void {
     timer(0,1000).subscribe(()=> {
-      this.DayTimeSubj.next(  new Date(this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)))
+      this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)
+      this.DayTimeSubj.next(  this.DayTimeSubj.getValue())
     });
   }
 

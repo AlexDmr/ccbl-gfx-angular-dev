@@ -36,6 +36,7 @@ import {SceneHeatingComponent} from './scene-heating/scene-heating.component';
 import {MatTabsModule} from '@angular/material/tabs';
 import { ClockComponent } from './clock/clock.component';
 import {DatePipe} from "@angular/common";
+import { ClockDisplayComponent } from './clock-display/clock-display.component';
 
 @NgModule({
     declarations: [
@@ -54,6 +55,7 @@ import {DatePipe} from "@angular/common";
         DeviceComponent,
         DeviceLampComponent,
         ClockComponent,
+        ClockDisplayComponent,
     ],
   imports: [
     BrowserModule,
