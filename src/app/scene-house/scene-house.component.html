@@ -1,0 +1,76 @@
+<section class="scene">
+  <img  [src]         = "houseURL" class="house"
+  />
+  <section class="location BathRoom">
+    <app-appartment class         = "BathRoom"
+                    [location]    = "BathRoom | async"
+                    [peoples]     = "BathRoomPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLBathRoom)"
+    ></app-appartment>
+  </section>
+  <section class="location ParentalRoom">
+    <app-appartment class         = "ParentalRoom"
+                    [location]    = "ParentalRoom | async"
+                    [peoples]     = "ParentalRoomPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLParentalRoom)"
+    ></app-appartment>
+  </section>
+  <section class="location LivingRoom">
+    <app-appartment class         = "LivingRoom"
+                    [location]    = "LivingRoom | async"
+                    [peoples]     = "LivingRoomPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLLivingRoom)"
+    ></app-appartment>
+  </section>
+  <section class="location Toilet">
+    <app-appartment class         = "ToiletRoom"
+                    [location]    = "ToiletRoom | async"
+                    [peoples]     = "ToiletRoomPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLToiletRoom)"
+    ></app-appartment>
+  </section>
+  <section class="location FirstRoom">
+    <app-appartment class         = "FirstRoom"
+                    [location]    = "FirstRoom | async"
+                    [peoples]     = "FirstRoomPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLFirstRoom)"
+    ></app-appartment>
+  </section>
+  <section class="location SecondRoom">
+    <app-appartment class         = "SecondRoom"
+                    [location]    = "SecondRoom | async"
+                    [peoples]     = "SecondRoomPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLSecondRoom)"
+    ></app-appartment>
+  </section>
+  <section class="location Kitchen">
+    <app-appartment class         = "Kitchen"
+                    [location]    = "Kitchen | async"
+                    [peoples]     = "KitchenPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLKitchen)"
+    ></app-appartment>
+  </section>
+  <section class="location Hallway">
+    <app-appartment class         = "Hallway"
+                    [location]    = "Hallway | async"
+                    [peoples]     = "HallwayPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLHallway)"
+    ></app-appartment>
+  </section>
+  <section class="location outside">
+    <app-appartment class         = "outside"
+                    [location]    = "elsewhere | async"
+                    [peoples]     = "elsewhereHomePeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLOutside)"
+    ></app-appartment>
+  </section>
+</section>

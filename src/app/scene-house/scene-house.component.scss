@@ -1,0 +1,99 @@
+section.scene {
+  display: inline-flex;
+  flex-flow: row;
+  position: relative;
+  img.house{
+    width: 800px;
+    margin-left: 10px;
+  }
+  .location.BathRoom {
+    > app-appartment {
+      position: absolute;
+      width: 193px;
+      height: 100px;
+      border: solid black 1px;
+      top: 124px;
+      left: 13px;
+    }
+  }
+  .location.ParentalRoom {
+    > app-appartment {
+      position: absolute;
+      width: 293px;
+      height: 100px;
+      border: solid black 1px;
+      top: 124px;
+      left: 209px;
+    }
+  }
+  .location.LivingRoom {
+    > app-appartment {
+      position: absolute;
+      width: 302px;
+      height: 100px;
+      border: solid black 1px;
+      top: 124px;
+      left: 504px;
+    }
+  }
+  .location.Toilet {
+    > app-appartment {
+      position: absolute;
+      width: 70px;
+      height: 78px;
+      border: solid black 1px;
+      top: 228px;
+      left: 13px;
+    }
+  }
+  .location.FirstRoom {
+    > app-appartment {
+      position: absolute;
+      width: 251px;
+      height: 100px;
+      border: solid black 1px;
+      top: 425px;
+      left: 283px;
+    }
+  }
+  .location.SecondRoom {
+    > app-appartment {
+      position: absolute;
+      width: 267px;
+      height: 100px;
+      border: solid black 1px;
+      top: 425px;
+      left: 13px;
+    }
+  }
+  .location.Kitchen {
+    > app-appartment {
+      position: absolute;
+      width: 270px;
+      height: 100px;
+      border: solid black 1px;
+      top: 425px;
+      left: 536px;
+    }
+  }
+  .location.Hallway {
+    > app-appartment {
+      position: absolute;
+      width: 658px;
+      height: 78px;
+      border: solid black 1px;
+      top: 228px;
+      left: 147px;
+    }
+  }
+  .location.outside {
+    > app-appartment {
+      position: absolute;
+      width: 251px;
+      height: 100px;
+      border: solid black 1px;
+      top: 553px;
+      left: 283px;
+    }
+  }
+}
