@@ -15,6 +15,12 @@ section.scene {
       top: 124px;
       left: 13px;
     }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 90px;
+      top: 50px;
+    }
   }
   .location.ParentalRoom {
     > app-appartment {
@@ -24,6 +30,12 @@ section.scene {
       border: solid black 1px;
       top: 124px;
       left: 209px;
+    }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 333px;
+      top: 50px;
     }
   }
   .location.LivingRoom {
@@ -35,6 +47,12 @@ section.scene {
       top: 124px;
       left: 504px;
     }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 644px;
+      top: 50px;
+    }
   }
   .location.Toilet {
     > app-appartment {
@@ -44,6 +62,12 @@ section.scene {
       border: solid black 1px;
       top: 228px;
       left: 13px;
+    }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 100px;
+      top: 253px;
     }
   }
   .location.FirstRoom {
@@ -55,6 +79,12 @@ section.scene {
       top: 425px;
       left: 283px;
     }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 384px;
+      top: 356px;
+    }
   }
   .location.SecondRoom {
     > app-appartment {
@@ -64,6 +94,12 @@ section.scene {
       border: solid black 1px;
       top: 425px;
       left: 13px;
+    }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 116px;
+      top: 356px;
     }
   }
   .location.Kitchen {
@@ -75,6 +111,12 @@ section.scene {
       top: 425px;
       left: 536px;
     }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 650px;
+      top: 356px;
+    }
   }
   .location.Hallway {
     > app-appartment {
@@ -84,6 +126,13 @@ section.scene {
       border: solid black 1px;
       top: 228px;
       left: 147px;
+    }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 554px;
+      top: 249px;
+
     }
   }
   .location.outside {
@@ -95,5 +144,26 @@ section.scene {
       top: 553px;
       left: 283px;
     }
+
   }
+
+}
+.clock{
+  flex-flow: row;
+  width: 112px;
+  position: relative;
+  left:300px;
+  margin-left: 20px;
+
+}
+.modifiable-Clock{
+  margin-top: 5px;
+  margin-left: 10px;
+}
+.dayNight{
+  position: absolute;
+  top:20px;
+  left:49px;
+  height: 20px;
+  width: 20px;
 }

@@ -1,6 +1,14 @@
+<section class="clock">
+      <span >
+        <app-clock-display  [tdate]="(DayTimeSubj)"></app-clock-display>
+        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async).toLocaleTimeString()" (ngModelChange)="changeDate($event) ">
+        <img [src]="imgDayNight" class="dayNight" />
+      </span>
+</section>
 <section class="scene">
   <img  [src]         = "houseURL" class="house"
   />
+
   <section class="location BathRoom">
     <app-appartment class         = "BathRoom"
                     [location]    = "BathRoom | async"
@@ -8,6 +16,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLBathRoom)"
     ></app-appartment>
+    <img [src]="BathRoomLamp"/>
   </section>
   <section class="location ParentalRoom">
     <app-appartment class         = "ParentalRoom"
@@ -16,6 +25,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLParentalRoom)"
     ></app-appartment>
+    <img [src]="ParentalRoomLamp"/>
   </section>
   <section class="location LivingRoom">
     <app-appartment class         = "LivingRoom"
@@ -24,6 +34,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLLivingRoom)"
     ></app-appartment>
+    <img [src]="LivingRoomLamp"/>
   </section>
   <section class="location Toilet">
     <app-appartment class         = "ToiletRoom"
@@ -32,6 +43,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLToiletRoom)"
     ></app-appartment>
+    <img [src]="ToiletRoomLamp"/>
   </section>
   <section class="location FirstRoom">
     <app-appartment class         = "FirstRoom"
@@ -40,6 +52,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLFirstRoom)"
     ></app-appartment>
+    <img [src]="FirstRoomLamp"/>
   </section>
   <section class="location SecondRoom">
     <app-appartment class         = "SecondRoom"
@@ -48,6 +61,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLSecondRoom)"
     ></app-appartment>
+    <img [src]="SecondRoomLamp"/>
   </section>
   <section class="location Kitchen">
     <app-appartment class         = "Kitchen"
@@ -56,6 +70,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLKitchen)"
     ></app-appartment>
+    <img [src]="KitchenLamp"/>
   </section>
   <section class="location Hallway">
     <app-appartment class         = "Hallway"
@@ -64,6 +79,7 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLHallway)"
     ></app-appartment>
+    <img [src]="HallwayLamp"/>
   </section>
   <section class="location outside">
     <app-appartment class         = "outside"
@@ -73,4 +89,13 @@
                     (dndDrop)     = "drop($event, SLOutside)"
     ></app-appartment>
   </section>
+
+</section>
+
+<section class="program">
+  <section>
+    <button (click)="start()">Start</button>
+  </section>
+  <lib-ccbl-program [program-versionner]="subProgV"></lib-ccbl-program>
+  <lib-ccbl-program [program-versionner]="progV"   ></lib-ccbl-program>
 </section>

@@ -101,13 +101,10 @@ export class SceneHeatingComponent implements OnInit {
 
     this.itIsDay.subscribe(Day=>
     {
-      //this.openWindows.next(Day);
       if(Day)
         this.imgDayNight="/assets/day.png";
       else
         this.imgDayNight="/assets/night.png";
-
-
     })
 
     this.InsidePeoples = this.sim.peoplesObs.pipe(
