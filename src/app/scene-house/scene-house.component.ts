@@ -65,6 +65,8 @@ export class SceneHomeComponent implements OnInit {
     map( date =>  date.getHours() < 20 && date.getHours() > 6 ),
     distinctUntilChanged());
 
+  //someone in roomX
+
 
   BathRoom = new BehaviorSubject<SceneLocation>( {
     metadata: {}
@@ -99,29 +101,65 @@ export class SceneHomeComponent implements OnInit {
     color: 'red'
   });
 
-    constructor(private sim: SceneService) {
+
+
+
+
+
+  constructor(private sim: SceneService) {
+    
       sim.init([ {
         imgURL: `assets/Alice.png`,
         name: 'Alice',
         phoning: false,
         location: 'BathRoom',
         metadata: {}
-      }, {
-        imgURL: `assets/Bob.png`,
-        name: 'Bob',
-        phoning: false,
-        location: 'ParentalRoom',
-        metadata: {}
-      }
+      },
+        {
+          imgURL: `assets/Louis.png`,
+          name: 'Louis',
+          phoning: false,
+          location: 'FirstRoom',
+          metadata: {}
+        }, {
+          imgURL: `assets/Bob.png`,
+          name: 'Bob',
+          phoning: false,
+          location: 'ParentalRoom',
+          metadata: {}
+        }
       ], [
 
       ], () => ({
         inputs: {
           Alice: sim.getPeopleObs('Alice'),
           Bob: sim.getPeopleObs('Bob'  ),
+          Louis: sim.getPeopleObs('Louis'  ),
           itIsDay: this.itIsDay,
-
-
+          someOneInBathRoom: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'BathRoom') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInParentalRoom: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'ParentalRoom') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInFirstRoom: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'FirstRoom') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInSecondRoom: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'SecondRoom') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInToiletRoom: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'ToiletRoom') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInLivingRoom: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'LivingRoom') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInKitchen: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'Kitchen') )
+          ).pipe( map( L => L.length > 0) ),
+          someOneInHallway: this.sim.peoplesObs.pipe(
+            map( peoples => peoples.filter( people => people.location === 'Hallway') )
+          ).pipe( map( L => L.length > 0) ),
         },
         outputs: {
           BathRoomLampState: onoff=>this.BathRoomLampState.next(onoff),
@@ -135,34 +173,37 @@ export class SceneHomeComponent implements OnInit {
         }
       }));
 
-      // Create observables related to display
-      this.BathRoomPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'BathRoom') )
-      );
-      this.ParentalRoomPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'ParentalRoom') )
-      );
-      this.FirstRoomPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'FirstRoom') )
-      );
-      this.SecondRoomPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'SecondRoom') )
-      );
-      this.ToiletRoomPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'ToiletRoom') )
-      );
-      this.LivingRoomPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'LivingRoom') )
-      );
-      this.KitchenPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'Kitchen') )
-      );
-      this.HallwayPeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'Hallway') )
-      );
-      this.elsewhereHomePeoples = this.sim.peoplesObs.pipe(
-        map( peoples => peoples.filter( people => people.location === 'Outside') )
-      );
+    this.BathRoomPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'BathRoom') )
+    );
+    this.ParentalRoomPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'ParentalRoom') )
+    );
+    this.FirstRoomPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'FirstRoom') )
+    );
+    this.SecondRoomPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'SecondRoom') )
+    );
+    this.ToiletRoomPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'ToiletRoom') )
+    );
+    this.LivingRoomPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'LivingRoom') )
+    );
+    this.KitchenPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'Kitchen') )
+    );
+    this.HallwayPeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'Hallway') )
+    );
+    this.elsewhereHomePeoples = this.sim.peoplesObs.pipe(
+      map( peoples => peoples.filter( people => people.location === 'Outside') )
+    );
+
+
+
+
       this.BathRoomLampState.subscribe(value =>this.BathRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
         this.ParentalRoomLampState.subscribe(value =>this.ParentalRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
         this.FirstRoomLampState.subscribe(value =>this.FirstRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
@@ -183,14 +224,14 @@ export class SceneHomeComponent implements OnInit {
   progV    = new ProgVersionner( this.initialRootProg    );
   subProgV = new ProgVersionner( this.initialSubProgUser );
 
-  ngOnInit(): void {
+  ngOnInit(): void {// Create observables related to display
+
 
     timer(0,1000).subscribe(()=> {
       this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)
       this.DayTimeSubj.next(  this.DayTimeSubj.getValue())
     });
   }
-
 
   private get initialRootProg(): HumanReadableProgram {
     return {
@@ -199,8 +240,17 @@ export class SceneHomeComponent implements OnInit {
           events: [],
           emitters: [
             {name: 'Alice', type: 'People'},
+            {name: 'Louis', type: 'People'},
             {name: 'Bob', type: 'People'},
             {name: 'itIsDay', type: 'boolean'} ,
+            {name: 'someOneInBathRoom', type: 'boolean'} ,
+            {name: 'someOneInParentalRoom', type: 'boolean'} ,
+            {name: 'someOneInFirstRoom', type: 'boolean'} ,
+            {name: 'someOneInSecondRoom', type: 'boolean'} ,
+            {name: 'someOneInToiletRoom', type: 'boolean'} ,
+            {name: 'someOneInLivingRoom', type: 'boolean'} ,
+            {name: 'someOneInKitchen', type: 'boolean'} ,
+            {name: 'someOneInHallway', type: 'boolean'} ,
 
           ],
           channels: [
@@ -216,27 +266,8 @@ export class SceneHomeComponent implements OnInit {
         }
       },
       localChannels: [
-        {name: 'inBathRoom'   , type: 'boolean'},
-        {name: 'inParentalRoom'   , type: 'boolean'},
-        {name: 'inFirstRoom'   , type: 'boolean'},
-        {name: 'inSecondRoom'   , type: 'boolean'},
-        {name: 'inToiletRoom'   , type: 'boolean'},
-        {name: 'inLivingRoom'   , type: 'boolean'},
-        {name: 'inKitchen'   , type: 'boolean'},
-        {name: 'inHallway'   , type: 'boolean'},
-
       ],
       actions: [
-        {channel: 'inBathRoom', affectation: {value: `Alice.location == "BathRoom"| Bob.location == "BathRoom"`}},
-        {channel: 'inParentalRoom', affectation: {value: `Alice.location == "ParentalRoom"| Bob.location == "ParentalRoom"`}},
-        {channel: 'inFirstRoom', affectation: {value: `Alice.location == "FirstRoom"| Bob.location == "FirstRoom"`}},
-        {channel: 'inSecondRoom', affectation: {value: `Alice.location == "SecondRoom"| Bob.location == "SecondRoom"`}},
-        {channel: 'inToiletRoom', affectation: {value: `Alice.location == "ToiletRoom"| Bob.location == "ToiletRoom"`}},
-        {channel: 'inLivingRoom', affectation: {value: `Alice.location == "LivingRoom"| Bob.location == "LivingRoom"`}},
-        {channel: 'inKitchen', affectation: {value: `Alice.location == "Kitchen"| Bob.location == "Kitchen"`}},
-        {channel: 'inHallway', affectation: {value: `Alice.location == "Hallway"| Bob.location == "Hallway"`}},
-
-
         {channel: 'BathRoomLampState', affectation: {value: 'false'}},
         {channel:'ParentalRoomLampState',affectation: {value: 'false'}},
         {channel:'FirstRoomLampState', affectation: {value: 'false'}},
@@ -248,7 +279,67 @@ export class SceneHomeComponent implements OnInit {
 
       ],
       subPrograms: {
-        subProgUser: this.initialSubProgUser
+        ProgUser: this.initialSubProgUser
+      },
+      allen: {
+        During: [
+          {
+            as: 'isinBathRoom',
+            mapInputs: {
+              BathRoomLampState:'BathRoomLampState',
+              ParentalRoomLampState: 'ParentalRoomLampState',
+              FirstRoomLampState:'FirstRoomLampState',
+              SecondRoomLampState: 'SecondRoomLampState',
+              ToiletRoomLampState:'ToiletRoomLampState',
+              LivingRoomLampState:'LivingRoomLampState',
+              KitchenLampState:'KitchenLampState',
+              HallwayLampState:'HallwayLampState',
+
+            },
+            programId: 'ProgUser',
+
+          }
+        ]
+      }
+    };
+  }
+  private get initialSubProgUser(): HumanReadableProgram {
+    return {
+      dependencies: {
+        import: {
+          emitters: [
+            {name: 'Alice', type: 'People'},
+            {name: 'Louis', type: 'People'},
+            {name: 'Bob', type: 'People'},
+            {name: 'itIsDay', type: 'boolean'} ,
+            {name: 'someOneInBathRoom', type: 'boolean'} ,
+            {name: 'someOneInParentalRoom', type: 'boolean'} ,
+            {name: 'someOneInFirstRoom', type: 'boolean'} ,
+            {name: 'someOneInSecondRoom', type: 'boolean'} ,
+            {name: 'someOneInToiletRoom', type: 'boolean'} ,
+            {name: 'someOneInLivingRoom', type: 'boolean'} ,
+            {name: 'someOneInKitchen', type: 'boolean'} ,
+            {name: 'someOneInHallway', type: 'boolean'} ,
+          ],
+          channels: [
+            {name:'BathRoomLampState', type:'LAMPE'},
+            {name:'ParentalRoomLampState', type:'LAMPE'},
+            {name:'FirstRoomLampState', type:'LAMPE'},
+            {name:'SecondRoomLampState', type:'LAMPE'},
+            {name:'ToiletRoomLampState', type:'LAMPE'},
+            {name:'LivingRoomLampState', type:'LAMPE'},
+            {name:'KitchenLampState', type:'LAMPE'},
+            {name:'HallwayLampState', type:'LAMPE'},
+          ],
+
+        }
+      },
+      actions:[
+        {channel: 'BathRoomLampState', affectation: {value: 'itIsDay'}}
+      ]
+      ,
+      subPrograms: {
+        subProgUser: this.SubProgUser
       },
       allen: {
         During: [
@@ -261,7 +352,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinBathRoom',
                   mapInputs: {
 
-                    InRoom: 'inBathRoom',
+                    InRoom: 'someOneInBathRoom',
                     lamp: 'BathRoomLampState'
 
                   },
@@ -272,7 +363,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinParentalRoom',
                   mapInputs: {
 
-                    InRoom: 'inParentalRoom',
+                    InRoom: 'someOneInParentalRoom',
                     lamp: 'ParentalRoomLampState'
 
                   },
@@ -283,7 +374,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinFirstRoom',
                   mapInputs: {
 
-                    InRoom: 'inFirstRoom',
+                    InRoom: 'someOneInFirstRoom',
                     lamp: 'FirstRoomLampState'
 
                   },
@@ -294,7 +385,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinSecondRoom',
                   mapInputs: {
 
-                    InRoom: 'inSecondRoom',
+                    InRoom: 'someOneInSecondRoom',
                     lamp: 'SecondRoomLampState'
 
                   },
@@ -305,7 +396,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinToiletRoom',
                   mapInputs: {
 
-                    InRoom: 'inToiletRoom',
+                    InRoom: 'someOneInToiletRoom',
                     lamp: 'ToiletRoomLampState'
 
                   },
@@ -316,7 +407,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinLivingRoom',
                   mapInputs: {
 
-                    InRoom: 'inLivingRoom',
+                    InRoom: 'someOneInLivingRoom',
                     lamp: 'LivingRoomLampState'
 
                   },
@@ -327,7 +418,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinKitchen',
                   mapInputs: {
 
-                    InRoom: 'inKitchen',
+                    InRoom: 'someOneInKitchen',
                     lamp: 'KitchenLampState'
 
                   },
@@ -338,7 +429,7 @@ export class SceneHomeComponent implements OnInit {
                   as: 'isinHallway',
                   mapInputs: {
 
-                    InRoom: 'inHallway',
+                    InRoom: 'someOneInHallway',
                     lamp: 'HallwayLampState'
 
                   },
@@ -347,29 +438,6 @@ export class SceneHomeComponent implements OnInit {
                 }
               ]
             }
-          }
-        ]
-      }
-    };
-  }
-  private get initialSubProgUser(): HumanReadableProgram {
-    return {
-      dependencies: {
-        import: {
-          emitters: [
-            {name: 'InRoom', type: 'boolean'},
-          ],
-          channels: [
-            {name: 'lamp', type: 'LAMPE'}
-          ]
-        }
-      },
-      allen: {
-        During: [
-          {
-            contextName: 'Some one In room',
-            state: 'InRoom',
-            actions: [{channel: 'lamp', affectation: {value: 'true'}}]
           }
         ]
       }
