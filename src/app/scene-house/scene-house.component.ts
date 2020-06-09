@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {DndDropEvent} from "ngx-drag-drop";
 import {People, SceneLocation} from "../data/Scene";
 import {SceneService} from "../scene.service";
@@ -17,6 +17,8 @@ export type PossibleLocations = 'BathRoom'|
   styleUrls: ['./scene-house.component.scss']
 })
 export class SceneHomeComponent implements OnInit {
+
+
   houseURL          = '/assets/home-detail.png';
   BathRoomLamp      = '/assets/lamp off.png';
   ParentalRoomLamp  = '/assets/lamp on.png';
@@ -65,7 +67,11 @@ export class SceneHomeComponent implements OnInit {
     map( date =>  date.getHours() < 20 && date.getHours() > 6 ),
     distinctUntilChanged());
 
-  //someone in roomX
+  //tv
+  @ViewChild('TV', { static: true }) tv: ElementRef;
+  TvPlay = new BehaviorSubject<boolean>(false);
+  TvVolume=new BehaviorSubject<Number>(1);
+  TvSource=new BehaviorSubject<String>("assets/movie.mp4");
 
 
   BathRoom = new BehaviorSubject<SceneLocation>( {
@@ -107,7 +113,7 @@ export class SceneHomeComponent implements OnInit {
 
 
   constructor(private sim: SceneService) {
-    
+
       sim.init([ {
         imgURL: `assets/Alice.png`,
         name: 'Alice',
@@ -137,29 +143,21 @@ export class SceneHomeComponent implements OnInit {
           Louis: sim.getPeopleObs('Louis'  ),
           itIsDay: this.itIsDay,
           someOneInBathRoom: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'BathRoom') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'BathRoom') )),
           someOneInParentalRoom: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'ParentalRoom') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'ParentalRoom') )),
           someOneInFirstRoom: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'FirstRoom') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'FirstRoom') )),
           someOneInSecondRoom: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'SecondRoom') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'SecondRoom') )),
           someOneInToiletRoom: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'ToiletRoom') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'ToiletRoom') )),
           someOneInLivingRoom: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'LivingRoom') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'LivingRoom') )),
           someOneInKitchen: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'Kitchen') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'Kitchen') )),
           someOneInHallway: this.sim.peoplesObs.pipe(
-            map( peoples => peoples.filter( people => people.location === 'Hallway') )
-          ).pipe( map( L => L.length > 0) ),
+            map( peoples => !!peoples.find( people => people.location === 'Hallway') )),
         },
         outputs: {
           BathRoomLampState: onoff=>this.BathRoomLampState.next(onoff),
@@ -170,10 +168,39 @@ export class SceneHomeComponent implements OnInit {
           LivingRoomLampState: onoff=>this.LivingRoomLampState.next(onoff),
           KitchenLampState: onoff=>this.KitchenLampState.next(onoff),
           HallwayLampState: onoff=>this.HallwayLampState.next(onoff),
+          TvPlay: onoff=>this.TvPlay.next(onoff),
+          TvVolume: vol=>this.TvVolume.next(vol),
+          TvSource: source=>this.TvSource.next(source),
         }
       }));
 
-    this.BathRoomPeoples = this.sim.peoplesObs.pipe(
+
+      this.BathRoomLampState.subscribe(value =>this.BathRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.ParentalRoomLampState.subscribe(value =>this.ParentalRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.FirstRoomLampState.subscribe(value =>this.FirstRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.SecondRoomLampState.subscribe(value =>this.SecondRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.ToiletRoomLampState.subscribe(value =>this.ToiletRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.LivingRoomLampState.subscribe(value =>this.LivingRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.KitchenLampState.subscribe(value =>this.KitchenLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.HallwayLampState.subscribe(value =>this.HallwayLamp=value?"/assets/lamp on.png":"/assets/lamp off.png")
+      this.itIsDay.subscribe(Day=>
+      {
+        if(Day) {
+          this.imgDayNight = "/assets/day.png";
+        }
+        else {
+          this.imgDayNight = "/assets/night.png";
+        }
+      })
+
+    }
+
+  progV    = new ProgVersionner( this.initialRootProg    );
+  subProgV = new ProgVersionner( this.initialSubProgUser );
+  someOneInBathRoom: Observable<boolean>;
+
+  ngOnInit(): void {// Create observables related to display
+    this.BathRoomPeoples =  this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === 'BathRoom') )
     );
     this.ParentalRoomPeoples = this.sim.peoplesObs.pipe(
@@ -200,39 +227,31 @@ export class SceneHomeComponent implements OnInit {
     this.elsewhereHomePeoples = this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === 'Outside') )
     );
-
-
-
-
-      this.BathRoomLampState.subscribe(value =>this.BathRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.ParentalRoomLampState.subscribe(value =>this.ParentalRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.FirstRoomLampState.subscribe(value =>this.FirstRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.SecondRoomLampState.subscribe(value =>this.SecondRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.ToiletRoomLampState.subscribe(value =>this.ToiletRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.LivingRoomLampState.subscribe(value =>this.LivingRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.KitchenLampState.subscribe(value =>this.KitchenLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-        this.HallwayLampState.subscribe(value =>this.HallwayLamp=value?"/assets/lamp on.png":"/assets/lamp off.png")
-      this.itIsDay.subscribe(Day=>
-      {
-        if(Day)
-          this.imgDayNight="/assets/day.png";
-        else
-          this.imgDayNight="/assets/night.png";
-      })
-    }
-
-  progV    = new ProgVersionner( this.initialRootProg    );
-  subProgV = new ProgVersionner( this.initialSubProgUser );
-
-  ngOnInit(): void {// Create observables related to display
-
-
+    this.someOneInBathRoom = this.BathRoomPeoples.pipe( map(L => L.length > 0) );
     timer(0,1000).subscribe(()=> {
       this.DayTimeSubj.getValue().setSeconds(this.DayTimeSubj.getValue().getSeconds()+1)
       this.DayTimeSubj.next(  this.DayTimeSubj.getValue())
     });
   }
 
+  ngAfterViewInit(): void {
+    this.TvPlay.subscribe(play => {
+      if (play)
+        this.tv.nativeElement.play();
+      else
+        this.tv.nativeElement.pause();
+    });
+    this.TvVolume.subscribe( volume=>
+      {
+        this.tv.nativeElement.volume=volume;
+      }
+
+    )
+    this.TvSource.subscribe(()=> {
+      this.tv.nativeElement.load();
+      this.tv.nativeElement.autoplay=this.TvPlay.getValue();
+    }  );
+  }
   private get initialRootProg(): HumanReadableProgram {
     return {
       dependencies: {
@@ -262,6 +281,10 @@ export class SceneHomeComponent implements OnInit {
             {name:'LivingRoomLampState', type:'LAMPE'},
             {name:'KitchenLampState', type:'LAMPE'},
             {name:'HallwayLampState', type:'LAMPE'},
+            {name: 'TvPlay', type: 'boolean'} ,
+            {name: 'TvVolume', type: 'Number'} ,
+            {name: 'TvSource', type: 'string'} ,
+
           ]
         }
       },
@@ -276,6 +299,11 @@ export class SceneHomeComponent implements OnInit {
         {channel:'LivingRoomLampState', affectation: {value: 'false'}},
         {channel:'KitchenLampState', affectation: {value: 'false'}},
         {channel:'HallwayLampState', affectation: {value: 'false'}},
+        {channel:'TvPlay', affectation: {value: 'false'}},
+        {channel:'TvVolume', affectation: {value: '1'}},
+        {channel:'TvSource', affectation: {value: '"assets/oceans.mp4"'}},
+
+
 
       ],
       subPrograms: {
@@ -294,7 +322,9 @@ export class SceneHomeComponent implements OnInit {
               LivingRoomLampState:'LivingRoomLampState',
               KitchenLampState:'KitchenLampState',
               HallwayLampState:'HallwayLampState',
-
+              TvPlay: 'TvPlay',
+              TvVolume: 'TvVolume',
+              TvSource: 'TvSource',
             },
             programId: 'ProgUser',
 
@@ -330,13 +360,14 @@ export class SceneHomeComponent implements OnInit {
             {name:'LivingRoomLampState', type:'LAMPE'},
             {name:'KitchenLampState', type:'LAMPE'},
             {name:'HallwayLampState', type:'LAMPE'},
+            {name: 'TvPlay', type: 'boolean'} ,
+            {name: 'TvVolume', type: 'Number'} ,
+            {name: 'TvSource', type: 'string'} ,
+
           ],
 
         }
-      },
-      actions:[
-        {channel: 'BathRoomLampState', affectation: {value: 'itIsDay'}}
-      ]
+      }
       ,
       subPrograms: {
         subProgUser: this.SubProgUser
@@ -346,8 +377,12 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName:'its night',
             state:'not itIsDay',
+            actions: [{channel: 'TvPlay', affectation: {value: 'true'}},
+              {channel: 'TvVolume', affectation: {value: '0.2'}},
+              {channel: 'TvSource', affectation: {value: '"assets/movie.mp4"'}}],
             allen:{
               During: [
+
                 {
                   as: 'isinBathRoom',
                   mapInputs: {
@@ -479,6 +514,7 @@ export class SceneHomeComponent implements OnInit {
   }
   changeDate(d:string){
     var tokens = d.split(':');
-    this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),Number(tokens[2]))));
+    this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),tokens[2]?Number(tokens[2]):this.DayTimeSubj.getValue().getSeconds())));
+
   }
 }

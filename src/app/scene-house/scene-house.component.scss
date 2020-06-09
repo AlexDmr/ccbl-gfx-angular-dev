@@ -38,6 +38,12 @@ section.scene {
       top: 50px;
     }
   }
+  .tv{
+    position: absolute;
+    width: 115px;
+    left: 690px;
+    top: 26px;
+  }
   .location.LivingRoom {
     > app-appartment {
       position: absolute;
@@ -86,6 +92,7 @@ section.scene {
       top: 356px;
     }
   }
+
   .location.SecondRoom {
     > app-appartment {
       position: absolute;

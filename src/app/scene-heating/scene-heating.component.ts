@@ -332,6 +332,7 @@ export class SceneHeatingComponent implements OnInit {
   }
   changeDate(d:string){
     var tokens = d.split(':');
-    this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),Number(tokens[2]))));
+    this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),tokens[2]?Number(tokens[2]):this.DayTimeSubj.getValue().getSeconds())));
+
   }
 }

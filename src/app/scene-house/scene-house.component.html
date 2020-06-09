@@ -46,6 +46,10 @@
     <img [src]="ToiletRoomLamp"/>
   </section>
   <section class="location FirstRoom">
+    <video  class="tv" #TV>
+      <source  [src]="TvSource | async" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
     <app-appartment class         = "FirstRoom"
                     [location]    = "FirstRoom | async"
                     [peoples]     = "FirstRoomPeoples | async"
