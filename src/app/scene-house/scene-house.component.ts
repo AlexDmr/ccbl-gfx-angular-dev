@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {DndDropEvent} from "ngx-drag-drop";
 import {People, SceneLocation} from "../data/Scene";
 import {SceneService} from "../scene.service";
@@ -69,6 +69,11 @@ export class SceneHomeComponent implements OnInit {
 
   //tv
   @ViewChild('TV', { static: true }) tv: ElementRef;
+  @ViewChild('clock', { static: true }) clock: ElementRef;
+  @HostListener('window:scroll', ['$event']) // for window scroll events
+  onScroll(event) {
+    this.clock.nativeElement.blur();
+  }
   TvPlay = new BehaviorSubject<boolean>(false);
   TvVolume=new BehaviorSubject<Number>(1);
   TvSource=new BehaviorSubject<String>("assets/movie.mp4");
@@ -200,6 +205,7 @@ export class SceneHomeComponent implements OnInit {
   someOneInBathRoom: Observable<boolean>;
 
   ngOnInit(): void {// Create observables related to display
+
     this.BathRoomPeoples =  this.sim.peoplesObs.pipe(
       map( peoples => peoples.filter( people => people.location === 'BathRoom') )
     );
@@ -249,6 +255,7 @@ export class SceneHomeComponent implements OnInit {
     )
     this.TvSource.subscribe(()=> {
       this.tv.nativeElement.load();
+
       this.tv.nativeElement.autoplay=this.TvPlay.getValue();
     }  );
   }

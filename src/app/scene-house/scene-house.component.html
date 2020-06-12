@@ -1,8 +1,8 @@
 <section class="clock">
       <span >
         <app-clock-display  [tdate]="(DayTimeSubj)"></app-clock-display>
-        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async).toLocaleTimeString()" (ngModelChange)="changeDate($event) ">
-        <img [src]="imgDayNight" class="dayNight" />
+        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async).toLocaleTimeString()" (ngModelChange)="changeDate($event)"(scroll)="onScroll($event)" #clock>
+        <img [src]="imgDayNight" class="dayNight"  />
       </span>
 </section>
 <section class="scene">

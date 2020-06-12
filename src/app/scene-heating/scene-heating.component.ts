@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, timer} from 'rxjs';
 import { SceneLocation, People } from '../data/Scene';
 import { DeviceLamp } from '../device-lamp/device-lamp.component';
@@ -18,6 +18,7 @@ export type PossibleLocations = 'Home' | 'elsewhere';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [SceneService]
 })
+
 export class SceneHeatingComponent implements OnInit {
   locHome: PossibleLocations = 'Home';
   locOutside: PossibleLocations = 'elsewhere';
@@ -30,7 +31,11 @@ export class SceneHeatingComponent implements OnInit {
   Outside = new BehaviorSubject<SceneLocation>( {
     metadata: {}
   } );
-
+  @ViewChild('clock', { static: true }) clock: ElementRef;
+  @HostListener('window:scroll', ['$event']) // for window scroll events
+  onScroll(event) {
+    this.clock.nativeElement.blur();
+  }
   InsidePeoples:  Observable<People<PossibleLocations>[]>;
   OutsidePeoples: Observable<People<PossibleLocations>[]>;
   Peoples: Observable<People<PossibleLocations>[]>;
