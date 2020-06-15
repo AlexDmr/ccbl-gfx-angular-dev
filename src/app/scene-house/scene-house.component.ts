@@ -10,6 +10,7 @@ import {ProgVersionner} from "../../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.serv
 
 export type PossibleLocations = 'BathRoom'|
   'Outside'|'ParentalRoom'|'FirstRoom'|'SecondRoom'|'ToiletRoom'|'LivingRoom'|'Kitchen'|'Hallway'  ;
+export type statemachinecoffee = 'on'|'off'|'preparing'|'ready';
 
 @Component({
   selector: 'app-scene-house',
@@ -19,7 +20,7 @@ export type PossibleLocations = 'BathRoom'|
 export class SceneHomeComponent implements OnInit {
 
 
-  houseURL          = '/assets/home-detail.png';
+  houseURL          = '/assets/Appart Test.svg';
   BathRoomLamp      = '/assets/lamp off.png';
   ParentalRoomLamp  = '/assets/lamp on.png';
   FirstRoomLamp     = '/assets/lamp on.png';
@@ -29,6 +30,9 @@ export class SceneHomeComponent implements OnInit {
   KitchenLamp       = '/assets/lamp on.png';
   HallwayLamp       = '/assets/lamp on.png';
   imgDayNight: String;
+  coffeemachine     = '/assets/cafe pret.gif';
+  Oven              = '/assets/four off.png';
+
 
   allowDndList: string[] = ['People'];
   SLBathRoom: PossibleLocations = 'BathRoom';
@@ -60,6 +64,8 @@ export class SceneHomeComponent implements OnInit {
   LivingRoomLampState    = new BehaviorSubject<boolean>( false );
   KitchenLampState       = new BehaviorSubject<boolean>( false );
   HallwayLampState       = new BehaviorSubject<boolean>( false );
+  CoffeeMachineState     = new BehaviorSubject<statemachinecoffee>( 'off' );
+  OvenState              = new BehaviorSubject<boolean>( false );
 
   //Date
   DayTimeSubj = new BehaviorSubject<Date>(new Date()); // Cette variable doit permettre de régler l'heure (pas de synchro automatique avec l'horloge système)
@@ -75,8 +81,8 @@ export class SceneHomeComponent implements OnInit {
     this.clock.nativeElement.blur();
   }
   TvPlay = new BehaviorSubject<boolean>(false);
-  TvVolume=new BehaviorSubject<Number>(1);
-  TvSource=new BehaviorSubject<String>("assets/movie.mp4");
+  TvVolume=new BehaviorSubject<number>(1);
+  TvSource=new BehaviorSubject<string>("assets/movie.mp4");
 
 
   BathRoom = new BehaviorSubject<SceneLocation>( {
@@ -147,6 +153,7 @@ export class SceneHomeComponent implements OnInit {
           Bob: sim.getPeopleObs('Bob'  ),
           Louis: sim.getPeopleObs('Louis'  ),
           itIsDay: this.itIsDay,
+          CoffeeMachineState: this.CoffeeMachineState,
           someOneInBathRoom: this.sim.peoplesObs.pipe(
             map( peoples => !!peoples.find( people => people.location === 'BathRoom') )),
           someOneInParentalRoom: this.sim.peoplesObs.pipe(
@@ -173,9 +180,11 @@ export class SceneHomeComponent implements OnInit {
           LivingRoomLampState: onoff=>this.LivingRoomLampState.next(onoff),
           KitchenLampState: onoff=>this.KitchenLampState.next(onoff),
           HallwayLampState: onoff=>this.HallwayLampState.next(onoff),
+          OvenState:onoff=>this.OvenState.next(onoff),
           TvPlay: onoff=>this.TvPlay.next(onoff),
           TvVolume: vol=>this.TvVolume.next(vol),
           TvSource: source=>this.TvSource.next(source),
+
         }
       }));
 
@@ -186,7 +195,11 @@ export class SceneHomeComponent implements OnInit {
       this.SecondRoomLampState.subscribe(value =>this.SecondRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
       this.ToiletRoomLampState.subscribe(value =>this.ToiletRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
       this.LivingRoomLampState.subscribe(value =>this.LivingRoomLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
-      this.KitchenLampState.subscribe(value =>this.KitchenLamp=value?"/assets/lamp on.png":"/assets/lamp off.png"),
+      this.KitchenLampState.subscribe(value => {
+        this.KitchenLamp = value ? "/assets/lamp on.png" : "/assets/lamp off.png";
+        if(this.CoffeeMachineState.getValue()==='off' &&value)
+        this.CoffeeMachineState.next('on');
+      }),
       this.HallwayLampState.subscribe(value =>this.HallwayLamp=value?"/assets/lamp on.png":"/assets/lamp off.png")
       this.itIsDay.subscribe(Day=>
       {
@@ -197,6 +210,26 @@ export class SceneHomeComponent implements OnInit {
           this.imgDayNight = "/assets/night.png";
         }
       })
+    this.CoffeeMachineState.subscribe(State=>{
+      if(State==='off'){
+        this.coffeemachine='/assets/machine a cafe off.png';
+      }
+      if(State==='on'){
+        this.coffeemachine='/assets/machine a cafe on.png';
+        setTimeout(()=>this.CoffeeMachineState.next('preparing'),2000);
+      }
+      if(State==='preparing'){
+        this.coffeemachine='/assets/preparation-cafe.gif';
+        setTimeout(()=>this.CoffeeMachineState.next('ready'),6000);
+      }
+      if(State==='ready'){
+        this.coffeemachine='/assets/cafe pret.gif';
+        setTimeout(()=>this.CoffeeMachineState.next('off'),15000);
+      }
+      }
+
+    );
+    this.OvenState.subscribe( value => this.Oven=value?'/assets/four on.png':'/assets/four off.png' );
 
     }
 
@@ -291,6 +324,7 @@ export class SceneHomeComponent implements OnInit {
             {name: 'TvPlay', type: 'boolean'} ,
             {name: 'TvVolume', type: 'Number'} ,
             {name: 'TvSource', type: 'string'} ,
+            {name: 'OvenState',type:'boolean'}
 
           ]
         }
@@ -306,6 +340,7 @@ export class SceneHomeComponent implements OnInit {
         {channel:'LivingRoomLampState', affectation: {value: 'false'}},
         {channel:'KitchenLampState', affectation: {value: 'false'}},
         {channel:'HallwayLampState', affectation: {value: 'false'}},
+        {channel:'OvenState', affectation: {value: 'false'}},
         {channel:'TvPlay', affectation: {value: 'false'}},
         {channel:'TvVolume', affectation: {value: '1'}},
         {channel:'TvSource', affectation: {value: '"assets/oceans.mp4"'}},
@@ -329,6 +364,7 @@ export class SceneHomeComponent implements OnInit {
               LivingRoomLampState:'LivingRoomLampState',
               KitchenLampState:'KitchenLampState',
               HallwayLampState:'HallwayLampState',
+              OvenState:'OvenState',
               TvPlay: 'TvPlay',
               TvVolume: 'TvVolume',
               TvSource: 'TvSource',
@@ -370,6 +406,7 @@ export class SceneHomeComponent implements OnInit {
             {name: 'TvPlay', type: 'boolean'} ,
             {name: 'TvVolume', type: 'Number'} ,
             {name: 'TvSource', type: 'string'} ,
+            {name: 'OvenState',type:'boolean'}
 
           ],
 
@@ -389,6 +426,14 @@ export class SceneHomeComponent implements OnInit {
               {channel: 'TvSource', affectation: {value: '"assets/movie.mp4"'}}],
             allen:{
               During: [
+                {
+                  contextName:'someOneInKitchen',
+                  state:'someOneInKitchen',
+                  actions:[
+                    {channel:'OvenState', affectation: {value: 'true'}},
+                  ]
+
+                },
 
                 {
                   as: 'isinBathRoom',

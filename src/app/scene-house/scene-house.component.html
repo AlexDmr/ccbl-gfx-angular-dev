@@ -27,6 +27,8 @@
     ></app-appartment>
     <img [src]="ParentalRoomLamp"/>
   </section>
+  <img src="assets/volume.png" class="volume" />
+  <p class="volume-val" [ngStyle]="{'color':(TvVolume.getValue()<0.34)?'#6a9601':(TvVolume.getValue()<0.67)?'#eaf046':'#e94f45','left':(TvVolume.getValue()<1)?'207px':'202px'}">{{100*TvVolume.getValue()}}</p>
   <section class="location LivingRoom">
     <app-appartment class         = "LivingRoom"
                     [location]    = "LivingRoom | async"
@@ -103,3 +105,5 @@
   <lib-ccbl-program [program-versionner]="subProgV"></lib-ccbl-program>
   <lib-ccbl-program [program-versionner]="progV"   ></lib-ccbl-program>
 </section>
+<img [src]="coffeemachine" class="coffee-machine"  />
+<img [src]="Oven" class="Oven"  />

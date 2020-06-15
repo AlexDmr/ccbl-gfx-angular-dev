@@ -1,4 +1,8 @@
 section.scene {
+  app-appartment.dndDragover, .dndDragover > app-appartment {
+    background: yellowgreen;
+    opacity: 50% ;
+  }
   display: inline-flex;
   flex-flow: row;
   position: relative;
@@ -9,157 +13,157 @@ section.scene {
   .location.BathRoom {
     > app-appartment {
       position: absolute;
-      width: 193px;
-      height: 100px;
+      width: 151px;
+      height: 67px;
       border: solid black 1px;
-      top: 124px;
-      left: 13px;
+      top: 232px;
+      left: 534px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 90px;
-      top: 50px;
+      left: 590px;
+      top: 200px;
     }
   }
   .location.ParentalRoom {
     > app-appartment {
       position: absolute;
-      width: 293px;
-      height: 100px;
+      width: 151px;
+      height: 70px;
       border: solid black 1px;
-      top: 124px;
-      left: 209px;
+      top: 195px;
+      left: 322px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 333px;
-      top: 50px;
+      left: 383px;
+      top: 267px;
     }
   }
   .tv{
     position: absolute;
-    width: 115px;
-    left: 690px;
-    top: 26px;
+    width: 85px;
+    left: 101px;
+    top: 336px;
   }
   .location.LivingRoom {
     > app-appartment {
       position: absolute;
-      width: 302px;
-      height: 100px;
+      width: 146px;
+      height: 70px;
       border: solid black 1px;
-      top: 124px;
-      left: 504px;
+      top: 502px;
+      left: 49px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 644px;
-      top: 50px;
+      left: 140px;
+      top: 451px;
     }
   }
   .location.Toilet {
     > app-appartment {
       position: absolute;
-      width: 70px;
-      height: 78px;
+      width: 80px;
+      height: 70px;
       border: solid black 1px;
-      top: 228px;
-      left: 13px;
+      top: 304px;
+      left: 535px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 100px;
-      top: 253px;
+      left: 620px;
+      top: 320px;
     }
   }
   .location.FirstRoom {
     > app-appartment {
       position: absolute;
-      width: 251px;
-      height: 100px;
+      width: 149px;
+      height: 70px;
       border: solid black 1px;
-      top: 425px;
-      left: 283px;
+      top: 12px;
+      left: 323px;
     }
     >img{
       position: absolute;
       width: 30px;
       left: 384px;
-      top: 356px;
+      top: 96px;
     }
   }
 
   .location.SecondRoom {
     > app-appartment {
       position: absolute;
-      width: 267px;
-      height: 100px;
+      width: 149px;
+      height: 70px;
+      top: 12px;
+      left: 535px;
       border: solid black 1px;
-      top: 425px;
-      left: 13px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 116px;
-      top: 356px;
+      left: 593px;
+      top: 88px;
     }
   }
   .location.Kitchen {
     > app-appartment {
       position: absolute;
       width: 270px;
-      height: 100px;
+      height: 70px;
       border: solid black 1px;
-      top: 425px;
-      left: 536px;
+      top: 455px;
+      left: 317px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 650px;
-      top: 356px;
+      left: 429px;
+      top: 548px;
     }
   }
   .location.Hallway {
     > app-appartment {
       position: absolute;
-      width: 658px;
-      height: 78px;
+      width: 277px;
+      height: 61px;
       border: solid black 1px;
-      top: 228px;
-      left: 147px;
+      top: 386px;
+      left: 314px;
     }
     >img{
       position: absolute;
       width: 30px;
-      left: 554px;
-      top: 249px;
+      left: 434px;
+      top: 399px;
 
     }
   }
   .location.outside {
     > app-appartment {
       position: absolute;
-      width: 251px;
-      height: 100px;
+      width: 172px;
+      height: 171px;
       border: solid black 1px;
-      top: 553px;
-      left: 283px;
+      top: 463px;
+      left: 633px;
     }
 
   }
 
 }
 .clock{
-  flex-flow: row;
+  z-index: 10;
   width: 112px;
-  position: relative;
-  left:300px;
+  position: absolute;
+  left:10px;
   margin-left: 20px;
 
 }
@@ -173,4 +177,27 @@ section.scene {
   left:49px;
   height: 20px;
   width: 20px;
+}
+.volume{
+  position: absolute;
+  top: 340px;
+  left: 190px;
+  height: 35px;
+}
+.volume-val{
+  position: absolute;
+  top: 342px;
+  height:10px;
+}
+.coffee-machine{
+  position: absolute;
+  top: 527px;
+  left: 492px;
+  height: 126px;
+}
+.Oven{
+  position: absolute;
+  top: 565px;
+  left: 318px;
+  width: 90px;
 }
