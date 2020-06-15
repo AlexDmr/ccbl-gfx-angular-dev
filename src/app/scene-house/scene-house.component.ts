@@ -29,9 +29,10 @@ export class SceneHomeComponent implements OnInit {
   LivingRoomLamp    = '/assets/lamp on.png';
   KitchenLamp       = '/assets/lamp on.png';
   HallwayLamp       = '/assets/lamp on.png';
-  imgDayNight: String;
   coffeemachine     = '/assets/cafe pret.gif';
   Oven              = '/assets/four off.png';
+  imgWeather        = '/assets/clean.gif';
+  imgDayNight: String;
 
 
   allowDndList: string[] = ['People'];
@@ -67,13 +68,28 @@ export class SceneHomeComponent implements OnInit {
   CoffeeMachineState     = new BehaviorSubject<statemachinecoffee>( 'off' );
   OvenState              = new BehaviorSubject<boolean>( false );
 
+  SwitchFirstRoom      = new BehaviorSubject<boolean>( false );
+  SwitchSecondRoom      = new BehaviorSubject<boolean>( false );
+  SwitchParentalRoom      = new BehaviorSubject<boolean>( false );
+  SwitchHallway      = new BehaviorSubject<boolean>( false );
+  SwitchKitchen      = new BehaviorSubject<boolean>( false );
+  SwitchLivingRoom      = new BehaviorSubject<boolean>( false );
+  SwitchBathroom      = new BehaviorSubject<boolean>( false );
+  SwitchToilet      = new BehaviorSubject<boolean>( false );
+
+
+
+
+
   //Date
   DayTimeSubj = new BehaviorSubject<Date>(new Date()); // Cette variable doit permettre de régler l'heure (pas de synchro automatique avec l'horloge système)
   itIsDay = this.DayTimeSubj.pipe(
     map( date =>  date.getHours() < 20 && date.getHours() > 6 ),
     distinctUntilChanged());
-
-  //tv
+  weather=this.DayTimeSubj.pipe(
+    map(date=> ((date.getHours()>2&& date.getHours()<7)||(date.getHours()>15&& date.getHours()<20))?'claire':( date.getHours()<3||(date.getHours()>12&& date.getHours()<16))?'Nuageux'
+      :((date.getHours()>19&& date.getHours()<22)||(date.getHours()>6&& date.getHours()<10))?'Pluie':'Tempete' ),distinctUntilChanged());
+      //tv
   @ViewChild('TV', { static: true }) tv: ElementRef;
   @ViewChild('clock', { static: true }) clock: ElementRef;
   @HostListener('window:scroll', ['$event']) // for window scroll events
@@ -153,6 +169,14 @@ export class SceneHomeComponent implements OnInit {
           Bob: sim.getPeopleObs('Bob'  ),
           Louis: sim.getPeopleObs('Louis'  ),
           itIsDay: this.itIsDay,
+          SwitchFirstRoom:  this.SwitchFirstRoom,
+          SwitchSecondRoom:  this.SwitchSecondRoom,
+          SwitchParentalRoom:  this.SwitchParentalRoom,
+          SwitchHallway:  this.SwitchHallway,
+          SwitchKitchen:  this.SwitchKitchen,
+          SwitchLivingRoom:  this.SwitchLivingRoom,
+          SwitchBathroom:  this.SwitchBathroom,
+          SwitchToilet:  this.SwitchToilet,
           CoffeeMachineState: this.CoffeeMachineState,
           someOneInBathRoom: this.sim.peoplesObs.pipe(
             map( peoples => !!peoples.find( people => people.location === 'BathRoom') )),
@@ -207,9 +231,22 @@ export class SceneHomeComponent implements OnInit {
           this.imgDayNight = "/assets/day.png";
         }
         else {
-          this.imgDayNight = "/assets/night.png";
+          this.imgDayNight = "/assets/moon.svg";
         }
       })
+      this.weather.subscribe( Weather=>
+        {
+          if(Weather==='claire')
+            this.imgWeather='/assets/clean.gif';
+          else if(Weather==='Nuageux')
+            this.imgWeather='/assets/Cloud.gif';
+          else if(Weather==='Pluie')
+            this.imgWeather='/assets/rain.gif';
+          else
+            this.imgWeather='/assets/Storm.gif';
+        }
+
+      )
     this.CoffeeMachineState.subscribe(State=>{
       if(State==='off'){
         this.coffeemachine='/assets/machine a cafe off.png';
@@ -310,6 +347,7 @@ export class SceneHomeComponent implements OnInit {
             {name: 'someOneInLivingRoom', type: 'boolean'} ,
             {name: 'someOneInKitchen', type: 'boolean'} ,
             {name: 'someOneInHallway', type: 'boolean'} ,
+            {name: 'SwitchKitchen',type:'boolean'}
 
           ],
           channels: [
@@ -324,7 +362,7 @@ export class SceneHomeComponent implements OnInit {
             {name: 'TvPlay', type: 'boolean'} ,
             {name: 'TvVolume', type: 'Number'} ,
             {name: 'TvSource', type: 'string'} ,
-            {name: 'OvenState',type:'boolean'}
+            {name: 'OvenState',type:'boolean'},
 
           ]
         }
@@ -393,6 +431,7 @@ export class SceneHomeComponent implements OnInit {
             {name: 'someOneInLivingRoom', type: 'boolean'} ,
             {name: 'someOneInKitchen', type: 'boolean'} ,
             {name: 'someOneInHallway', type: 'boolean'} ,
+            {name: 'SwitchKitchen',type:'boolean'}
           ],
           channels: [
             {name:'BathRoomLampState', type:'LAMPE'},
@@ -419,6 +458,22 @@ export class SceneHomeComponent implements OnInit {
       allen: {
         During: [
           {
+            contextName:'someOne In Kitchen',
+            state:'someOneInKitchen',
+            actions:[
+              {channel:'OvenState', affectation: {value: 'true'}},
+            ]
+
+          },
+          {
+            contextName:'switch kitchen ok',
+            state:'SwitchKitchen',
+            actions:[
+              {channel:'KitchenLampState', affectation: {value: 'true'}},
+            ]
+
+          },
+          {
             contextName:'its night',
             state:'not itIsDay',
             actions: [{channel: 'TvPlay', affectation: {value: 'true'}},
@@ -426,14 +481,7 @@ export class SceneHomeComponent implements OnInit {
               {channel: 'TvSource', affectation: {value: '"assets/movie.mp4"'}}],
             allen:{
               During: [
-                {
-                  contextName:'someOneInKitchen',
-                  state:'someOneInKitchen',
-                  actions:[
-                    {channel:'OvenState', affectation: {value: 'true'}},
-                  ]
 
-                },
 
                 {
                   as: 'isinBathRoom',
@@ -567,6 +615,8 @@ export class SceneHomeComponent implements OnInit {
   changeDate(d:string){
     var tokens = d.split(':');
     this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),tokens[2]?Number(tokens[2]):this.DayTimeSubj.getValue().getSeconds())));
-
+  }
+  changeSwitchVal(e,v){
+    v.next(e);
   }
 }

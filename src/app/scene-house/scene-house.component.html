@@ -5,6 +5,8 @@
         <img [src]="imgDayNight" class="dayNight"  />
       </span>
 </section>
+<img [src]="imgDayNight" class="dayNightWeather"  />
+<img [src]="imgWeather" class="Weather"  />
 <section class="scene">
   <img  [src]         = "houseURL" class="house"
   />
@@ -107,3 +109,61 @@
 </section>
 <img [src]="coffeemachine" class="coffee-machine"  />
 <img [src]="Oven" class="Oven"  />
+
+<div class="SwitchFirstRoom">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchFirstRoom)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchSecondRoom">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchSecondRoom)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchParentalRoom">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchParentalRoom)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchHallway">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchHallway)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchKitchen">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchKitchen)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchLivingRoom">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchLivingRoom)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchBathroom">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchBathroom)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchToilet">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchToilet)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+
