@@ -218,7 +218,48 @@ section.scene {
   width: 90px;
 }
 
+.window {
+  z-index: 8;
+  position: absolute;
+  width: 11px;
+  height: 71px;
+  border: solid black 1px;
 
+  // background-color: black;
+
+  > div {
+    height: 100%;
+    background: repeating-linear-gradient( 0deg, #000, #AAA 10px, #000 10px, #AAA 20px );
+    transition: height 1s;
+  }
+}
+.window.open {
+  // background-color: white;
+
+  > div {
+    height: 0;
+  }
+}
+.window.FirstRoom {
+  top: 59px;
+  left: 310px;
+}
+.window.ParentalRoom {
+  top: 218px;
+  left: 310px;
+}
+.window.SecondRoom {
+  top: 53px;
+  left: 685px;
+}
+.window.FirstLivingRoom {
+  top: 395px;
+  left: 10px;
+}
+.window.SecondLivingRoom {
+  top: 528px;
+  left: 10px;
+}
 
 *, *:before, *:after {
   box-sizing: inherit;

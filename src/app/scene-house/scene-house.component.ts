@@ -77,6 +77,7 @@ export class SceneHomeComponent implements OnInit {
   SwitchBathroom      = new BehaviorSubject<boolean>( false );
   SwitchToilet      = new BehaviorSubject<boolean>( false );
 
+  openWindows = new BehaviorSubject<boolean>( true );
 
 
 
@@ -178,6 +179,7 @@ export class SceneHomeComponent implements OnInit {
           SwitchBathroom:  this.SwitchBathroom,
           SwitchToilet:  this.SwitchToilet,
           CoffeeMachineState: this.CoffeeMachineState,
+          weather:this.weather,
           someOneInBathRoom: this.sim.peoplesObs.pipe(
             map( peoples => !!peoples.find( people => people.location === 'BathRoom') )),
           someOneInParentalRoom: this.sim.peoplesObs.pipe(
@@ -208,6 +210,7 @@ export class SceneHomeComponent implements OnInit {
           TvPlay: onoff=>this.TvPlay.next(onoff),
           TvVolume: vol=>this.TvVolume.next(vol),
           TvSource: source=>this.TvSource.next(source),
+          openWindows: open => this.openWindows.next(open),
 
         }
       }));
@@ -347,7 +350,8 @@ export class SceneHomeComponent implements OnInit {
             {name: 'someOneInLivingRoom', type: 'boolean'} ,
             {name: 'someOneInKitchen', type: 'boolean'} ,
             {name: 'someOneInHallway', type: 'boolean'} ,
-            {name: 'SwitchKitchen',type:'boolean'}
+            {name: 'SwitchKitchen',type:'boolean'},
+            {name:'weather',type:'string'},
 
           ],
           channels: [
@@ -363,6 +367,7 @@ export class SceneHomeComponent implements OnInit {
             {name: 'TvVolume', type: 'Number'} ,
             {name: 'TvSource', type: 'string'} ,
             {name: 'OvenState',type:'boolean'},
+            {name: 'openWindows', type: 'boolean'},
 
           ]
         }
@@ -382,7 +387,7 @@ export class SceneHomeComponent implements OnInit {
         {channel:'TvPlay', affectation: {value: 'false'}},
         {channel:'TvVolume', affectation: {value: '1'}},
         {channel:'TvSource', affectation: {value: '"assets/oceans.mp4"'}},
-
+        {channel: 'openWindows', affectation: {value: 'false' }}
 
 
       ],
@@ -406,6 +411,7 @@ export class SceneHomeComponent implements OnInit {
               TvPlay: 'TvPlay',
               TvVolume: 'TvVolume',
               TvSource: 'TvSource',
+              openWindows:'openWindows',
             },
             programId: 'ProgUser',
 
@@ -431,7 +437,8 @@ export class SceneHomeComponent implements OnInit {
             {name: 'someOneInLivingRoom', type: 'boolean'} ,
             {name: 'someOneInKitchen', type: 'boolean'} ,
             {name: 'someOneInHallway', type: 'boolean'} ,
-            {name: 'SwitchKitchen',type:'boolean'}
+            {name: 'SwitchKitchen',type:'boolean'},
+            {name:'weather',type:'string'},
           ],
           channels: [
             {name:'BathRoomLampState', type:'LAMPE'},
@@ -445,12 +452,13 @@ export class SceneHomeComponent implements OnInit {
             {name: 'TvPlay', type: 'boolean'} ,
             {name: 'TvVolume', type: 'Number'} ,
             {name: 'TvSource', type: 'string'} ,
-            {name: 'OvenState',type:'boolean'}
+            {name: 'OvenState',type:'boolean'},
+            {name: 'openWindows', type: 'boolean'},
 
           ],
 
         }
-      }
+      },actions: [{channel: 'openWindows', affectation: {value: 'true' }} ]
       ,
       subPrograms: {
         subProgUser: this.SubProgUser
@@ -466,6 +474,14 @@ export class SceneHomeComponent implements OnInit {
 
           },
           {
+            contextName:'storm or rain',
+            state:'weather=="Pluie" or weather=="Tempete"',
+            actions:[
+              {channel:'openWindows', affectation: {value: 'false'}},
+            ]
+
+          },
+          {
             contextName:'switch kitchen ok',
             state:'SwitchKitchen',
             actions:[
@@ -477,6 +493,7 @@ export class SceneHomeComponent implements OnInit {
             contextName:'its night',
             state:'not itIsDay',
             actions: [{channel: 'TvPlay', affectation: {value: 'true'}},
+              {channel:'openWindows', affectation: {value: 'false'}},
               {channel: 'TvVolume', affectation: {value: '0.2'}},
               {channel: 'TvSource', affectation: {value: '"assets/movie.mp4"'}}],
             allen:{

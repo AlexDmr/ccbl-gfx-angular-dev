@@ -109,7 +109,7 @@ export class SceneHeatingComponent implements OnInit {
       if(Day)
         this.imgDayNight="/assets/day.png";
       else
-        this.imgDayNight="/assets/night.png";
+        this.imgDayNight="/assets/moon.svg";
     })
 
     this.InsidePeoples = this.sim.peoplesObs.pipe(

@@ -166,4 +166,24 @@
     <span class="switch-right">Off</span>
   </label>
 </div>
+<div class       = "window FirstRoom"
+     [class.open] = "openWindows | async"
+     (click)      = "openWindows.next( !openWindows.getValue() )"
+><div></div></div>
+<div class       = "window ParentalRoom"
+     [class.open] = "openWindows | async"
+     (click)      = "openWindows.next( !openWindows.getValue() )"
+><div></div></div>
+<div class       = "window SecondRoom"
+     [class.open] = "openWindows | async"
+     (click)      = "openWindows.next( !openWindows.getValue() )"
+><div></div></div>
+<div class       = "window FirstLivingRoom"
+     [class.open] = "openWindows | async"
+     (click)      = "openWindows.next( !openWindows.getValue() )"
+><div></div></div>
+<div class       = "window SecondLivingRoom"
+     [class.open] = "openWindows | async"
+     (click)      = "openWindows.next( !openWindows.getValue() )"
+><div></div></div>
 
