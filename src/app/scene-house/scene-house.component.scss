@@ -27,7 +27,7 @@ section.scene {
     }
   }
   .location.ParentalRoom {
-    > app-appartment {
+    .ParentalRoom {
       position: absolute;
       width: 151px;
       height: 70px;
@@ -35,6 +35,15 @@ section.scene {
       top: 195px;
       left: 322px;
     }
+    .Bed{
+      position: absolute;
+      width: 61px;
+      height: 65px;
+      border: solid black 1px;
+      top: 300px;
+      left: 365px;
+    }
+
     >img{
       position: absolute;
       width: 30px;
@@ -49,13 +58,21 @@ section.scene {
     top: 336px;
   }
   .location.LivingRoom {
-    > app-appartment {
+    .LivingRoomSofa {
       position: absolute;
       width: 146px;
       height: 70px;
       border: solid black 1px;
       top: 502px;
       left: 49px;
+    }
+    .LivingRoom{
+      position: absolute;
+      width: 286px;
+      height: 70px;
+      border: solid black 1px;
+      top: 580px;
+      left: 23px;
     }
     >img{
       position: absolute;
@@ -81,13 +98,21 @@ section.scene {
     }
   }
   .location.FirstRoom {
-    > app-appartment {
+    .FirstRoom {
       position: absolute;
       width: 149px;
       height: 70px;
       border: solid black 1px;
       top: 12px;
       left: 323px;
+    }
+    .Bed{
+      position: absolute;
+      width: 25px;
+      height: 51px;
+      border: solid black 1px;
+      top: 137px;
+      left: 387px;
     }
     >img{
       position: absolute;
@@ -98,13 +123,21 @@ section.scene {
   }
 
   .location.SecondRoom {
-    > app-appartment {
+    .SecondRoom {
       position: absolute;
       width: 149px;
       height: 70px;
       top: 12px;
       left: 535px;
       border: solid black 1px;
+    }
+    .Bed{
+      position: absolute;
+      width: 63px;
+      height: 69px;
+      border: solid black 1px;
+      top: 107px;
+      left: 575px;
     }
     >img{
       position: absolute;
@@ -129,7 +162,7 @@ section.scene {
       top: 548px;
     }
   }
-  .location.Hallway {
+  .location.Hallway1 {
     > app-appartment {
       position: absolute;
       width: 277px;
@@ -143,6 +176,23 @@ section.scene {
       width: 30px;
       left: 434px;
       top: 399px;
+
+    }
+  }
+  .location.Hallway2 {
+    > app-appartment {
+      position: absolute;
+      width: 48px;
+      height: 361px;
+      border: solid black 1px;
+      top: 12px;
+      left: 480px;
+    }
+    >img{
+      position: absolute;
+      width: 30px;
+      left: 493px;
+      top: 249px;
 
     }
   }
@@ -282,10 +332,15 @@ section.scene {
   top: 334px;
   left: 436px;
 }
-.SwitchHallway {
+.SwitchHallway1 {
   position: absolute;
   top: 385px;
   left: 531px;
+}
+.SwitchHallway2 {
+  position: absolute;
+  top: 340px;
+  left: 496px;
 }
 .SwitchKitchen {
   position: absolute;
@@ -308,6 +363,31 @@ section.scene {
   top: 365px;
   left: 274px;
 }
+.select-Weather{
+  position: absolute;
+  top: 123px;
+  left: 199px;
+}
+.thermometer {
+  position: absolute;
+  top: 197px;
+  left: 170px;
+  img {
+    width: 2em;
+    margin-right: -55px;
+  }
+  .Bar{
+    transform: rotate(-90deg);
+  }
+}
+.output {
+  position: absolute;
+  top: 145px;
+  left: 227px;
+}
+
+
+
 
 /* Switch starts here */
 .rocker {

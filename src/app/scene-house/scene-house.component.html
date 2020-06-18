@@ -27,6 +27,12 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLParentalRoom)"
     ></app-appartment>
+    <app-appartment class         = "Bed"
+                    [location]    = "ParentalRoomBed | async"
+                    [peoples]     = "ParentalRoomBedPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLParentalRoomBed)"
+    ></app-appartment>
     <img [src]="ParentalRoomLamp"/>
   </section>
   <img src="assets/volume.png" class="volume" />
@@ -37,6 +43,12 @@
                     [peoples]     = "LivingRoomPeoples | async"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLLivingRoom)"
+    ></app-appartment>
+    <app-appartment class         = "LivingRoomSofa"
+                    [location]    = "LivingRoomSofa | async"
+                    [peoples]     = "LivingRoomSofaPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLLivingRoomSofa)"
     ></app-appartment>
     <img [src]="LivingRoomLamp"/>
   </section>
@@ -60,6 +72,12 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLFirstRoom)"
     ></app-appartment>
+    <app-appartment class         = "Bed"
+                    [location]    = "FirstRoom | async"
+                    [peoples]     = "FirstRoomBedPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLFirstRoomBed)"
+    ></app-appartment>
     <img [src]="FirstRoomLamp"/>
   </section>
   <section class="location SecondRoom">
@@ -69,6 +87,13 @@
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLSecondRoom)"
     ></app-appartment>
+    <app-appartment class         = "Bed"
+                    [location]    = "SecondRoomBed | async"
+                    [peoples]     = "SecondRoomBedPeoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLSecondRoomBed)"
+    ></app-appartment>
+
     <img [src]="SecondRoomLamp"/>
   </section>
   <section class="location Kitchen">
@@ -80,14 +105,23 @@
     ></app-appartment>
     <img [src]="KitchenLamp"/>
   </section>
-  <section class="location Hallway">
-    <app-appartment class         = "Hallway"
-                    [location]    = "Hallway | async"
-                    [peoples]     = "HallwayPeoples | async"
+  <section class="location Hallway1">
+    <app-appartment class         = "Hallway1"
+                    [location]    = "Hallway1 | async"
+                    [peoples]     = "Hallway1Peoples | async"
                     [dndDropzone] = "allowDndList"
-                    (dndDrop)     = "drop($event, SLHallway)"
+                    (dndDrop)     = "drop($event, SLHallway1)"
     ></app-appartment>
-    <img [src]="HallwayLamp"/>
+    <img [src]="Hallway1Lamp"/>
+  </section>
+  <section class="location Hallway2">
+    <app-appartment class         = "Hallway2"
+                    [location]    = "Hallway2 | async"
+                    [peoples]     = "Hallway2Peoples | async"
+                    [dndDropzone] = "allowDndList"
+                    (dndDrop)     = "drop($event, SLHallway2)"
+    ></app-appartment>
+    <img [src]="Hallway2Lamp"/>
   </section>
   <section class="location outside">
     <app-appartment class         = "outside"
@@ -131,9 +165,16 @@
     <span class="switch-right">Off</span>
   </label>
 </div>
-<div class="SwitchHallway">
+<div class="SwitchHallway1">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchHallway)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchHallway1)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
+<div class="SwitchHallway2">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchHallway2)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
@@ -166,6 +207,13 @@
     <span class="switch-right">Off</span>
   </label>
 </div>
+<div class="SwitchHallway2">
+  <label class="rocker">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchToilet)">
+    <span class="switch-left">On</span>
+    <span class="switch-right">Off</span>
+  </label>
+</div>
 <div class       = "window FirstRoom"
      [class.open] = "openWindows | async"
      (click)      = "openWindows.next( !openWindows.getValue() )"
@@ -187,3 +235,29 @@
      (click)      = "openWindows.next( !openWindows.getValue() )"
 ><div></div></div>
 
+<select class='select-Weather'
+        #mySelect
+        (change)='changeWeatherVal(mySelect.value)'>
+  <option value='Pluie' [selected]="weather.getValue() =='Pluie'">Pluie</option>
+  <option value='Tempete' [selected]="weather.getValue() =='Tempete'">Tempete</option>
+  <option value='claire' [selected]="weather.getValue() =='claire'">claire</option>
+  <option value='Nuageux'[selected]="weather.getValue() =='Nuageux'">Nuageux</option>
+</select>
+<section class="thermometer outside">
+  <img [src]="thermometerURL" />
+  <input class="Bar" type="range" min="0" max="30" list="tickmarks"
+         [ngModel]       = "outsideTempSubj | async"
+         (ngModelChange) = "outsideTempSubj.next($event)"
+  />
+</section>
+<output class="output">{{outsideTempSubj | async}}°</output>
+
+<datalist id="tickmarks">
+  <option value= "0" label= "0°C" >
+  <option value="5" label="5°C" >
+  <option value="10" label="10°C">
+  <option value="15" label="15°C">
+  <option value="20" label="20°C">
+  <option value="25" label="25°C">
+  <option value="30" label="30°C">
+</datalist>
