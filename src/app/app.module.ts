@@ -37,6 +37,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {DatePipe} from "@angular/common";
 import { ClockDisplayComponent } from './clock-display/clock-display.component';
 import { SceneHomeComponent } from './scene-house/scene-house.component';
+import { TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.component';
 
 @NgModule({
     declarations: [
@@ -56,6 +57,7 @@ import { SceneHomeComponent } from './scene-house/scene-house.component';
         DeviceLampComponent,
         ClockDisplayComponent,
         SceneHomeComponent,
+        TestEditorVerifComponent,
     ],
   imports: [
     BrowserModule,

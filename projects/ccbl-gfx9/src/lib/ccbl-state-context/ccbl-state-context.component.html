@@ -49,6 +49,7 @@
         <label class="programName" *ngIf="isProgramRoot">
           {{program.name || 'Root program'}}
         </label>
+        {{!isProgramRoot && C ? C.id : ''}}
         <lib-ccbl-expression [program]    = "program"
                             [expression] = "C.state"
                             (update)     = "updateState($event)"
