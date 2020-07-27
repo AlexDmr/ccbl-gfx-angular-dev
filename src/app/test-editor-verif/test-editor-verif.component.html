@@ -6,3 +6,16 @@
 </button>
 <hr/>
 <lib-ccbl-program [program-versionner]="progV"   ></lib-ccbl-program>
+
+<ul>
+  <li *ngFor="let AP of LAP | async" [ngClass]="AP.computationState">
+    {{AP.context.id}} {{AP.context.state}}
+    <ol>
+      <li *ngFor="let conf of AP.canBeTrue">
+        <ul *ngFor="let ap of conf">
+          {{ap.context.id}} {{ap.context.state}}
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ul>

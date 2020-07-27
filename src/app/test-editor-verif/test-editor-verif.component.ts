@@ -1,17 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ProgVersionner } from 'projects/ccbl-gfx9/src/public-api';
 import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
-import { CcblValidatorService } from '../ccbl-validator.service';
+import { SmtService } from '../smt.service';
+import { ActionsPath } from '../smt.definitions';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-test-editor-verif',
   templateUrl: './test-editor-verif.component.html',
-  styleUrls: ['./test-editor-verif.component.scss']
+  styleUrls: ['./test-editor-verif.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TestEditorVerifComponent implements OnInit {
   progV: ProgVersionner;
+  LAP = new BehaviorSubject<ActionsPath[]>([]);
 
-  constructor(private validator: CcblValidatorService) {
+  constructor(private smtService: SmtService) {
     const json = localStorage.getItem('TestEditorVerif');
     const P: HumanReadableProgram = json ? JSON.parse(json) : {};
     this.progV = new ProgVersionner( P );
@@ -21,7 +25,7 @@ export class TestEditorVerifComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  validate() {
-    this.validator.validate( this.progV.getCurrent() );
+  async validate() {
+    this.LAP.next( await this.smtService.evalProgram( this.progV.getCurrent() ) );
   }
 }
