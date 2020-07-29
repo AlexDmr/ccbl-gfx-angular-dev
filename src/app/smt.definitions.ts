@@ -155,6 +155,12 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
     return '';
   }
 
+  export function getActionsSMT(P: HumanReadableProgram, actions: HumanReadableStateAction[]): string {
+    return actions.map(
+      A => `(assert (= ${A.channel} ${getSMTExpr(P, A.affectation.value).SMT} ) )`
+    ).join(`\n`);
+  }
+
   export function getSMTExpr(P: HumanReadableProgram, expr: string): ExpressionSMT {
     const node = mathjs.parse( expr );
     const LV: VariableDescription[] = [
@@ -205,4 +211,82 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
       ...( (c.allen?.EndWith   ?? []) as HumanReadableStateContext[] ),
       // ...( (c.allen?.Meet?.contextsSequence ?? []) as HumanReadableStateContext[] ),
     ].filter(C => C.contextName !== undefined)
+  }
+
+  export function getProgramDeclarations(P: HumanReadableProgram): string {
+    let str = `\n; Variables declaration\n`;
+    const L = [ ...(P.dependencies?.import?.channels || [])
+              , ...(P.dependencies?.import?.emitters || [])
+              , ...(P.dependencies?.export?.channels || [])
+              , ...(P.dependencies?.export?.emitters || [])
+              , ...(P.localChannels || [])
+              ];
+    str += L.map( v => getVarDeclaration(v) ).join(`\n`);
+    return str;
+  }
+
+  function getVarDeclaration(v: VariableDescription): string {
+      switch(v.type.toLowerCase()) {
+        case 'boolean':
+        case 'bool':
+          return `(declare-fun ${v.name} () Bool)`;
+        case 'integer':
+        case 'int':
+          return `(declare-fun ${v.name} () Int)`;
+        case 'number':
+        case 'real':
+          return `(declare-fun ${v.name} () Real)`;
+        default:
+            const node = mathjs.parse(v.type);
+            if (node.isObjectNode) {
+              let str = '';
+              const properties: {[key: string]: MathNode} = (node as any).properties;
+              // tslint:disable-next-line: forin
+              for ( const p in properties ) {
+                const val = properties[p];
+                if (val.isSymbolNode) {
+                  str += getVarDeclaration({name: `${v.name}.${p}`, type: val.name});
+                  str += `\n`;
+                } else {
+                  if (node.isObjectNode) {
+                      str += getVarDeclaration({name: `${v.name}.${p}`, type: val.toString()});
+                      str += `\n`;
+                    }
+                }
+              }
+              return str;
+            } else {
+              return 'unknown';
+            }
+      }
+  }
+
+  export function getActionsPathWithoutLastActions(AP: ActionsPath): ActionsPath {
+    return {
+      ...AP,
+      actions: [],
+      context: {
+        ...AP.context,
+        actions: []
+      }
+    };
+  }
+
+  export function getActions(...L: ActionsPath[]): HumanReadableStateAction[] {
+    return L.map(ap => ap.context.actions ?? [])
+            .reduce( (acc, LA) => {
+              const Lres: HumanReadableStateAction[] = [];
+              acc.forEach( act => {
+                if (!LA.find(a => a.channel === act.channel)) {
+                  Lres.push(act);
+                }
+              });
+              Lres.push( ...LA );
+              return Lres;
+            } );
+  }
+
+  export function getContexts(...L: ActionsPath[]): HumanReadableStateContext[] {
+    return L.flatMap( AP => [...getContexts(...AP.ancestors), AP.context] )
+            .reduce( (acc, C: HumanReadableStateContext) => !!acc.find(c => c.id === C.id) ? acc : [...acc, C], []);
   }

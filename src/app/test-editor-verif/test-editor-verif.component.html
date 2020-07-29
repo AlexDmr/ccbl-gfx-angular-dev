@@ -9,7 +9,7 @@
 
 <ul>
   <li *ngFor="let AP of LAP | async" [ngClass]="AP.computationState">
-    {{AP.context.id}} {{AP.context.state}}
+    {{AP.context.id}} {{AP.context.state}} {{AP.computationState}}
     <ol>
       <li *ngFor="let conf of AP.canBeTrue">
         <ul *ngFor="let ap of conf">
