@@ -11,7 +11,7 @@ import {
   VariableDescription,
   ProgramReference
 } from 'ccbl-js/lib/ProgramObjectInterface';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
 import {MatDialog} from '@angular/material/dialog';
 import {
@@ -24,6 +24,9 @@ import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl
 import {DataEditProgramDescr, EditProgramDescrComponent} from '../edit-program-descr/edit-program-descr.component';
 import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/dialog-edit-prog-instance.component';
 import { DataEditSubProgram } from '../dialog-edit-sub-program/dialog-edit-sub-program.component';
+import { SmtService } from '../smt.service';
+import { ActionsPath } from '../smt.definitions';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-ccbl-state-context',
@@ -62,6 +65,11 @@ export class CcblStateContextComponent implements OnInit {
   }
   private pCurrentIndexInSequence = 1;
   private pCurrentContext: HumanReadableStateContext;
+  private subjAP = new BehaviorSubject<ActionsPath>( undefined );
+  canBeTrue: Observable<boolean> = this.subjAP.pipe(
+    map( AP => AP && AP.canBeTrue.length > 0 )
+  );
+
 
   // Statics
   static async staticEditProgram(dialog: MatDialog, data: DataEditProgramDescr): Promise<HumanReadableProgram | undefined> {
@@ -88,13 +96,25 @@ export class CcblStateContextComponent implements OnInit {
   // Constructor
   constructor(
     private clipboard: ClipboardService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private smtService: SmtService
   ) {
     this.currentContext.subscribe( c => this.pCurrentContext = c);
   }
 
   ngOnInit() {
     this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
+    console.log('Ready for', this.context.id);
+    this.smtService.obsProgEval.subscribe( conf => {
+      const id = this.isProgramRoot ? 'root' : this.context.id;
+      const AP = conf.LAP.find(ap => ap.context.id === id);
+      // console.log('AP =', AP);
+      this.subjAP.next( AP );
+    });
+  }
+
+  programVerification(): void {
+    this.smtService.evalProgram( this.progVersionner.getCurrent() );
   }
 
   get program(): HumanReadableProgram {

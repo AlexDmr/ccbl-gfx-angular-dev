@@ -49,6 +49,7 @@
         <label class="programName" *ngIf="isProgramRoot">
           {{program.name || 'Root program'}}
         </label>
+        {{(canBeTrue | async) ? 'OK ' : 'NOK '}}
         {{!isProgramRoot && C ? C.id : ''}}
         <lib-ccbl-expression [program]    = "program"
                             [expression] = "C.state"
@@ -163,6 +164,9 @@
 <mat-menu #menuGeneral="matMenu">
   <button mat-menu-item (click)="editProgram()" *ngIf="isProgramRoot">
     <b>Edit program</b>
+  </button>
+  <button mat-menu-item (click)="programVerification()" *ngIf="isProgramRoot">
+    <b>Program verification</b>
   </button>
   <button mat-menu-item (click)="editCondition()" *ngIf="!isProgramRoot">
     Edit condition

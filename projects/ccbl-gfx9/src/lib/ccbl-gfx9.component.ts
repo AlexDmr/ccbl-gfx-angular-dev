@@ -7,12 +7,14 @@ import {
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {CcblGfx9Service, ProgVersionner} from './ccbl-gfx9.service';
+import { SmtService } from './smt.service';
 
 @Component({
   selector: 'lib-ccbl-program',
   styleUrls: ['ccbl-gfx9.component.scss'],
   templateUrl: 'ccbl-gfx9.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [SmtService]
 })
 export class CcblGfx9Component implements OnInit, OnChanges {
   // tslint:disable-next-line: no-input-rename

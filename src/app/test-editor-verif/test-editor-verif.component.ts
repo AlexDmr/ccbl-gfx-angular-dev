@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ProgVersionner } from 'projects/ccbl-gfx9/src/public-api';
 import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
-import { SmtService } from '../smt.service';
-import { ActionsPath } from '../smt.definitions';
+import { ActionsPath } from '../../../projects/ccbl-gfx9/src/lib/smt.definitions';
 import { BehaviorSubject } from 'rxjs';
+import { SmtService } from 'projects/ccbl-gfx9/src/lib/smt.service';
 
 @Component({
   selector: 'app-test-editor-verif',
@@ -26,6 +26,7 @@ export class TestEditorVerifComponent implements OnInit {
   }
 
   async validate() {
-    this.LAP.next( await this.smtService.evalProgram( this.progV.getCurrent() ) );
+    const conf = await this.smtService.evalProgram( this.progV.getCurrent() );
+    this.LAP.next( conf.LAP );
   }
 }

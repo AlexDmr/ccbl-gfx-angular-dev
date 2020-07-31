@@ -2,17 +2,22 @@ import { Injectable } from '@angular/core';
 import { HumanReadableStateContext, HumanReadableProgram, VariableDescription } from 'ccbl-js/lib/ProgramObjectInterface';
 import { computeDependencies, ActionsPath, getStateChildren,
          unionOrderedAP, equalLActionsPath, getProgramDeclarations,
-         getActionsPathWithoutLastActions, getContexts, getActions, getSMTExpr, getActionsSMT } from './smt.definitions';
-
-const dec: string[] = [];
+         getActionsPathWithoutLastActions, getContexts, getActions, getSMTExpr, getActionsSMT,
+         Negation, EnumerateContextsByPriorityInv } from './smt.definitions';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { filter } from 'rxjs/internal/operators/filter';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SmtService {
   private url = 'ws://localhost:8080';
+  private subjProgEval = new BehaviorSubject<SMTconfig>( undefined );
+  obsProgEval: Observable<SMTconfig> = this.subjProgEval.asObservable().pipe( filter(c => !!c) );
 
-  constructor() { }
+  constructor() {
+    console.log('Init a SmtService');
+  }
 
   get URL(): string {
     return this.url;
@@ -22,27 +27,57 @@ export class SmtService {
     this.url = url ?? this.url;
   }
 
-  async evalProgram(P: HumanReadableProgram): Promise<ActionsPath[]> {
+  async evalProgram(P: HumanReadableProgram): Promise<SMTconfig> {
     // const LAP: ActionsPath[] = computeDependencies(P);
     // Calcul atteignabilité&co des contexts dans LAP
     const conf = new SMTconfigC(P);
     await conf.init( this.url );
+    // Direct canBeTrue computation
     for (const ap of conf.LAP) {
+      // console.log('<evalProgram-evalAP', ap.context.id, '>');
       await this.evalAP(ap, conf);
+      await this.developConsequences(ap, conf, false); // XXX DEBUG
+      await this.developConsequences(ap, conf, true ); // XXX DEBUG
+      // console.log('</evalProgram-evalAP>');
       ap.computationState = 'Done';
     }
-    // await this.evalAP(conf.LAP[0], conf );
-    // Calcul d'occlusion des opérations
-    //   - cas d'une opération qui en occulte une autre
-    //   - cas d'un ensemble d'opération qui en occulte une autre
-    //     A : 0
-    //     E >= 0 alors A : 1
-    //     E <  0 alors A : 2
-    return conf.LAP;
+    this.subjProgEval.next(conf);
+    return conf;
+  }
+
+  async developConsequences(AP: ActionsPath, conf: SMTconfig, withAP = false): Promise<ActionsPath> {
+    const L0: ActionsPath[] = EnumerateContextsByPriorityInv({...conf.P, id: 'root', contextName: 'root'})
+                             .map(c => conf.LAP.find(ap => ap.context.id === c.id) );
+    const lap = L0.filter(ap => ap !== AP && !AP.ancestors.find(a => a.context === ap.context) );
+    const newCanBeTrue = [];
+    for (const cond of AP.canBeTrue) {
+      let newCond = unionOrderedAP( ...(withAP ? [...cond, AP] : cond) ) // [...cond];
+      // Filter cond and their ancestors
+      let L = lap.filter(ap => !newCond.find(a => a.context === ap.context && !a.ancestors.find(an => an.context === ap.context) ) );
+      while (L.length > 0) {
+        const ap0 = L.shift();
+        const apNeg = Negation(ap0);
+        const canApNegBeTrue: boolean = await this.canBeTrue(apNeg, newCond, conf);
+        if (!canApNegBeTrue) { // cond => ap
+          newCond.push(ap0);
+          // Recursively restart
+          L = lap.filter(ap => !newCond.find(a => a.context === ap.context && !a.ancestors.find(an => an.context === ap.context) ) );
+        } else { // Remove ap descendants from L
+          L = L.filter(ap => ap !== ap0 && !ap.ancestors.find(a => a.context === ap0.context) );
+        }
+      } // end whil L.length
+      newCond = unionOrderedAP(...newCond);
+      if (await this.canBeTrue(AP, newCond, conf)) {
+        newCanBeTrue.push(newCond);
+      }
+    }
+    AP.canBeTrue = newCanBeTrue.reduce( (acc, LAP) => acc.find(L => equalLActionsPath(L, LAP)) ? acc : [...acc, LAP], []);
+    return AP;
   }
 
   async evalAP(c: ActionsPath, conf: SMTconfig): Promise<ActionsPath> {
     const {LAP} = conf;
+    // console.log('<evalAP', c.context.id, '>');
     // First, eval parent if needed
     if (c.computationState === 'Undone') {
       const parent = c.ancestors[c.ancestors.length - 1];
@@ -51,6 +86,7 @@ export class SmtService {
       }
       await this.evalAPinContext(c, parent?.canBeTrue || [[]], conf);
     }
+    // console.log('</evalAP>');
     return c;
   }
 
@@ -66,7 +102,7 @@ export class SmtService {
    */
   private async evalAPinContext(c: ActionsPath, LLC: ActionsPath[][], conf: SMTconfig): Promise<ActionsPath[][]> {
     const {LAP} = conf;
-    // console.log(dec.join(''), c.context.id, c.computationState);
+    // console.log('<evalAPinContext', c.context.id, '>');
     switch (c.computationState) {
       case 'Undone':
         c.computationState = 'WiP';
@@ -85,25 +121,24 @@ export class SmtService {
         }
         if (c.canBeTrue.length === c.dependencies.length) {
           c.computationState = 'Done';
-          // Go through childrens
+          /*// Go through childrens
           const children: HumanReadableStateContext[] = getStateChildren(c.context);
           const L = c.canBeTrue.map( lap => [...lap, c]);
           for (const C of children) {
             const ap = LAP.find( AP => AP.context === C);
-            dec.push(`\t`);
             await this.evalAPinContext(ap, L, conf);
-            dec.pop();
-          }
+          }*/
         } else {
           c.computationState = 'Undone';
         }
-        // console.log(dec.join(''), c.context.id, 'now', c.computationState);
+        // console.log('</evalAPinContext>');
         return c.canBeTrue;
-        break;
-        case 'WiP': // If we are here, there is a dependency circularity
-          return [];
-        case 'Done':
-          return c.canBeTrue;
+      case 'WiP': // If we are here, there is a dependency circularity
+        // console.log('</evalAPinContext>');
+        return [];
+      case 'Done':
+        // console.log('</evalAPinContext>');
+        return c.canBeTrue;
     }
   }
 
@@ -124,9 +159,7 @@ export class SmtService {
       for (const lap of LP) {
         // First, compute ALPHA, i.e. under which configurations AP can be true and can hold
         for (const ap of lap) {
-          dec.push(`\t`);
           await this.evalAP(ap, conf);
-          dec.pop();
         }
 
         // Combine LC configuration with ALPHA configurations
@@ -162,7 +195,7 @@ export class SmtService {
       ...LAP.flatMap(ap => ap.ancestors),
       ...c.ancestors
     ];
-    const L = unionOrderedAP( ...[...ancestors, ...LAP, c].map( C => C === c ? c0 : C) );
+    const L = unionOrderedAP( ...[...ancestors, ...LAP, c0] ); // c].map( C => C === c ? c0 : C) );
     const LC = getContexts(...L);
     const LA = getActions (...L);
 
@@ -181,11 +214,8 @@ export class SmtService {
       '(check-sat)',
       '(pop)', '', '', ''
     ].join(`\n`);
-    // console.log(SMT);
     // Eval c0.state in the context provided by L
     const [sat] = await conf.send(SMT);
-    console.log(c.context.id, `in [${LC.map(ctxt => ctxt.id).join(', ')}] = `, sat);
-    console.log(SMT);
     return sat === 'sat';
   }
 
@@ -229,10 +259,13 @@ class SMTconfigC implements SMTconfig {
 
     send(msg: string): Promise<string[]> {
       const nb = msg.split(`\n`).reduce( (n, w) => w === '(check-sat)' ? n + 1 : n, 0);
-      this.ws.send(msg);
-      return new Promise<string[]>(
-        (resolve, reject) => this.Lcb.push({nb, on: resolve, L: []})
+      const cb: CBobj = {nb, on: undefined, L: []};
+      this.Lcb.push(cb);
+      const P =  new Promise<string[]>(
+        (resolve, reject) => cb.on = resolve
       );
+      this.ws.send(msg);
+      return P;
     }
 
     close(): void {

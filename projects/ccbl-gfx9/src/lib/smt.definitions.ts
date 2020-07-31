@@ -24,24 +24,40 @@ export interface ActionsPath {
   canBeFalse?: Promise<ActionsPath[][]>;
 }
 
-  // LL is a list of variables
-  // Each variable can have possible values T[]
-  // We send back the combination of variable
-  // ex : [[a, b], [c]] => [[], [a], [b], [c], [a, c], [b, c]]
-  export function Combination<T>(LL: T[][]): T[][] {
-    if (LL.length === 0) {
-      return [[]]; // Only empty set
-    } else {
-      const [LA, ...LLR] = LL;
-      // Combinations without LA
-      const L1: T[][] = Combination(LLR);
+export function EnumerateContextsByPriorityInv(root: HumanReadableStateContext): HumanReadableStateContext[] {
+  const LC = [
+    ...(root.allen?.During ?? []),
+    ...(root.allen?.StartWith ?? []),
+    ...(root.allen?.EndWith ?? []),
+    ...(root.allen?.Meet?.contextsSequence ?? [])
+  ].reverse();
 
-      // Combinations with every possible A in LA
-      const L2: T[][] = LA.flatMap( A => L1.map( L => [A, ...L]) )
+  return [
+    root,
+    ...LC.map(c => c as HumanReadableStateContext)
+         .filter(c => c.contextName !== undefined)
+         .flatMap(c => EnumerateContextsByPriorityInv(c) )
+  ];
+}
 
-      return [...L1, ...L2];
-    }
+// LL is a list of variables
+// Each variable can have possible values T[]
+// We send back the combination of variable
+// ex : [[a, b], [c]] => [[], [a], [b], [c], [a, c], [b, c]]
+export function Combination<T>(LL: T[][]): T[][] {
+  if (LL.length === 0) {
+    return [[]]; // Only empty set
+  } else {
+    const [LA, ...LLR] = LL;
+    // Combinations without LA
+    const L1: T[][] = Combination(LLR);
+
+    // Combinations with every possible A in LA
+    const L2: T[][] = LA.flatMap( A => L1.map( L => [A, ...L]) )
+
+    return [...L1, ...L2];
   }
+}
 
 export function equalLActionsPath(LAP1: ActionsPath[], LAP2: ActionsPath[]): boolean {
   return LAP1.length === LAP2.length
@@ -114,7 +130,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
       const LA: string[] = node.args.map( n => mathNodeToSMT(P, n) );
       const op = node.op === '==' ? '=' : node.op;
       if (LA.length === 1) {
-          return `${op}${LA[0]}`;
+          return `(${op} ${LA[0]})`;
       } else {
           return `(${op} ${LA.join(' ')})`;
       }
@@ -179,7 +195,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
 }
 
   export function  computeDependencies(P: HumanReadableProgram): ActionsPath[] {
-    const LAP: ActionsPath[] = getStateAffectationPaths(P, {...P, contextName: 'root'});
+    const LAP: ActionsPath[] = getStateAffectationPaths(P, {...P, contextName: 'root', id: 'root', state: 'true'});
     LAP.forEach( AP => {
       // AP depend on its parent to be true
       // List all actionsPath dependencies for each variable dependency
@@ -259,6 +275,16 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
               return 'unknown';
             }
       }
+  }
+
+  export function Negation(AP: ActionsPath): ActionsPath {
+    return {
+      ...AP,
+      context: {
+        ...AP.context,
+        state: `not (${AP.context.state})`
+      }
+    };
   }
 
   export function getActionsPathWithoutLastActions(AP: ActionsPath): ActionsPath {

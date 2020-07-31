@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {ContextOrProgram, HumanReadableEventContext, HumanReadableStateContext, ProgramReference} from 'ccbl-js/lib/ProgramObjectInterface';
-import {CCBLContextState} from 'ccbl-js/lib/ContextState';
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
 
 @Component({

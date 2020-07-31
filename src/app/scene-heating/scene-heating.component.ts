@@ -7,7 +7,6 @@ import {Affectation, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterf
 import { SceneService } from '../scene.service';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { DndDropEvent } from 'ngx-drag-drop';
-import {Time} from "@angular/common";
 
 export type PossibleLocations = 'Home' | 'elsewhere';
 
