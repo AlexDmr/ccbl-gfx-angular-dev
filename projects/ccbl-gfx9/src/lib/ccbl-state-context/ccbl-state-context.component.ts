@@ -67,7 +67,7 @@ export class CcblStateContextComponent implements OnInit {
   private pCurrentContext: HumanReadableStateContext;
   private subjAP = new BehaviorSubject<ActionsPath>( undefined );
   canBeTrue: Observable<boolean> = this.subjAP.pipe(
-    map( AP => AP && AP.canBeTrue.length > 0 )
+    map( AP => !AP || AP.canBeTrue.length > 0 )
   );
 
 

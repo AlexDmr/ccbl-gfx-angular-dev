@@ -44,12 +44,11 @@
                                   [program] = "program"
                                   ></lib-ccbl-event-expression>
       </section>
-      <section class="state">
+      <section class="state" [class.cannotBeTrue]="!(canBeTrue | async)">
         <!-- <label class="contextName">&nbsp;{{C.contextName}}:&nbsp;</label> -->
         <label class="programName" *ngIf="isProgramRoot">
           {{program.name || 'Root program'}}
         </label>
-        {{(canBeTrue | async) ? 'OK ' : 'NOK '}}
         {{!isProgramRoot && C ? C.id : ''}}
         <lib-ccbl-expression [program]    = "program"
                             [expression] = "C.state"

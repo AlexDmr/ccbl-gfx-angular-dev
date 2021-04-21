@@ -111,6 +111,10 @@ $canDropColor: lightgreen;
       }
     }
 
+    section.state.cannotBeTrue {
+      background-color: orangered;
+    }
+
     section.event {
       background-color: lightgoldenrodyellow;
       display: inline-block;
