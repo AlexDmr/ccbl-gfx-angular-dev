@@ -4,37 +4,57 @@
     <th>Value</th>
   </thead>
   <tbody>
-    <tr *ngFor="let chan of channelsToMap"
-        class = "channel"
-        [class.unspecified] = "!getChannel(chan.name)">
-      <td>{{chan.name}}</td>
+    <tr
+      *ngFor="let chan of channelsToMap"
+      class="channel"
+      [class.unspecified]="!getChannel(chan.name)"
+    >
+      <td>{{ chan.name }}</td>
       <td>
-        <select [ngModel]="getChannel(chan.name)" class="block"
-                (ngModelChange)="updateParameter(chan.name, $event)">
+        <select
+          [ngModel]="getChannel(chan.name)"
+          class="block"
+          (ngModelChange)="updateParameter(chan.name, $event)"
+        >
           <option *ngFor="let chan of channels" [value]="chan.name">
-            {{chan.name}}
+            {{ chan.name }}
           </option>
-      </select>
+        </select>
       </td>
     </tr>
-    <tr *ngFor="let em of emittersToMap" class="emitter" [class.unspecified] = "!getEmitter(em.name)">
-      <td>{{em.name}}</td>
-      <td (dblclick) = "expr.edit()" class="emitter" [class.unspecified] = "!getEmitter(em.name)">
-        <lib-ccbl-expression [expression]   = "getEmitter(em.name)" #expr
-                             [program]      = "parentProgram"
-                             [acceptEvents] = "false"
-                             [editable]     = "true"
-                             (update)       = "updateParameter(em.name, $event)"
+    <tr
+      *ngFor="let em of emittersToMap"
+      class="emitter"
+      [class.unspecified]="!getEmitter(em.name)"
+    >
+      <td>{{ em.name }}</td>
+      <td
+        (dblclick)="expr.edit()"
+        class="emitter"
+        [class.unspecified]="!getEmitter(em.name)"
+      >
+        <lib-ccbl-expression
+          [expression]="getEmitter(em.name)"
+          #expr
+          [program]="parentProgram!"
+          [acceptEvents]="false"
+          [editable]="true"
+          (update)="updateParameter(em.name, $event)"
         ></lib-ccbl-expression>
       </td>
     </tr>
-    <tr *ngFor="let event of eventsToMap" class="event" [class.unspecified] = "!getEvent(event.name).eventSource">
-      <td>{{event.name}}</td>
-      <td (dblclick) = "evt.editEvent()">
-        <lib-ccbl-event-expression #evt
-                                   [evt]      = "getEvent(event.name) || {eventSource: ''}"
-                                   [program]  = "parentProgram"
-                                   (update)   = "updateParameter(event.name, $event)"
+    <tr
+      *ngFor="let event of eventsToMap"
+      class="event"
+      [class.unspecified]="!getEvent(event.name).eventSource"
+    >
+      <td>{{ event.name }}</td>
+      <td (dblclick)="evt.editEvent()">
+        <lib-ccbl-event-expression
+          #evt
+          [evt]="getEvent(event.name) || { eventSource: '' }"
+          [program]="parentProgram!"
+          (update)="updateParameter(event.name, $event)"
         ></lib-ccbl-event-expression>
       </td>
     </tr>

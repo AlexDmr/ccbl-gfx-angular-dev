@@ -2,51 +2,66 @@
   <form (ngSubmit)="updateTitle(inputName.value)">
     <mat-form-field appearance="fill">
       <mat-label>Name</mat-label>
-      <input #inputName [ngModel]="prog.name" name="inputName" matInput (blur)="updateTitle(inputName.value)"/>
+      <input
+        #inputName
+        [ngModel]="prog.name"
+        name="inputName"
+        matInput
+        (blur)="updateTitle(inputName.value)"
+      />
     </mat-form-field>
   </form>
   <mat-form-field appearance="fill">
     <mat-label>Description</mat-label>
-    <textarea #tDescr matInput [value]="prog.description"
-              (blur)="updateDescription(tDescr.value)"></textarea>
+    <textarea
+      #tDescr
+      matInput
+      [value]="prog.description"
+      (blur)="updateDescription(tDescr.value)"
+    ></textarea>
   </mat-form-field>
 
-
-  <lib-ccbl-program-api [program]  = "prog"
-                        [editable] = "true"
-                        (update)   = "updateAPI($event)"
+  <lib-ccbl-program-api
+    [program]="prog"
+    [editable]="true"
+    (update)="updateAPI($event)"
   ></lib-ccbl-program-api>
 
   <ul>
     <li *ngFor="let chan of prog?.localChannels">
-      <lib-ccbl-expression [expression]="chan.name" [program]="progObs | async"
-                           [editable]="false"></lib-ccbl-expression>
-      ({{chan.type}})
-      <button mat-raised-button color="warn" (click)="deleteLocalChannel(chan)">Delete</button>
+      <lib-ccbl-expression
+        *ngIf="progObs | async as P"
+        [expression]="chan.name"
+        [program]="P"
+        [editable]="false"
+      ></lib-ccbl-expression>
+      ({{ chan.type }})
+      <button mat-raised-button color="warn" (click)="deleteLocalChannel(chan)">
+        Delete
+      </button>
     </li>
   </ul>
   <button mat-raised-button color="primary" (click)="appendLocalChannel()">
     Append new local channel
   </button>
 
-  <lib-ccbl-program [program-versionner] = "progV"></lib-ccbl-program>
-
+  <lib-ccbl-program [program-versionner]="progV"></lib-ccbl-program>
 
   <mat-form-field appearance="fill">
     <mat-label>Raw</mat-label>
-    <textarea #tRaw matInput
-              (blur)="updateDescriptionFromRaw(tRaw.value)"
-              ></textarea>
+    <textarea
+      #tRaw
+      matInput
+      (blur)="updateDescriptionFromRaw(tRaw.value)"
+    ></textarea>
   </mat-form-field>
-
 </section>
 
-<hr/>
+<hr />
 
 <section class="okcancel">
-  <label class="error">
-  </label>
-  <button mat-raised-button color="warn"    (click)="cancel()">Cancel</button>
+  <label class="error"> </label>
+  <button mat-raised-button color="warn" (click)="cancel()">Cancel</button>
   <button mat-raised-button color="primary" (click)="ok()">OK</button>
 </section>
 

@@ -6,35 +6,35 @@ import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'lib-ccbl-program-reference',
+  selector: 'lib-ccbl-program-reference[data]',
   templateUrl: './ccbl-program-reference.component.html',
   styleUrls: ['./ccbl-program-reference.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblProgramReferenceComponent implements OnInit {
-  @Input('program-versionner') private progVersionner: ProgVersionner;
-  @Input() data: ProgramReference;
+  @Input('program-versionner') progVersionner?: ProgVersionner;
+  @Input() data!: ProgramReference;
   extendedMode = false;
 
   constructor(private matDialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.data.id = this.data.id || getUID('progRef');
+    this.data.id = this.data?.id ?? getUID('progRef');
     if (!getDisplay(this.data)) {
-      updateDisplay(this.data, {details: false});
+      updateDisplay(this.data as {id: string}, {details: false});
     }
   }
 
   get details(): boolean {
-    return getDisplay(this.data).details || false;
+    return getDisplay(this.data!)?.details ?? false;
   }
 
   set details(d: boolean) {
-    updateDisplay(this.data, {details: d});
+    updateDisplay(this.data as {id: string}, {details: d});
   }
 
   get parentProgramObs(): Observable<HumanReadableProgram> {
-    return this.progVersionner.asObservable();
+    return this.progVersionner!.asObservable();
   }
 
   get inputChannels(): VariableDescription[] {
@@ -61,17 +61,17 @@ export class CcblProgramReferenceComponent implements OnInit {
     return this.program?.dependencies?.export?.events || [];
   }
 
-  private get program(): HumanReadableProgram {
-    const subPrograms = this.progVersionner.getCurrent().subPrograms;
-    return subPrograms ? subPrograms[this.data.programId] : undefined;
+  private get program(): HumanReadableProgram | undefined {
+    const subPrograms = this.progVersionner!.getCurrent().subPrograms;
+    return subPrograms?.[this.data.programId];
   }
 
   get description(): string {
-    return this.program?.description;
+    return this.program?.description ?? '';
   }
 
   getMapValue(n: string): string {
-    const m = this.data.mapInputs[n];
+    const m = this.data.mapInputs![n];
     return m !== undefined ? m.toString() : n;
   }
 
@@ -94,28 +94,28 @@ export class CcblProgramReferenceComponent implements OnInit {
   async edit() {
     const progRef = await DialogEditProgInstanceComponent.editProgRef(this.matDialog, {
       progRef: this.data,
-      parentProgram: this.progVersionner.getCurrent(),
+      parentProgram: this.progVersionner!.getCurrent(),
       editMode: true
     } );
     this.updateWith(progRef);
   }
 
-  updateWith(progRef: ProgramReference) {
+  updateWith(progRef: ProgramReference | undefined) {
     if (progRef) {
-      this.progVersionner.updateProrgamReference(this.data, progRef);
+      this.progVersionner!.updateProrgamReference(this.data, progRef);
     }
   }
 
   delete() {
-    this.progVersionner.removeContext(this.data);
+    this.progVersionner!.removeContext(this.data);
   }
 
   startDragging() {
-    this.progVersionner.draggedContext = this.data;
+    this.progVersionner!.draggedContext = this.data;
   }
 
   stopDragging() {
-    this.progVersionner.draggedContext = undefined;
+    this.progVersionner!.draggedContext = undefined;
   }
 
 }

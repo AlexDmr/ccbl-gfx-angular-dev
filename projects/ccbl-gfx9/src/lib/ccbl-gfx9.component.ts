@@ -18,10 +18,10 @@ import { SmtService } from './smt.service';
 })
 export class CcblGfx9Component implements OnInit, OnChanges {
   // tslint:disable-next-line: no-input-rename
-  @Input('program-versionner') private progVersionner: ProgVersionner;
+  @Input('program-versionner') progVersionner!: ProgVersionner;
   updateObs = new BehaviorSubject<boolean>(true);
-  private program: HumanReadableProgram;
-  private subscription: Subscription;
+  private program?: HumanReadableProgram;
+  private subscription?: Subscription;
 
   constructor(private ccblGfxService: CcblGfx9Service) {
   }
@@ -34,6 +34,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
       this.subscription.unsubscribe();
       // console.log("Update program to be displayed");
     }
+
     this.program = this.progVersionner.getCurrent();
     this.subscription = this.progVersionner.asObservable().subscribe( P => {
       this.program = P;
@@ -47,16 +48,16 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getRootContext(): HumanReadableStateContext {
-    return {
+    return this.program ? {
       contextName: 'Program',
       actions: this.program.actions,
       allen: this.program.allen,
       ccblContext: this.program.ccblContext
-    };
+    } : {contextName: '', actions: [], allen: {}};
   }
 
   getDuringContexts(): ContextOrProgram[] {
-    if (this.program.allen && this.program.allen.During) {
+    if (this.program && this.program.allen && this.program.allen.During) {
       return this.program.allen.During;
     } else {
       return [];
@@ -92,7 +93,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getImportedChannels(): VariableDescription[] {
-    if (this.program.dependencies && this.program.dependencies.import && this.program.dependencies.import.channels) {
+    if (this.program && this.program.dependencies && this.program.dependencies.import && this.program.dependencies.import.channels) {
       return this.program.dependencies.import.channels;
     } else {
       return [];
@@ -100,7 +101,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getImportedEmitters(): VariableDescription[] {
-    if (this.program.dependencies && this.program.dependencies.import && this.program.dependencies.import.emitters) {
+    if (this.program && this.program.dependencies && this.program.dependencies.import && this.program.dependencies.import.emitters) {
       return this.program.dependencies.import.emitters;
     } else {
       return [];
@@ -108,7 +109,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getImportedEvents(): VariableDescription[] {
-    if (this.program.dependencies && this.program.dependencies.import && this.program.dependencies.import.events) {
+    if (this.program && this.program.dependencies && this.program.dependencies.import && this.program.dependencies.import.events) {
       return this.program.dependencies.import.events;
     } else {
       return [];
@@ -116,7 +117,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getExportedChannels(): VariableDescription[] {
-    if (this.program.dependencies && this.program.dependencies.export && this.program.dependencies.export.channels) {
+    if (this.program && this.program.dependencies && this.program.dependencies.export && this.program.dependencies.export.channels) {
       return this.program.dependencies.export.channels;
     } else {
       return [];
@@ -124,7 +125,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getExportedEmitters(): VariableDescription[] {
-    if (this.program.dependencies && this.program.dependencies.export && this.program.dependencies.export.emitters) {
+    if (this.program && this.program.dependencies && this.program.dependencies.export && this.program.dependencies.export.emitters) {
       return this.program.dependencies.export.emitters;
     } else {
       return [];
@@ -132,7 +133,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getExportedEvents(): VariableDescription[] {
-    if (this.program.dependencies && this.program.dependencies.export && this.program.dependencies.export.events) {
+    if (this.program && this.program.dependencies && this.program.dependencies.export && this.program.dependencies.export.events) {
       return this.program.dependencies.export.events;
     } else {
       return [];
@@ -140,7 +141,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   }
 
   getLocalChannels(): VariableDescription[] {
-    if (this.program.localChannels) {
+    if (this.program && this.program.localChannels) {
       return this.program.localChannels;
     } else {
       return [];

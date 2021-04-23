@@ -10,17 +10,21 @@ import {Observable} from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SensorScalarComponent implements OnInit {
-  @Input() data: ScalarSensor;
-  obs: Observable<number>;
+  @Input() data?: ScalarSensor;
+  obs?: Observable<number>;
 
   constructor(private ccblEngine: CcblEngineService) { }
 
   ngOnInit() {
-    this.obs = this.ccblEngine.getObsValue(this.data.name);
+    if (this.data) {
+      this.obs = this.ccblEngine.getObsValue(this.data.name);
+    }
   }
 
   update(s: number) {
-    this.ccblEngine.setValue(this.data.varType, this.data.name, s);
+    if (this.data) {
+      this.ccblEngine.setValue(this.data.varType, this.data.name, s);
+    }
   }
 
 }

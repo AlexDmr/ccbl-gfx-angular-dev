@@ -6,7 +6,7 @@
       Start event
     </mat-checkbox> <br/>
     <lib-ccbl-event-expression  *ngIf                 = "hasEvent('eventStart')"
-                                [evt]                 = "newContext.eventStart"
+                                [evt]                 = "newContext.eventStart!"
                                 [program]             = "program"
                                 (update)              = "newContext.eventStart = $event"
                                 #eventStart
@@ -38,7 +38,7 @@
       Finish event
     </mat-checkbox> <br/>
     <lib-ccbl-event-expression  *ngIf      = "hasEvent('eventFinish')"
-                                [evt]      = "newContext.eventFinish"
+                                [evt]      = "newContext.eventFinish!"
                                 [program]  = "program"
                                 (update)   = "newContext.eventFinish = $event"
                                 (click)    = "eventFinish.editEvent()"

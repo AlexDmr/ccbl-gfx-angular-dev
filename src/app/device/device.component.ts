@@ -8,7 +8,7 @@ import { Device } from '../data/Scene';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DeviceComponent implements OnInit {
-  @Input() data: Device;
+  @Input() data?: Device;
 
   constructor() { }
 

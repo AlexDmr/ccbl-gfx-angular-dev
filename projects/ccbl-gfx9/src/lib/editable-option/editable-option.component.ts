@@ -24,9 +24,9 @@ export interface EditableOptionType<T> {
 export class EditableOptionComponent implements OnInit {
   @Input () value: any;
   @Input () editable = true;
-  @Input () options: EditableOptionType<any>[];
+  @Input () options: EditableOptionType<any>[] = [];
   @Output() onupdate = new EventEmitter<string>();
-  @ViewChild('select') selectTag: ElementRef;
+  @ViewChild('select') selectTag!: ElementRef;
   pEdition = false;
 
   constructor() { }

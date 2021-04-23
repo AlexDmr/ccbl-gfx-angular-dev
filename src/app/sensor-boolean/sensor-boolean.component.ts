@@ -9,17 +9,21 @@ import {Observable} from 'rxjs';
   styleUrls: ['./sensor-boolean.component.scss']
 })
 export class SensorBooleanComponent implements OnInit {
-  @Input() data: BooleanSensor;
-  obs: Observable<boolean>;
+  @Input() data?: BooleanSensor;
+  obs?: Observable<boolean>;
 
   constructor(private ccblEngine: CcblEngineService) { }
 
   ngOnInit() {
-    this.obs = this.ccblEngine.getObsValue(this.data.name);
+    if (this.data) {
+      this.obs = this.ccblEngine.getObsValue(this.data.name);
+    }
   }
 
   select(s: boolean) {
-    this.ccblEngine.setValue(this.data.varType, this.data.name, s);
+    if (this.data) {
+      this.ccblEngine.setValue(this.data.varType, this.data.name, s);
+    }
   }
 
 }

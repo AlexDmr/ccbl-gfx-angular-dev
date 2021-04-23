@@ -20,7 +20,7 @@ export interface DataEditSubProgram {
 export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
   progV: ProgVersionner;
   progObs: Observable<HumanReadableProgram>;
-  _localChannelsObs: Observable<VariableDescription[]>;
+  // _localChannelsObs: Observable<VariableDescription[]>;
 
   constructor(private dialogRef: MatDialogRef<DialogEditSubProgramComponent, HumanReadableProgram>,
               @Inject(MAT_DIALOG_DATA) private data: DataEditSubProgram,
@@ -76,7 +76,7 @@ export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
     const data: DataAppendDependency = {
       program: this.data.program,
       vType: 'channels',
-      inOut: undefined
+      inOut: 'local'
     };
     const dialogRef = this.matDialog.open(DialogAppendDependencyComponent, {
       data,

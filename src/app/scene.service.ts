@@ -21,9 +21,9 @@ export interface SimEnvConfig {
   providedIn: 'root'
 })
 export class SceneService {
-  env: CCBLEnvironmentExecutionInterface;
+  env?: CCBLEnvironmentExecutionInterface;
   clock: CCBLTestClock = new CCBLTestClock();
-  ccblProg: CCBLProgramObject;
+  ccblProg?: CCBLProgramObject;
   obsClock = new Observable( observer => {
     this.clock.on( ms => observer.next(ms) );
   }).pipe(
@@ -45,7 +45,6 @@ export class SceneService {
   private clockSubscription: Subscription;
 
   constructor() {
-    // this.env = new CCBLEnvironmentExecution( this.clock );
     this.clockSubscription = this.obsClock.connect();
   }
 
@@ -66,11 +65,11 @@ export class SceneService {
     return combineLatest(this.peoples);
   }
 
-  getPeopleObs(name: string): Observable<People<any>> {
+  getPeopleObs(name: string): Observable<People<any>> | undefined {
     return this.peoples.find( P => P.getValue().name === name );
   }
 
-  getDeviceObs(name: string): Observable<Device> {
+  getDeviceObs(name: string): Observable<Device> | undefined {
     return this.devices.find( D => D.getValue().name === name );
   }
 
@@ -86,7 +85,7 @@ export class SceneService {
 
   start(P: HumanReadableProgram): CCBLProgramObjectInterface {
     this.reset();
-    this.env = new CCBLEnvironmentExecution( this.clock );
+    const env = this.env = new CCBLEnvironmentExecution( this.clock );
 
     // Register environment
     const LEm: VariableDescription[] = P.dependencies?.import?.emitters || [];
@@ -99,9 +98,9 @@ export class SceneService {
       } else {
         const ccblEvt = new CCBLEvent({
           eventName: vd.name,
-          env: this.env,
+          env: env,
         });
-        this.env.registerCCBLEvent( vd.name, ccblEvt );
+        env.registerCCBLEvent( vd.name, ccblEvt );
         obs.subscribe( e => {
           this.clock.goto( Date.now() );
           ccblEvt.trigger({value: e})
@@ -114,7 +113,7 @@ export class SceneService {
         throw new Error(`Emitter ${vd.name} cannot be found in observable Map`);
       } else {
         const ccblEmiter = new CCBLEmitterValue<any>( undefined );
-        this.env.register_CCBLEmitterValue(vd.name, ccblEmiter);
+        env.register_CCBLEmitterValue(vd.name, ccblEmiter);
         obs.subscribe( v => {
           console.log(`Emitter ${vd.name} set to`, v);
           ccblEmiter.set(v);
@@ -129,7 +128,7 @@ export class SceneService {
       } else {
         const E = new CCBLEmitterValue<any>( undefined );
         const ccblChannel = new Channel(E);
-        this.env.register_Channel(vd.name, ccblChannel);
+        env.register_Channel(vd.name, ccblChannel);
         E.on( cb );
       }
     });
@@ -158,9 +157,9 @@ export class SceneService {
         const LEm: VariableDescription[] = P.dependencies?.import?.emitters || [];
         const LEv: VariableDescription[] = P.dependencies?.import?.events   || [];
         const LC:  VariableDescription[] = P.dependencies?.import?.channels || [];
-        LEm.forEach( e => this.env.unregister_CCBLEmitterValue(e.name) );
-        LEv.forEach( e => this.env.unregisterCCBLEvent        (e.name) );
-        LC .forEach( c => this.env.unregister_Channel         (c.name) );
+        LEm.forEach( e => this.env!.unregister_CCBLEmitterValue(e.name) );
+        LEv.forEach( e => this.env!.unregisterCCBLEvent        (e.name) );
+        LC .forEach( c => this.env!.unregister_Channel         (c.name) );
       }
       this.ccblProg.dispose();
     }

@@ -13,7 +13,7 @@ export interface DeviceLamp {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DeviceLampComponent implements OnInit {
-  @Input() lamp: DeviceLamp;
+  @Input() lamp?: DeviceLamp;
 
   constructor() { }
 

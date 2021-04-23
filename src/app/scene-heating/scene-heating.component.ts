@@ -30,14 +30,14 @@ export class SceneHeatingComponent implements OnInit {
   Outside = new BehaviorSubject<SceneLocation>( {
     metadata: {}
   } );
-  @ViewChild('clock', { static: true }) clock: ElementRef;
+  @ViewChild('clock', { static: true }) clock!: ElementRef;
   @HostListener('window:scroll', ['$event']) // for window scroll events
-  onScroll(event) {
+  onScroll() {
     this.clock.nativeElement.blur();
   }
   InsidePeoples:  Observable<People<PossibleLocations>[]>;
   OutsidePeoples: Observable<People<PossibleLocations>[]>;
-  Peoples: Observable<People<PossibleLocations>[]>;
+  // Peoples: Observable<People<PossibleLocations>[]>;
   allowDndList: string[] = ['People'];
 
   Avatar = new BehaviorSubject<DeviceLamp>({
@@ -85,7 +85,7 @@ export class SceneHeatingComponent implements OnInit {
       }
     ], [], () => ({
       inputs: { // Angular -> CCBL XXX C'est ici qu'on peut passer en entrée des variables à CCBL
-        Eve: sim.getPeopleObs('Eve'),
+        Eve: sim.getPeopleObs('Eve')!,
         tempOutside: this.outsideTempSubj,
         itIsDay: this.itIsDay,
         // XXX ah d'accord je comprend mieux le systeme maintenant
@@ -222,7 +222,7 @@ export class SceneHeatingComponent implements OnInit {
 //d'accord
   // OK faite ça après
   // Il reste juste un petit tour à faire côté CCBL pour ce soir je pense
-  imgDayNight: String;
+  imgDayNight: string = '';
 
   private get initialRootProg(): HumanReadableProgram {
     return {
@@ -326,7 +326,7 @@ export class SceneHeatingComponent implements OnInit {
   start() {
     const P = this.sim.start( this.progV.getCurrent());
     this.progV.updateWith( P.toHumanReadableProgram() );
-    const SP = P.getProgramInstance( 'subProgUser' );
+    const SP = P.getProgramInstance( 'subProgUser' )!;
     this.subProgV.updateWith( SP.toHumanReadableProgram() );
   }
 

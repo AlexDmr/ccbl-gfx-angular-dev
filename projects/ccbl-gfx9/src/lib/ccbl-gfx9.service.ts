@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   Affectation,
-  ContextOrProgram, DataIsNameUsedInProg,
+  ContextOrProgram, copyHumanReadableStateContext, DataIsNameUsedInProg,
   HumanReadableContext,
   HumanReadableEventAction,
   HumanReadableEventChannelAction,
@@ -41,7 +41,7 @@ export class CcblGfx9Service {
 }
 
 export class ProgVersionner {
-  draggedContext: ContextOrProgram = undefined;
+  draggedContext?: ContextOrProgram;
 
   constructor(private original: HumanReadableProgram) {
     original.localChannels = original.localChannels || [];
@@ -74,8 +74,8 @@ export class ProgVersionner {
 
   dispose() {
     this.progSubj.complete();
-    this.undos = undefined;
-    this.redos = undefined;
+    this.undos = [];
+    this.redos = [];
   }
 
   parse(expr: string): MathNode {
@@ -88,14 +88,14 @@ export class ProgVersionner {
 
   getEvents(): VariableDescription[] {
     const prog = this.getCurrent();
-    const L: VariableDescription[] = [...prog.dependencies.import.events, ...prog.dependencies.export.events];
+    const L: VariableDescription[] = [...(prog.dependencies?.import?.events ?? []), ...(prog.dependencies!.export!.events ?? [])];
     L.sort( (a, b) => a.name.toLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1 );
     return L;
   }
 
   getEmitters(): VariableDescription[] {
     const prog = this.getCurrent();
-    const L: VariableDescription[] = [...prog.dependencies.import.emitters];
+    const L: VariableDescription[] = [...(prog.dependencies!.import!.emitters ?? [])];
     L.sort( (a, b) => a.name.toLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1 );
     return L;
   }
@@ -131,7 +131,7 @@ export class ProgVersionner {
 
   undo() {
     if (this.undos.length) {
-      const prog = this.undos.pop();
+      const prog = this.undos.pop()!;
       this.redos.push( this.getCurrent() );
       this.progSubj.next(prog);
     }
@@ -144,7 +144,7 @@ export class ProgVersionner {
 
   redo() {
     if (this.redos.length) {
-      const prog = this.redos.pop();
+      const prog = this.redos.pop()!;
       this.undos.push( this.getCurrent() );
       this.progSubj.next(prog);
     }
@@ -158,35 +158,35 @@ export class ProgVersionner {
     const prog = this.getCurrent();
     this.updateWith({
       ...prog,
-      localChannels: [...prog.localChannels, varDescr]
+      localChannels: [...(prog.localChannels ?? []), varDescr]
     });
   }
 
   appendImportedChannel(varDescr: VariableDescription) {
     const prog = this.getCurrent();
     const newProg = {...prog};
-    newProg.dependencies.import.channels.push(varDescr);
+    newProg.dependencies?.import?.channels?.push(varDescr);
     this.updateWith(newProg);
   }
 
   appendExportedChannel(varDescr: VariableDescription) {
     const prog = this.getCurrent();
     const newProg = {...prog};
-    newProg.dependencies.export.channels.push(varDescr);
+    newProg.dependencies?.export?.channels?.push(varDescr);
     this.updateWith(newProg);
   }
 
   appendImportedEmitter(varDescr: VariableDescription) {
     const prog = this.getCurrent();
     const newProg = {...prog};
-    newProg.dependencies.import.emitters.push(varDescr);
+    newProg.dependencies?.import?.emitters?.push(varDescr);
     this.updateWith(newProg);
   }
 
   appendExportedEmitter(varDescr: VariableDescription) {
     const prog = this.getCurrent();
     const newProg = {...prog};
-    newProg.dependencies.export.emitters.push(varDescr);
+    newProg.dependencies?.export?.emitters?.push(varDescr);
     this.updateWith(newProg);
   }
 
@@ -199,33 +199,33 @@ export class ProgVersionner {
   appendImportedEvent(varDescr: VariableDescription) {
     const prog = this.getCurrent();
     const newProg = {...prog};
-    newProg.dependencies.import.events.push(varDescr);
+    newProg.dependencies?.import?.events?.push(varDescr);
     this.updateWith(newProg);
   }
 
   appendExportedEvent(varDescr: VariableDescription) {
     const prog = this.getCurrent();
     const newProg = {...prog};
-    newProg.dependencies.export.events.push(varDescr);
+    newProg.dependencies?.export?.events?.push(varDescr);
     this.updateWith(newProg);
   }
 
   removeVariableDescription(varDescr: VariableDescription) {
     const prog = this.getCurrent();
-    const reducer = (acc, vd) => vd !== varDescr ? [...acc, vd] : acc;
+    const reducer = (acc: VariableDescription[], vd: VariableDescription) => vd !== varDescr ? [...acc, vd] : acc;
     this.updateWith({
       ...prog,
-      localChannels: prog.localChannels.reduce(reducer, []),
+      localChannels: prog.localChannels?.reduce(reducer, []),
       dependencies: {
         import: {
-          channels: prog.dependencies.import.channels.reduce(reducer, []),
-          emitters: prog.dependencies.import.emitters.reduce(reducer, []),
-          events: prog.dependencies.import.events.reduce(reducer, [])
+          channels: prog.dependencies?.import?.channels?.reduce(reducer, []),
+          emitters: prog.dependencies?.import?.emitters?.reduce(reducer, []),
+          events: prog.dependencies?.import?.events?.reduce(reducer, [])
         },
         export: {
-          channels: prog.dependencies.export.channels.reduce(reducer, []),
-          emitters: prog.dependencies.export.emitters.reduce(reducer, []),
-          events: prog.dependencies.export.events.reduce(reducer, [])
+          channels: prog.dependencies?.export?.channels?.reduce(reducer, []),
+          emitters: prog.dependencies?.export?.emitters?.reduce(reducer, []),
+          events: prog.dependencies?.export?.events?.reduce(reducer, [])
         }
       }
     });
@@ -234,20 +234,20 @@ export class ProgVersionner {
   updateVariableDescription(original: VariableDescription, updated: VariableDescription) {
     const prog = this.getCurrent();
     if (original && updated && prog.localChannels) {
-      const fctUpdate = vd => vd !== original ? vd : updated;
+      const fctUpdate = (vd: VariableDescription) => vd !== original ? vd : updated;
       this.updateWith({
         ...prog,
         localChannels: prog.localChannels.map(fctUpdate),
         dependencies: {
           import: {
-            channels: prog.dependencies.import.channels.map(fctUpdate),
-            emitters: prog.dependencies.import.emitters.map(fctUpdate),
-            events:   prog.dependencies.import.events  .map(fctUpdate)
+            channels: prog.dependencies?.import?.channels?.map(fctUpdate),
+            emitters: prog.dependencies?.import?.emitters?.map(fctUpdate),
+            events:   prog.dependencies?.import?.events  ?.map(fctUpdate)
           },
           export: {
-            channels: prog.dependencies.export.channels.map(fctUpdate),
-            emitters: prog.dependencies.export.emitters.map(fctUpdate),
-            events:   prog.dependencies.export.events  .map(fctUpdate)
+            channels: prog.dependencies?.export?.channels?.map(fctUpdate),
+            emitters: prog.dependencies?.export?.emitters?.map(fctUpdate),
+            events:   prog.dependencies?.export?.events  ?.map(fctUpdate)
           }
         }
       });
@@ -270,10 +270,10 @@ export class ProgVersionner {
       return V;
     }
     function getVariableImported(p: HumanReadableProgram): VariableDescription[] {
-      return (p && p.dependencies) ? getVariableFromVocabulary(p.dependencies.import) : [];
+      return (p && p.dependencies) ? getVariableFromVocabulary(p.dependencies.import ?? {}) : [];
     }
     function getVariableExported(p: HumanReadableProgram): VariableDescription[] {
-      return (p && p.dependencies) ? getVariableFromVocabulary(p.dependencies.export) : [];
+      return (p && p.dependencies) ? getVariableFromVocabulary(p.dependencies.export ?? {}) : [];
     }
 
     // Name used for a local channel ?
@@ -284,7 +284,7 @@ export class ProgVersionner {
     const progRefs = this.getProgramsInstances();
     progRefs.forEach( pgRef => {
       const pgName = pgRef.as;
-      const pg: HumanReadableProgram = prog.subPrograms[pgRef.programId];
+      const pg: HumanReadableProgram = prog.subPrograms![pgRef.programId];
       getVariableExported(pg).forEach( v => LVD.push({
         ...v,
         name: `${pgName}__${v.name}`,
@@ -304,7 +304,7 @@ export class ProgVersionner {
     const contexts: ContextOrProgram[] = ProgVersionner.getSubContexts( {contextName: 'root', ...prog} );
     const Lpgref: ProgramReference[] = [];
     while (contexts.length) {
-      const context = contexts.pop();
+      const context = contexts.pop()!;
       if (isProgramReference(context)) {
         Lpgref.push(context as ProgramReference);
       }
@@ -330,7 +330,7 @@ export class ProgVersionner {
           ...(ancestor.allen.Meet      ? ancestor.allen.Meet.contextsSequence as HumanReadableContext[] : []),
         );
       }
-      return L.reduce( (acc, c) => acc || this.isContextNestedIn(context, c as HumanReadableStateContext), false );
+      return L.reduce( (acc: boolean, c) => acc || this.isContextNestedIn(context, c as HumanReadableStateContext), false );
     }
   }
 
@@ -351,13 +351,25 @@ export class ProgVersionner {
     // Create a new context state and insert it at the right place in parent.
     const {context, parent, via} = conf;
     parent.allen = parent.allen || {};
-    if (via === AllenType.Meet) {
-      parent.allen.Meet = parent.allen.Meet || {loop: undefined, contextsSequence: []};
-    } else {
-      parent.allen[AllenToString(via)] = parent.allen[AllenToString(via)] || [];
+    let LC: ContextOrProgram[];
+    switch (via) {
+      case AllenType.Meet:
+        parent.allen.Meet = parent.allen.Meet || {loop: undefined, contextsSequence: []};
+        LC = parent.allen.Meet.contextsSequence;
+        break;
+      case AllenType.During:
+        LC = parent.allen.During ||= [];
+        break;
+      case AllenType.StartWith:
+        LC = parent.allen.StartWith ||= [];
+        break;
+      case AllenType.EndWith:
+        LC = parent.allen.EndWith ||= [];
+        break;
+      default:
+        LC = [];
     }
 
-    const LC: ContextOrProgram[] = via === AllenType.Meet ? parent.allen?.Meet?.contextsSequence : parent.allen[AllenToString(via)];
     const position: number = conf.after ? LC.indexOf(conf.after) + 1 : 0;
     const path = this.getPathToContext(parent);
     const contextToAppend: ContextOrProgram = !!context ? context : {
@@ -372,9 +384,9 @@ export class ProgVersionner {
 
     newParent.allen = newParent.allen || {};
     switch (via) {
-      case AllenType.During   : newParent.allen.During    = appendContextOrProgram(newParent.allen.During,    contextToAppend, position); break;
-      case AllenType.StartWith: newParent.allen.StartWith = appendContextOrProgram(newParent.allen.StartWith, contextToAppend, position); break;
-      case AllenType.EndWith  : newParent.allen.EndWith   = appendContextOrProgram(newParent.allen.EndWith,   contextToAppend, position); break;
+      case AllenType.During   : newParent.allen.During    = appendContextOrProgram(newParent.allen.During!,    contextToAppend, position); break;
+      case AllenType.StartWith: newParent.allen.StartWith = appendContextOrProgram(newParent.allen.StartWith!, contextToAppend, position); break;
+      case AllenType.EndWith  : newParent.allen.EndWith   = appendContextOrProgram(newParent.allen.EndWith!,   contextToAppend, position); break;
       case AllenType.Meet     : newParent.allen.Meet = {
         ...newParent.allen.Meet,
         contextsSequence: appendContextOrProgram(newParent.allen.Meet?.contextsSequence || [], contextToAppend, position) as HumanReadableStateContext[]
@@ -461,41 +473,47 @@ export class ProgVersionner {
 
   removeEventAction(action: HumanReadableEventAction) {
     const AP = this.getActionPathToAction(action);
-    const context = AP.path.pop().from;
-    const cs = context as HumanReadableStateContext;
-    if (cs.state) {
-      const newCs = {...cs};
-      cs.actionsOnStart = cs.actionsOnStart || [];
-      cs.actionsOnEnd   = cs.actionsOnEnd   || [];
-      this.updateAncestors({
-        ...context,
-        actionsOnStart: cs.actionsOnStart.filter(a => a !== action ),
-        actionsOnEnd:   cs.actionsOnEnd  .filter(a => a !== action )
-      } as HumanReadableStateContext, AP.path );
-    } else {
-      this.updateEventeContextAncestors({
-        ...context,
-        actions: (context as HumanReadableEventContext).actions.filter(a => a !== action )
-      } as HumanReadableEventContext, AP.path );
+    if (AP && AP.path.length > 0) {
+      const context = AP.path.pop()!.from;
+      const cs = context as HumanReadableStateContext;
+      if (cs.state) {
+        const newCs = {...cs};
+        cs.actionsOnStart = cs.actionsOnStart || [];
+        cs.actionsOnEnd   = cs.actionsOnEnd   || [];
+        this.updateAncestors({
+          ...context,
+          actionsOnStart: cs.actionsOnStart.filter(a => a !== action ),
+          actionsOnEnd:   cs.actionsOnEnd  .filter(a => a !== action )
+        } as HumanReadableStateContext, AP.path );
+      } else {
+        this.updateEventeContextAncestors({
+          ...context,
+          actions: (context as HumanReadableEventContext).actions.filter(a => a !== action )
+        } as HumanReadableEventContext, AP.path );
+      }
     }
   }
 
   removeStateAction(action: HumanReadableStateAction) {
     const AP = this.getActionPathToStateAction(action);
-    const context = AP.path.pop().from;
-    this.updateAncestors({
-      ...context,
-      actions: (context as HumanReadableStateContext).actions.filter(a => a !== action )
-    } as HumanReadableStateContext, AP.path );
+    if (AP && AP.path.length > 0) {
+      const context = AP.path.pop()!.from;
+      this.updateAncestors({
+        ...context,
+        actions: ((context as HumanReadableStateContext).actions ?? []).filter(a => a !== action )
+      } as HumanReadableStateContext, AP.path );
+    }
   }
 
   updateStateAction(action: HumanReadableStateAction, newAction: HumanReadableStateAction) {
     const AP = this.getActionPathToStateAction(action);
-    const context = AP.path.pop().from;
-    this.updateAncestors({
-      ...context,
-      actions: (context as HumanReadableStateContext).actions.map(a => a !== action ? a : newAction )
-    } as HumanReadableStateContext, AP.path );
+    if (AP && AP.path.length > 0) {
+      const context = AP.path.pop()!.from;
+      this.updateAncestors({
+        ...context,
+        actions: ((context as HumanReadableStateContext).actions ?? []).map(a => a !== action ? a : newAction )
+      } as HumanReadableStateContext, AP.path );
+    }
   }
 
   updateStateActionChannel(action: HumanReadableStateAction, newChannel: string) {
@@ -519,18 +537,21 @@ export class ProgVersionner {
   }
 
   convertExpressionToHTML(expr: MathNode | string): string {
-    let node: MathNode;
+    let node: MathNode | undefined;
     let err: string;
     if (typeof expr === 'string') {
       const res = this.parseExpression(expr);
-      node = res.success;
-      err = res.error;
+      if (res.success !== undefined) {
+        node = res.success;
+      } else {
+        err = res.error!;
+      }
     } else {
       node = expr;
     }
     // console.log(node);
     return node ? this.mathNodeToHTML(node) : `
-      <label class="error tooltip">${expr}<label class="tooltiptext">(${err})</label></label>`;
+      <label class="error tooltip">${expr}<label class="tooltiptext">(${err!})</label></label>`;
   }
 
   updateStateInContext(context: HumanReadableStateContext, value: string) {
@@ -549,7 +570,7 @@ export class ProgVersionner {
     const AP = LP.find( ap => {
       const action = ap.action as HumanReadableStateAction;
       return action ? action.affectation === affectation : false;
-    } );
+    } )!;
 
     // Change action
     const PS = AP.path.pop() as PathStep;
@@ -562,14 +583,14 @@ export class ProgVersionner {
     this.updateAncestors(newContext, AP.path);
   }
 
-  private getActionPathToAction(action: HumanReadableAction): ActionAndPath {
+  private getActionPathToAction(action: HumanReadableAction): ActionAndPath | undefined {
     const LP = this.asActionsAndPaths();
 
     // Find the ActionAndPath that is about this affectation
     return LP.find( ap => ap.action === action );
   }
 
-  private getActionPathToStateAction(action: HumanReadableStateAction): ActionAndPath {
+  private getActionPathToStateAction(action: HumanReadableStateAction): ActionAndPath | undefined {
     const LP = this.asActionsAndPaths();
 
     // Find the ActionAndPath that is about this affectation
@@ -580,7 +601,7 @@ export class ProgVersionner {
     const LP = this.asActionsAndPaths();
 
     // Find one ActionAndPath that is about this context
-    const AP: ActionAndPath = LP.find( ap => !!ap.path.find( step => step.to === context ) );
+    const AP: ActionAndPath | undefined = LP.find( ap => !!ap.path.find( step => step.to === context ) );
 
     if (!!AP) {
       const {path} = AP.path.reduce(
@@ -616,41 +637,52 @@ export class ProgVersionner {
     this.updateAncestors(newContext as any as HumanReadableStateContext, path);
   }
 
-  private updateAncestors( newContext: ContextOrProgram // HumanReadableStateContext
+  private updateAncestors( newContext: ContextOrProgram | undefined // HumanReadableStateContext
     ,                      path: PathStep[]
     ,                      updateProg = true): { old: HumanReadableContext[]
     , now: HumanReadableContext[]
   } {
     const prog = this.getCurrent();
-    let step: PathStep;
+    let step: PathStep | undefined;
     const old: HumanReadableContext[] = [];
     const now: HumanReadableContext[] = [];
     // tslint:disable-next-line:no-conditional-assignment
     while ( step = path.pop() ) {
       // console.log("\tstep", step);
-      let viaStr: string;
-      let Lcontexts: ContextOrProgram[];
       const from = step.from as HumanReadableStateContext;
+      const tmp = {...from}; // copyHumanReadableStateContext(from);
       switch (step.via) {
-        case AllenType.EndWith  : viaStr = 'EndWith'  ; Lcontexts = from.allen.EndWith   ; break;
-        case AllenType.StartWith: viaStr = 'StartWith'; Lcontexts = from.allen.StartWith ; break;
-        case AllenType.Meet     : viaStr = 'Meet'     ; Lcontexts = from.allen.Meet.contextsSequence; break;
-        case AllenType.During   : viaStr = 'During'   ; Lcontexts = from.allen.During    ; break;
+        case AllenType.EndWith:
+          if ( (tmp.allen?.EndWith?.length ?? 0) > 0) {
+            tmp.allen!.EndWith = tmp.allen!.EndWith!.map( c => c !== step!.to ? c : newContext).filter( c => !!c ).map(c => c as ContextOrProgram);
+          } else {
+            delete tmp.allen?.EndWith;
+          }
+          break;
+        case AllenType.StartWith:
+          if ( (tmp.allen?.StartWith?.length ?? 0) > 0) {
+            tmp.allen!.StartWith = tmp.allen!.StartWith!.map( c => c !== step!.to ? c : newContext).filter( c => !!c ).map(c => c as ContextOrProgram);
+          } else {
+            delete tmp.allen?.StartWith;
+          }
+          break;
+        case AllenType.During:
+          if ( (tmp.allen?.During?.length ?? 0) > 0) {
+            tmp.allen!.During = tmp.allen!.During!.map( c => c !== step!.to ? c : newContext).filter( c => !!c ).map(c => c as ContextOrProgram);
+          } else {
+            delete tmp.allen?.During;
+          }
+          break;
+        case AllenType.Meet:
+          if ( (from.allen?.Meet?.contextsSequence.length ?? 0) > 0) {
+            const newSC = newContext as HumanReadableStateContext;
+            tmp.allen!.Meet!.contextsSequence = tmp.allen!.Meet!.contextsSequence.map( c => c !== step!.to ? c : newSC).filter( c => !!c );
+          } else {
+            delete tmp.allen!.Meet;
+          }
+          break;
       }
-      const tmp = {...from} as HumanReadableStateContext;
-      if (step.via === AllenType.Meet) {
-        if (Lcontexts.length > 0) {
-          const newSC = newContext as HumanReadableStateContext;
-          tmp.allen.Meet.contextsSequence = tmp.allen.Meet.contextsSequence.map( c => c !== step.to ? c : newSC).filter( c => !!c );
-        } else {
-          delete tmp.allen.Meet;
-        }
-      } else {
-        tmp.allen[viaStr] = Lcontexts.map( c => c !== step.to ? c : newContext).filter( c => !!c );
-        if (tmp.allen[viaStr].length === 0) {
-          delete tmp.allen[viaStr];
-        }
-      }
+
       // Go next
       newContext = tmp as HumanReadableStateContext;
       old.push(from);
@@ -679,7 +711,7 @@ export class ProgVersionner {
       path: [{from: contextState}]
     }) );
     if (LAW.length === 0) { LAW.push({
-      action: undefined,
+      action: {channel: '', affectation: "0"}, // XXX was undefined,
       in: actionPlace.While,
       path: [{from: cp}]
     });
@@ -723,7 +755,7 @@ export class ProgVersionner {
     }
 
     const LL: ActionAndPath[][] = paths.map(step => {
-      return this.getActionsAndPathRec(step.to).map(AP => {
+      return this.getActionsAndPathRec(step.to!).map(AP => {
         AP.path = [step, ...AP.path];
         return AP;
       });
@@ -759,7 +791,7 @@ export class ProgVersionner {
       </label>`;
     }
     if (node.isOperatorNode) {
-      const LA: string[] = node.args.map( n => this.mathNodeToHTML(n) );
+      const LA: string[] = node.args!.map( n => this.mathNodeToHTML(n) );
       if (LA.length === 1) {
         return `${node.op} ${LA[0]}`;
       } else {
@@ -768,7 +800,7 @@ export class ProgVersionner {
     }
     if (node.isSymbolNode) {
       // Channel, emitter, other program, ... ? Is it present in the program ?
-      if (this.isNamedUsed( node.name )) {
+      if (this.isNamedUsed( node.name! )) {
         return `<label>${node.name}</label>`;
       } else {
         return `<label class="error tooltip">${node.name}<label class="tooltiptext">Unknown symbol</label></label>`;
@@ -779,7 +811,7 @@ export class ProgVersionner {
       return `${obj}.<label class="accessor">${node.name}</label>`;
     }
     if ( (node as any).isFunctionNode) {
-      const LA: string[] = node.args.map( n => this.mathNodeToHTML(n) );
+      const LA: string[] = node.args!.map( n => this.mathNodeToHTML(n) );
       const strArgs = LA.join(', ');
       return `<label class="function">${node.name}</label>( ${strArgs} )`;
     }
@@ -789,7 +821,7 @@ export class ProgVersionner {
     }
 
     console.error('unknown node', node);
-    return node.name;
+    return node.name!;
   }
 
 }
@@ -856,7 +888,7 @@ export function convertExpressionToNodes(
 }
 
 export function mathNodeToArray(
-  P: HumanReadableProgram, node: MathNode, acceptEvent, ...vocabulary: VariableDescription[]
+  P: HumanReadableProgram, node: MathNode, acceptEvent: boolean, ...vocabulary: VariableDescription[]
 ): ParsedExprNode[] {
   const L: ParsedExprNode[] = [];
   if (node.isConstantNode) {
@@ -896,9 +928,9 @@ export function mathNodeToArray(
     );
   }
   if (node.isOperatorNode) {
-    const LA: ParsedExprNode[][] = node.args.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
+    const LA: ParsedExprNode[][] = node.args!.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
     if (LA.length === 1) {
-      L.push( {label: node.op, type: 'MathJS::OperatorNode unary', mathNode: node}
+      L.push( {label: node.op!, type: 'MathJS::OperatorNode unary', mathNode: node}
         , ...LA[0] );
     } else {
       L.push( ...LA.reduce( (acc, e) => [...acc, {label: `${node.op} `, type: 'MathJS::OperatorNode'}, ...e] ) );
@@ -910,8 +942,8 @@ export function mathNodeToArray(
       , {label: ') ', type: 'parenthesis', mathNode: node} );
   }
   if (node.isSymbolNode) {
-    const name = node.name;
-    const used = isNameUsedInProg(name, P);
+    const name = node.name!;
+    const used = isNameUsedInProg(name!, P);
     if (used) {
       L.push({
         label: `${name} `,
@@ -939,12 +971,12 @@ export function mathNodeToArray(
         {label: dotNotation ? '.' : '[', type: 'attribute', mathNode: node},
         ...( n.value !== undefined ? [{label: n.value, type: 'attribute accessor'}] : mathNodeToArray(P, n, acceptEvent, ...vocabulary) ),
         {label: dotNotation ? '' : ']', type: 'attribute', mathNode: node},
-      ], [])
+      ], [] as ParsedExprNode[])
     );
     L[L.length - 1].label += ' ';
   }
   if (node.isFunctionNode) {
-    const LA: ParsedExprNode[][] = node.args.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
+    const LA: ParsedExprNode[][] = node.args!.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
     const F = mathNodeToArray(P, (node as any).fn, acceptEvent, ...vocabulary);
     F[0].type = 'function';
     L.push(
@@ -976,12 +1008,12 @@ export type CONF = {[key: string]: any};
 export type IdCONF = string;
 const mapDisplay = new Map<IdCONF, CONF>();
 
-export function getDisplay(c: {id?: string}): CONF {
-  return mapDisplay.get(c.id);
+export function getDisplay(c: {id?: string} | undefined): CONF | undefined {
+  return c?.id ? mapDisplay.get(c.id) : undefined;
 }
 
-export function updateDisplay(c: {id?: string}, update: CONF): CONF {
-  const conf: CONF = mapDisplay.get(c.id) || {};
+export function updateDisplay(c: {id: string}, update: CONF): CONF | undefined {
+  const conf: CONF = mapDisplay.get(c.id) ?? {};
   const newConf = {...conf, ...update};
   mapDisplay.set(c.id, newConf);
   return newConf;

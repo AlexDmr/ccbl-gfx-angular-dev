@@ -4,17 +4,16 @@ import {ContextOrProgram, HumanReadableEventContext, HumanReadableStateContext, 
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
 
 @Component({
-  selector: 'lib-ccbl-context-or-program',
+  selector: 'lib-ccbl-context-or-program[program-versionner][data]',
   templateUrl: './ccbl-context-or-program.component.html',
   styleUrls: ['./ccbl-context-or-program.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblContextOrProgramComponent implements OnInit {
-  @Input() data: ContextOrProgram;
-  // tslint:disable-next-line: no-input-rename
-  @Input('program-versionner') private progVersionner: ProgVersionner;
+  @Input() data!: ContextOrProgram;
+  @Input('program-versionner') progVersionner!: ProgVersionner;
   @Input() isProgramRoot = false;
-  @Input() from: AllenType;
+  @Input() from?: AllenType;
 
   constructor() { }
 

@@ -64,8 +64,8 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
 
     ], () => ({
       inputs: {
-        Alice: sim.getPeopleObs('Alice'),
-        Bob: sim.getPeopleObs('Bob'  )
+        Alice: sim.getPeopleObs('Alice')!,
+        Bob: sim.getPeopleObs('Bob'  )!
       },
       outputs: {
         Avatar: color => this.Avatar.next( {
@@ -97,7 +97,9 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
     const P = this.sim.start( this.progV.getCurrent());
     this.progV.updateWith( P.toHumanReadableProgram() );
     const SP = P.getProgramInstance( 'subProgUser' );
-    this.subProgV.updateWith( SP.toHumanReadableProgram() );
+    if (SP) {
+      this.subProgV.updateWith( SP.toHumanReadableProgram() );
+    }
   }
 
   reset() {

@@ -3,10 +3,9 @@ import {convertExpressionToNodes} from '../ccbl-gfx9.service';
 import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MathJsStatic, MathNode, create, all} from 'mathjs';
-// import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 import {BehaviorSubject} from 'rxjs';
 
-const mathjs: Partial<MathJsStatic> = create(all, {});
+const mathjs = create(all, {}) as MathJsStatic;
 
 export interface DataEditExpression {
   expression: string;
@@ -24,24 +23,26 @@ export interface DataEditExpression {
 })
 export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   tmpExpr: string;
-  pNewExpr: string;
-  errorIndicationSubj = new BehaviorSubject<string>(undefined);
+  pNewExpr: string = '';
+  errorIndicationSubj = new BehaviorSubject<string | undefined>(undefined);
   cursorPos = -1;
   cursorErrorPos = -1;
-  @ViewChild('inputExpr') inputExpr: ElementRef<HTMLInputElement>;
-  @ViewChild('fakeLabel') fakeLabel: ElementRef<HTMLPreElement>;
+  @ViewChild('inputExpr') inputExpr!: ElementRef<HTMLInputElement>;
+  @ViewChild('fakeLabel') fakeLabel!: ElementRef<HTMLPreElement>;
   interpolators = ['linear', 'easeInOut', 'waitEnd'];
   interpolator = 'linear';
   V0 = '0';
   V1 = '';
   duration = '1000';
-  private mathNodeRoot: MathNode;
+  private mathNodeRoot?: MathNode;
 
   constructor(private dialogRef: MatDialogRef<DialogEditExpressionComponent, string>,
               @Inject(MAT_DIALOG_DATA) public data: DataEditExpression) {
     this.newExpr = this.tmpExpr = this.data.expression;
     if (this.isTransition) {
-      const L = (this.mathNodeRoot as any).blocks.map(b => b.node) as MathNode[];
+      const L: MathNode[] = [];
+      this.mathNodeRoot!.forEach( n => L.push(n) );
+      // XXX OLD const L = (this.mathNodeRoot as any).blocks.map(b => b.node) as MathNode[];
       this.V0 = L[0].toString();
       this.V1 = L[1].toString();
       this.duration = L[2].toString();
@@ -76,7 +77,7 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   }
 
   get isTransition(): boolean {
-    return (this.canExpressTransition && this.mathNodeRoot) ? this.mathNodeRoot.isBlockNode : false;
+    return this.canExpressTransition && !!this.mathNodeRoot?.isBlockNode; // ) ? this.mathNodeRoot.isBlockNode : false;
   }
 
   set isTransition(b: boolean) {
@@ -124,7 +125,7 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
     } catch (err) {
       this.errorIndicationSubj.next( err.toString() );
       this.pNewExpr = s;
-      const res = /\(char ([0-9]*)\)$/.exec(this.errorIndicationSubj.getValue());
+      const res = /\(char ([0-9]*)\)$/.exec(this.errorIndicationSubj.getValue() ?? '');
       const carAt = res ? +res[1] : -1;
       this.fakeLabel.nativeElement.textContent = this.pNewExpr.slice(0, carAt);
       this.cursorErrorPos = this.fakeLabel.nativeElement.clientWidth;

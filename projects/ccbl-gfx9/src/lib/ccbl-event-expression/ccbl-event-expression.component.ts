@@ -5,14 +5,14 @@ import {DataDialogTrigger, DialogTriggerComponent} from '../dialog-trigger/dialo
 import {MatDialog} from '@angular/material/dialog';
 
 @Component({
-  selector: 'lib-ccbl-event-expression',
+  selector: 'lib-ccbl-event-expression[evt][program]',
   templateUrl: './ccbl-event-expression.component.html',
   styleUrls: ['./ccbl-event-expression.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblEventExpressionComponent implements OnInit {
-  @Input() evt: EventTrigger;
-  @Input() program: HumanReadableProgram;
+  @Input() evt!: EventTrigger;
+  @Input() program!: HumanReadableProgram;
   @Output() update = new EventEmitter<EventTrigger>();
   static async staticEditEvent(dialog: MatDialog, data: DataDialogTrigger): Promise<EventTrigger> {
     const dialogRef = dialog.open(DialogTriggerComponent, {
@@ -55,7 +55,7 @@ export class CcblEventExpressionComponent implements OnInit {
     return !this.evt.eventSource && !! this.evt.eventExpression;
   }
 
-  get filterForEvent(): string {
+  get filterForEvent(): string | undefined {
     return this.evt.eventFilter?.replace(/event\.value/gi, this.evt.eventSource);
   }
 }

@@ -70,7 +70,7 @@
             (dndDrop)="appendContext('During', this.draggedContext )"
     >
       <lib-ccbl-event-channel-action  *ngFor                 = "let action of startActions"
-                                      [program-versionner]   = "programVersionner"
+                                      [program-versionner]   = "programVersionner!"
                                       [action]               = "asHumanReadableEventChannelAction(action)"
                                       [mat-menu-trigger-for] = "matMenuChannelAction"
                                       [matMenuTriggerData]   = "{action: action, atStart: true}"
@@ -81,9 +81,9 @@
             (dndDrop)="appendContext('During', this.draggedContext )"
     >
       <lib-ccbl-action-state          *ngFor               = "let action of actions"
-                                      [program-versionner] = "programVersionner"
+                                      [program-versionner] = "programVersionner!"
                                       [action]             = "action"
-                                      [context]            = "context"
+                                      [context]            = "context!"
                                       (update)             = "updateStateAction(action, $event);"
       ></lib-ccbl-action-state>
     </section>

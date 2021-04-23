@@ -66,7 +66,7 @@ export class EnvGeneratorComponent implements OnInit {
       DialogDeviceComponent, {
         data: {varType: si.varType, name: si.name, label: si.name, type: si.type as SensorDataType, userCanControl: true}
       });
-    si.sensor = await dialogRef.afterClosed().toPromise();
+    si.sensor = await dialogRef.afterClosed().toPromise() ?? si.sensor;
   }
 }
 

@@ -18,9 +18,9 @@ import {
   encapsulation: ViewEncapsulation.None
 })
 export class EditableLabelComponent implements OnInit {
-  @Input() label: string;
+  @Input() label: string = '';
   @Output() onupdate = new EventEmitter<string>();
-  @ViewChild('newExpr') newExpr: ElementRef;
+  @ViewChild('newExpr') newExpr!: ElementRef;
   pEditing = false;
 
   constructor() { }

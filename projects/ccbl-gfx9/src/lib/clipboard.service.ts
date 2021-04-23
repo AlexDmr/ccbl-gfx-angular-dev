@@ -8,7 +8,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
   providedIn: 'root'
 })
 export class ClipboardService {
-  private context: HumanReadableContext = undefined;
+  private context?: HumanReadableContext;
 
   constructor(private angClipboard: Clipboard) { }
 

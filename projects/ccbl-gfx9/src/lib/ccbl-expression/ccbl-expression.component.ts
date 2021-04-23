@@ -17,13 +17,13 @@ import {MathNode} from 'mathjs';
 import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 
 @Component({
-  selector: 'lib-ccbl-expression',
+  selector: 'lib-ccbl-expression[program]',
   templateUrl: './ccbl-expression.component.html',
   styleUrls: ['./ccbl-expression.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblExpressionComponent implements OnInit {
-  @ViewChild('newExpr') newExpr: ElementRef;
+  @ViewChild('newExpr') newExpr!: ElementRef;
   @Input() overrided = false;
   @Input()
   get expression(): string {
@@ -44,13 +44,13 @@ export class CcblExpressionComponent implements OnInit {
   @Input() acceptEvents = false;
   @Input() vocabulary: VariableDescription[] = [];
   @Input() canExpressTransition = false;
-  @Input() program: HumanReadableProgram;
+  @Input() program!: HumanReadableProgram;
   // tslint:disable-next-line: no-output-rename
   @Output('update') private newExpression = new EventEmitter<string>();
 
   pEditing = false;
-  private pExpression: string;
-  private nodeRoot: MathNode;
+  private pExpression: string = '';
+  private nodeRoot?: MathNode;
 
   constructor(private matDialog: MatDialog) { }
 
@@ -58,7 +58,7 @@ export class CcblExpressionComponent implements OnInit {
   }
 
   get isInterpolation(): boolean {
-    return this.nodeRoot && this.nodeRoot.isBlockNode;
+    return this.nodeRoot?.isBlockNode ?? false;
   }
 
   get V0(): string {
@@ -111,7 +111,7 @@ export class CcblExpressionComponent implements OnInit {
         data,
         closeOnNavigation: false
       });
-      const newE: string = await dialogRef.afterClosed().toPromise();
+      const newE = await dialogRef.afterClosed().toPromise();
       if (newE !== undefined) {
         this.newExpression.emit(newE);
       }

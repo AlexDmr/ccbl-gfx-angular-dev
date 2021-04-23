@@ -18,7 +18,7 @@ export interface DataAppendDependency {
 export class DialogAppendDependencyComponent implements OnInit {
   vd: VariableDescription;
   pTitle: string;
-  error: string;
+  error: string = '';
   constructor(private dialogRef: MatDialogRef<DialogAppendDependencyComponent, VariableDescription>,
               @Inject(MAT_DIALOG_DATA) public data: DataAppendDependency) {
     let vt: string;

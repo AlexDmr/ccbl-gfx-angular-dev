@@ -26,12 +26,12 @@ export interface DataEditProgramRef {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogEditProgInstanceComponent implements OnInit {
-  newProgRefSubj = new BehaviorSubject<ProgramReference>( undefined );
-  originalName: string;
-  private errorMessage: string[];
+  newProgRefSubj = new BehaviorSubject<ProgramReference | undefined>( undefined );
+  originalName: string = '';
+  private errorMessage: string[] = [];
   errorObs = new BehaviorSubject<string>('');
 
-  static async editProgRef(dialog: MatDialog, data: DataEditProgramRef): Promise<ProgramReference> {
+  static async editProgRef(dialog: MatDialog, data: DataEditProgramRef): Promise<ProgramReference | undefined> {
     const dialogRef = dialog.open<DialogEditProgInstanceComponent, DataEditProgramRef, ProgramReference>(
       DialogEditProgInstanceComponent, {
       data,
@@ -74,11 +74,11 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   get programId(): string {
-    return this.newProgRefSubj.getValue().programId;
+    return this.newProgRefSubj.getValue()!.programId;
   }
 
   set programId(id: string) {
-    const P = this.newProgRefSubj.getValue();
+    const P = this.newProgRefSubj.getValue()!;
     const PR: ProgramReference = {
       as: P.as,
       programId: id,
@@ -89,13 +89,13 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   get progRef(): ProgramReference {
-    return this.newProgRefSubj.getValue();
+    return this.newProgRefSubj.getValue()!;
   }
 
 
   getEvent(name: string): EventTrigger {
-    if (this.progRef.mapInputs[name] as EventTrigger) {
-      return this.progRef.mapInputs[name] as EventTrigger;
+    if (this.progRef?.mapInputs?.[name]) {
+      return this.progRef!.mapInputs![name] as EventTrigger;
     } else {
       const dep = this.data.parentProgram.dependencies;
       const L: VariableDescription[] = [
@@ -108,17 +108,17 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   getEmitter(name: string): string {
-    const M = this.progRef.mapInputs[name];
+    const M = this.progRef?.mapInputs?.[name];
     if (M) {
       return M as string;
     } else {
       const dep = this.data.parentProgram.dependencies;
       const L: VariableDescription[] = [
-        ...(dep?.import?.emitters || []),
-        ...(dep?.export?.emitters || []),
-        ...(dep?.import?.channels || []),
-        ...(dep?.export?.channels || []),
-        ...(this.data.parentProgram?.localChannels)
+        ...(dep?.import?.emitters ?? []),
+        ...(dep?.export?.emitters ?? []),
+        ...(dep?.import?.channels ?? []),
+        ...(dep?.export?.channels ?? []),
+        ...(this.data.parentProgram?.localChannels ?? [])
       ];
       const n = L.find(e => e.name === name)?.name || '';
       return n;
@@ -126,7 +126,7 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   getChannel(name: string): string {
-    const M = this.progRef.mapInputs[name];
+    const M = this.progRef.mapInputs![name];
     return M as string;
   }
 
@@ -135,11 +135,11 @@ export class DialogEditProgInstanceComponent implements OnInit {
   }
 
   get subProgramsId(): string[] {
-    return Object.keys( this.data.parentProgram.subPrograms );
+    return Object.keys( this.data.parentProgram.subPrograms! );
   }
 
   get subProg(): HumanReadableProgram {
-    return this.data.parentProgram.subPrograms[ this.progRef.programId ];
+    return this.data.parentProgram.subPrograms![ this.progRef.programId ];
   }
 
   get availableEvents(): VariableDescription[] {
@@ -211,9 +211,9 @@ export class DialogEditProgInstanceComponent implements OnInit {
       this.errorMessage.push(`This program name is already used as ${used.location} ${used.varRange}`);
     }
 
-    if (this.eventsToMap  .find( e => !this.progRef.mapInputs[e.name] ) ||
-        this.emittersToMap.find( e => !this.progRef.mapInputs[e.name] ) ||
-        this.channelsToMap.find( e => !this.progRef.mapInputs[e.name] )
+    if (this.eventsToMap  .find( e => !this.progRef.mapInputs![e.name] ) ||
+        this.emittersToMap.find( e => !this.progRef.mapInputs![e.name] ) ||
+        this.channelsToMap.find( e => !this.progRef.mapInputs![e.name] )
     ) {
       this.errorMessage.push(`Some inputs are not specified`);
     }

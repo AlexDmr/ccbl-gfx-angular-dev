@@ -38,6 +38,7 @@ import {DatePipe} from "@angular/common";
 import { ClockDisplayComponent } from './clock-display/clock-display.component';
 import { SceneHomeComponent } from './scene-house/scene-house.component';
 import { TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
     declarations: [
@@ -79,7 +80,8 @@ import { TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.
     MatGridListModule,
     MatStepperModule,
     MatRadioModule,
-    MatTabsModule
+    MatTabsModule,
+    NgbModule
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent]

@@ -1,5 +1,6 @@
 <section [dndDraggable] = "data"
          dndType       = "People"
+         *ngIf="!!data"
 >
   <section [mat-menu-trigger-for]="menuPeople">
     <img [src]="data.imgURL" />
@@ -11,6 +12,6 @@
 
 <mat-menu #menuPeople="matMenu" yPosition="above">
   <button mat-menu-item (click)="togglePhoning()">
-    {{data.phoning ? 'stop' : 'start'}} phoning
+    {{data?.phoning ? 'stop' : 'start'}} phoning
   </button>
 </mat-menu>

@@ -18,10 +18,10 @@ export interface DataDialogTrigger {
 export class DialogTriggerComponent implements OnInit {
   triggerType: 'event' | 'expression' = 'event';
   expression = '2 > 1';
-  expectedExpressionValue: boolean;
+  expectedExpressionValue?: boolean;
   computedExpression = 'rien pour le moment';
-  currentEvent: string;
-  currentFilter: string;
+  currentEvent: string  = '';
+  currentFilter: string = '';
 
   constructor(private dialogRef: MatDialogRef<DialogTriggerComponent, EventTrigger>,
               @Inject(MAT_DIALOG_DATA) public data: DataDialogTrigger
@@ -32,11 +32,11 @@ export class DialogTriggerComponent implements OnInit {
     const evt = this.data.evt;
     if (evt.eventSource === undefined && evt.eventSource !== '' || !!evt.eventExpression ) {
       this.triggerType = 'expression';
-      this.setExpression(evt.eventExpression);
+      this.setExpression(evt.eventExpression ?? '');
     } else {
       this.triggerType = 'event';
       this.currentEvent  = evt.eventSource;
-      this.currentFilter = evt.eventFilter;
+      this.currentFilter = evt.eventFilter ?? '';
     }
     this.triggerType = this.events.length > 0 ? this.triggerType : 'expression';
   }
@@ -53,9 +53,9 @@ export class DialogTriggerComponent implements OnInit {
   setExpression(expr: string) {
     console.log('setExpression', expr);
     const node: MathNode = mathjs.parse( expr );
-    if (node.op === '==' && node.args[0].isParenthesisNode && typeof node.args[1].value === 'boolean') {
-      this.expression = node.args[0].toString();
-      this.setExpectedValue( node.args[1].value );
+    if (node.op === '==' && node.args![0].isParenthesisNode && typeof node.args![1].value === 'boolean') {
+      this.expression = node.args![0].toString();
+      this.setExpectedValue( node.args![1].value );
     } else {
       this.expression = expr;
       this.setExpectedValue( undefined );

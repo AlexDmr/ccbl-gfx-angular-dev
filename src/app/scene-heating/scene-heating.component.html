@@ -15,8 +15,8 @@
 
   <section class="outside">
     <app-appartment class         = "peopleOutside"
-                    [location]    = "Outside | async"
-                    [peoples]     = "OutsidePeoples | async"
+                    [location]    = "(Outside | async)!"
+                    [peoples]     = "(OutsidePeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, locOutside)"
     ></app-appartment>
@@ -31,8 +31,8 @@
   </section>
 
   <app-appartment class         = "peopleInside"
-                  [location]    = "Home | async"
-                  [peoples]     = "InsidePeoples | async"
+                  [location]    = "(Home | async)!"
+                  [peoples]     = "(InsidePeoples | async)!"
                   [dndDropzone] = "allowDndList"
                   (dndDrop)     = "drop($event, locHome)"
                   ></app-appartment>
@@ -45,11 +45,11 @@
     <section class="clock">
       <span >
         <app-clock-display [tdate]="(DayTimeSubj)"></app-clock-display>
-        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async).toLocaleTimeString()" (ngModelChange)="changeDate($event) " (scroll)="onScroll($event)" #clock>
+        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async)!.toLocaleTimeString()" (ngModelChange)="changeDate($event) " (scroll)="onScroll()" #clock>
         <img [src]="imgDayNight" class="dayNight" />
       </span>
     </section>
-  <div class="Avatar" [style.backgroundColor]="(Avatar | async).color">
+  <div class="Avatar" [style.backgroundColor]="(Avatar | async)!.color">
   </div>
 
   <img [src]          = "heatingURL"

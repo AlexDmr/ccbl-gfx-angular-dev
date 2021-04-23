@@ -9,11 +9,11 @@ import { getUID, getDisplay, updateDisplay } from '../ccbl-gfx9.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProgInstanceParametersComponent implements OnInit {
-  @Input() parentProgram: HumanReadableProgram;
-  @Input() private set initialProgRef(pg: ProgramReference) {
+  @Input() parentProgram: HumanReadableProgram | undefined;
+  @Input() set initialProgRef(pg: ProgramReference) {
     this.progRef = copyContextOrProgram(pg) as ProgramReference;
   };
-  progRef: ProgramReference;
+  progRef: ProgramReference | undefined;
   @Output() update = new EventEmitter<ProgramReference>();
 
   constructor() { }
@@ -22,12 +22,12 @@ export class ProgInstanceParametersComponent implements OnInit {
   }
 
   updateParameter(name: string, value: ProgramInput) {
-    this.progRef.mapInputs[name] = value;
+    this.progRef!.mapInputs![name] = value;
     this.update.emit(this.progRef);
   }
 
   get subProg(): HumanReadableProgram {
-    return this.parentProgram.subPrograms[ this.progRef.programId ];
+    return this.parentProgram!.subPrograms![ this.progRef!.programId ];
   }
 
   get eventsToMap(): VariableDescription[] {
@@ -45,18 +45,18 @@ export class ProgInstanceParametersComponent implements OnInit {
   get channels(): VariableDescription[] {
     const P = this.parentProgram;
     return [
-      ...(P.dependencies?.import?.channels || []),
-      ...(P.dependencies?.export?.channels || []),
-      ...(P.localChannels || []),
+      ...(P?.dependencies?.import?.channels || []),
+      ...(P?.dependencies?.export?.channels || []),
+      ...(P?.localChannels || []),
     ];
   }
 
 
   getEvent(name: string): EventTrigger {
-    if (this.progRef.mapInputs[name] as EventTrigger) {
-      return this.progRef.mapInputs[name] as EventTrigger;
+    if (this.progRef!.mapInputs![name] as EventTrigger) {
+      return this.progRef!.mapInputs![name] as EventTrigger;
     } else {
-      const dep = this.parentProgram.dependencies;
+      const dep = this.parentProgram!.dependencies;
       const L: VariableDescription[] = [
         ...(dep?.import?.events || []),
         ...(dep?.export?.events || []),
@@ -67,11 +67,11 @@ export class ProgInstanceParametersComponent implements OnInit {
   }
 
   getChannel(name: string): string {
-    const M = this.progRef.mapInputs[name];
+    const M = this.progRef!.mapInputs![name];
     if (M) {
       return M as string;
     } else {
-      const dep = this.parentProgram.dependencies;
+      const dep = this.parentProgram!.dependencies;
       const L: VariableDescription[] = [
         ...(dep?.import?.channels || []),
         ...(dep?.export?.channels || []),
@@ -82,11 +82,11 @@ export class ProgInstanceParametersComponent implements OnInit {
   }
 
   getEmitter(name: string): string {
-    const M = this.progRef.mapInputs[name];
+    const M = this.progRef!.mapInputs![name];
     if (M) {
       return M as string;
     } else {
-      const dep = this.parentProgram.dependencies;
+      const dep = this.parentProgram!.dependencies;
       const L: VariableDescription[] = [
         ...(dep?.import?.emitters || []),
         ...(dep?.export?.emitters || []),

@@ -11,14 +11,17 @@ import {ProgVersionner} from "../../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.serv
 export type PossibleLocations = 'BathRoom'|
   'Outside'|'ParentalRoom'|'ParentalRoomBed'|'FirstRoom'|'FirstRoomBed'|'SecondRoom'|'SecondRoomBed'|'ToiletRoom'|'LivingRoom'|'LivingRoomSofa'|'Kitchen'|'Hallway1'|'Hallway2'  ;
 export type statemachinecoffee = 'ON'|'OFF'|'PREPARING'|'READY';
-export type Weather = 'claire'|'Nuageux'|'Pluie'|'Tempete';
+export type Weather = 'claire' | 'Nuageux' | 'Pluie' | 'Tempete';
+
 @Component({
   selector: 'app-scene-house',
   templateUrl: './scene-house.component.html',
   styleUrls: ['./scene-house.component.scss']
 })
 export class SceneHomeComponent implements OnInit {
-
+  weathers: Weather[] = [
+    'claire', 'Nuageux', 'Pluie', 'Tempete'
+  ]
 
   houseURL          = '/assets/Appart Test.svg';
   BathRoomLamp      = '/assets/lamp off.png';
@@ -33,7 +36,7 @@ export class SceneHomeComponent implements OnInit {
   coffeemachine     = '/assets/cafe pret.gif';
   Oven              = '/assets/four off.png';
   imgWeather        = '/assets/clean.gif';
-  imgDayNight: String;
+  imgDayNight: string = '';
 
 
   allowDndList: string[] = ['People'];
@@ -52,20 +55,20 @@ export class SceneHomeComponent implements OnInit {
   SLHallway1: PossibleLocations = 'Hallway1';
   SLHallway2: PossibleLocations = 'Hallway2';
 
-  BathRoomPeoples:   Observable<People<PossibleLocations>[]>;
-  ParentalRoomPeoples:   Observable<People<PossibleLocations>[]>;
-  ParentalRoomBedPeoples:   Observable<People<PossibleLocations>[]>;
-  FirstRoomPeoples:   Observable<People<PossibleLocations>[]>;
-  FirstRoomBedPeoples:   Observable<People<PossibleLocations>[]>;
-  SecondRoomPeoples:   Observable<People<PossibleLocations>[]>;
-  SecondRoomBedPeoples:   Observable<People<PossibleLocations>[]>;
-  ToiletRoomPeoples:   Observable<People<PossibleLocations>[]>;
-  LivingRoomPeoples:   Observable<People<PossibleLocations>[]>;
-  LivingRoomSofaPeoples:   Observable<People<PossibleLocations>[]>;
-  KitchenPeoples:   Observable<People<PossibleLocations>[]>;
-  Hallway1Peoples: Observable<People<PossibleLocations>[]>;
-  Hallway2Peoples: Observable<People<PossibleLocations>[]>;
-  elsewhereHomePeoples: Observable<People<PossibleLocations>[]>;
+  BathRoomPeoples!:   Observable<People<PossibleLocations>[]>;
+  ParentalRoomPeoples!:   Observable<People<PossibleLocations>[]>;
+  ParentalRoomBedPeoples!:   Observable<People<PossibleLocations>[]>;
+  FirstRoomPeoples!:   Observable<People<PossibleLocations>[]>;
+  FirstRoomBedPeoples!:   Observable<People<PossibleLocations>[]>;
+  SecondRoomPeoples!:   Observable<People<PossibleLocations>[]>;
+  SecondRoomBedPeoples!:   Observable<People<PossibleLocations>[]>;
+  ToiletRoomPeoples!:   Observable<People<PossibleLocations>[]>;
+  LivingRoomPeoples!:   Observable<People<PossibleLocations>[]>;
+  LivingRoomSofaPeoples!:   Observable<People<PossibleLocations>[]>;
+  KitchenPeoples!:   Observable<People<PossibleLocations>[]>;
+  Hallway1Peoples!: Observable<People<PossibleLocations>[]>;
+  Hallway2Peoples!: Observable<People<PossibleLocations>[]>;
+  elsewhereHomePeoples!: Observable<People<PossibleLocations>[]>;
 
   //lamp
   BathRoomLampState      = new BehaviorSubject<boolean>( false );
@@ -104,10 +107,10 @@ export class SceneHomeComponent implements OnInit {
     distinctUntilChanged());
   weather=new BehaviorSubject<Weather>( 'Tempete' );
       //tv
-  @ViewChild('TV', { static: true }) tv: ElementRef;
-  @ViewChild('clock', { static: true }) clock: ElementRef;
+  @ViewChild('TV', { static: true }) tv!: ElementRef;
+  @ViewChild('clock', { static: true }) clock!: ElementRef;
   @HostListener('window:scroll', ['$event']) // for window scroll events
-  onScroll(event) {
+  onScroll() {
     this.clock.nativeElement.blur();
   }
   TvPlay = new BehaviorSubject<boolean>(false);
@@ -193,9 +196,9 @@ export class SceneHomeComponent implements OnInit {
 
       ], () => ({
         inputs: {
-          Alice: sim.getPeopleObs('Alice'),
-          Bob: sim.getPeopleObs('Bob'  ),
-          Louis: sim.getPeopleObs('Louis'  ),
+          Alice: sim.getPeopleObs('Alice')!,
+          Bob: sim.getPeopleObs('Bob'  )!,
+          Louis: sim.getPeopleObs('Louis'  )!,
           itIsDay: this.itIsDay,
           SwitchFirstRoom:  this.SwitchFirstRoom,
           SwitchSecondRoom:  this.SwitchSecondRoom,
@@ -326,7 +329,7 @@ export class SceneHomeComponent implements OnInit {
 
   progV    = new ProgVersionner( this.initialRootProg    );
   subProgV = new ProgVersionner( this.initialSubProgUser );
-  someOneInBathRoom: Observable<boolean>;
+  someOneInBathRoom!: Observable<boolean>;
 
   ngOnInit(): void {// Create observables related to display
 
@@ -734,17 +737,17 @@ export class SceneHomeComponent implements OnInit {
   start() {
     const P = this.sim.start( this.progV.getCurrent());
     this.progV.updateWith( P.toHumanReadableProgram() );
-    const SP = P.getProgramInstance( 'User Prog' );
+    const SP = P.getProgramInstance( 'User Prog' )!;
     this.subProgV.updateWith( SP.toHumanReadableProgram() );
   }
   changeDate(d:string){
     var tokens = d.split(':');
     this.DayTimeSubj.next(new Date(this.DayTimeSubj.getValue().setHours(Number(tokens[0]),Number(tokens[1]),tokens[2]?Number(tokens[2]):this.DayTimeSubj.getValue().getSeconds())));
   }
-  changeSwitchVal(e,v){
+  changeSwitchVal(e: any, v: BehaviorSubject<any>){
     v.next(e);
   }
-  changeWeatherVal(v){
+  changeWeatherVal(v: Weather){
     this.weather.next(v);
   }
 }

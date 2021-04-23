@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HumanReadableStateContext, HumanReadableProgram, VariableDescription } from 'ccbl-js/lib/ProgramObjectInterface';
-import { computeDependencies, ActionsPath, getStateChildren,
+import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
+import { computeDependencies, ActionsPath,
          unionOrderedAP, equalLActionsPath, getProgramDeclarations,
          getActionsPathWithoutLastActions, getContexts, getActions, getSMTExpr, getActionsSMT,
          Negation, EnumerateContextsByPriorityInv } from './smt.definitions';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { filter } from 'rxjs/internal/operators/filter';
+import { map, filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SmtService {
   private url = 'ws://localhost:8080';
-  private subjProgEval = new BehaviorSubject<SMTconfig>( undefined );
-  obsProgEval: Observable<SMTconfig> = this.subjProgEval.asObservable().pipe( filter(c => !!c) );
+  private subjProgEval = new BehaviorSubject<SMTconfig | undefined>( undefined );
+  obsProgEval: Observable<SMTconfig> = this.subjProgEval.asObservable().pipe( filter(c => !!c), map(c => c as SMTconfig) );
 
   constructor() {
     console.log('Init a SmtService');
@@ -47,7 +47,8 @@ export class SmtService {
 
   async developConsequences(AP: ActionsPath, conf: SMTconfig, withAP = false): Promise<ActionsPath> {
     const L0: ActionsPath[] = EnumerateContextsByPriorityInv({...conf.P, id: 'root', contextName: 'root'})
-                             .map(c => conf.LAP.find(ap => ap.context.id === c.id) );
+                             .map(c => conf.LAP.find(ap => ap.context.id === c.id) )
+                             .filter( c => !!c).map(c => c as ActionsPath);
     const lap = L0.filter(ap => ap !== AP && !AP.ancestors.find(a => a.context === ap.context) );
     const newCanBeTrue = [];
     for (const cond of AP.canBeTrue) {
@@ -55,7 +56,7 @@ export class SmtService {
       // Filter cond and their ancestors
       let L = lap.filter(ap => !newCond.find(a => a.context === ap.context && !a.ancestors.find(an => an.context === ap.context) ) );
       while (L.length > 0) {
-        const ap0 = L.shift();
+        const ap0 = L.shift()!;
         const apNeg = Negation(ap0);
         const canApNegBeTrue: boolean = await this.canBeTrue(apNeg, newCond, conf);
         if (!canApNegBeTrue) { // cond => ap
@@ -71,7 +72,7 @@ export class SmtService {
         newCanBeTrue.push(newCond);
       }
     }
-    AP.canBeTrue = newCanBeTrue.reduce( (acc, LAP) => acc.find(L => equalLActionsPath(L, LAP)) ? acc : [...acc, LAP], []);
+    AP.canBeTrue = newCanBeTrue.reduce( (acc, LAP) => acc.find(L => equalLActionsPath(L, LAP)) ? acc : [...acc, LAP], [] as ActionsPath[][]);
     return AP;
   }
 
@@ -236,7 +237,7 @@ interface SMTconfig {
 
 class SMTconfigC implements SMTconfig {
   LAP: ActionsPath[];
-  ws: WebSocket;
+  ws!: WebSocket;
   private Lcb: CBobj[] = [];
 
   constructor(public P: HumanReadableProgram) {
@@ -245,11 +246,11 @@ class SMTconfigC implements SMTconfig {
 
     async init(url: string) {
       this.ws = await this.openSession(url);
-      this.ws.onmessage = (evt: MessageEvent) => {
+      this.ws.onmessage = (evt: MessageEvent<string>) => {
         evt.data.trim().split(`\n`).forEach( sat => {
           this.Lcb[0].L.push(sat);
           if (this.Lcb[0].L.length === this.Lcb[0].nb) {
-            const cb = this.Lcb.shift();
+            const cb = this.Lcb.shift()!;
             cb.on( cb.L );
           }
         });
@@ -259,7 +260,7 @@ class SMTconfigC implements SMTconfig {
 
     send(msg: string): Promise<string[]> {
       const nb = msg.split(`\n`).reduce( (n, w) => w === '(check-sat)' ? n + 1 : n, 0);
-      const cb: CBobj = {nb, on: undefined, L: []};
+      const cb: CBobj = {nb, on: () => {}, L: []};
       this.Lcb.push(cb);
       const P =  new Promise<string[]>(
         (resolve, reject) => cb.on = resolve

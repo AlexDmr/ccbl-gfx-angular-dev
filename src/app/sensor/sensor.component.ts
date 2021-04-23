@@ -8,7 +8,7 @@ import {BasicSensor, isBooleanSensor, isColorSensor, isEvent, isScalarSensor, Co
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SensorComponent implements OnInit {
-  @Input() data: BasicSensor;
+  @Input() data?: BasicSensor;
 
   constructor() { }
 
@@ -16,19 +16,19 @@ export class SensorComponent implements OnInit {
   }
 
   get isEvent(): boolean {
-    return isEvent(this.data);
+    return !!this.data && isEvent(this.data);
   }
 
   get isBooleanSensor(): boolean {
-    return !isEvent(this.data) && isBooleanSensor(this.data);
+    return !!this.data && !isEvent(this.data) && isBooleanSensor(this.data);
   }
 
   get isScalarSensor(): boolean {
-    return !isEvent(this.data) && isScalarSensor(this.data);
+    return !!this.data && !isEvent(this.data) && isScalarSensor(this.data);
   }
 
   get isColorSensor(): boolean {
-    return !isEvent(this.data) && isColorSensor(this.data);
+    return !!this.data && !isEvent(this.data) && isColorSensor(this.data);
   }
 
   asColorSensor(): ColorSensor {

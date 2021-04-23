@@ -14,14 +14,14 @@ import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl
 import {MatDialog} from '@angular/material/dialog';
 
 @Component({
-  selector: 'lib-ccbl-event-context',
+  selector: 'lib-ccbl-event-context[context][program-versionner]',
   templateUrl: './ccbl-event-context.component.html',
   styleUrls: ['./ccbl-event-context.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblEventContextComponent implements OnInit {
-  @Input() context: HumanReadableEventContext;
-  @Input('program-versionner') private progVersionner: ProgVersionner;
+  @Input() context!: HumanReadableEventContext;
+  @Input('program-versionner') progVersionner!: ProgVersionner;
 
   constructor(private matDialog: MatDialog) { }
 
@@ -93,7 +93,7 @@ export class CcblEventContextComponent implements OnInit {
   get availableChannels(): VariableDescription[] {
     let L = this.progVersionner.getChannels();
     if (this.context.actions) {
-      L = L.filter(c => !this.context.actions.find((a: HumanReadableEventChannelAction) => a.channel === c.name));
+      L = L.filter(c => !this.context.actions.find( a => (a as HumanReadableEventChannelAction).channel === c.name));
     }
     return L.sort((v1, v2) => v1.name.toLowerCase() > v2.name.toLowerCase() ? 1 : -1);
   }
@@ -114,7 +114,7 @@ export class CcblEventContextComponent implements OnInit {
   }
 
   get eventFilter(): string {
-    return this.context.eventFilter;
+    return this.context.eventFilter ?? '';
   }
 
   set eventFilter(eventFilter: string) {

@@ -21,7 +21,7 @@ export interface DataEditProgramDescr {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditProgramDescrComponent implements OnInit {
-  newProgSubj = new BehaviorSubject<HumanReadableProgram>(undefined);
+  newProgSubj = new BehaviorSubject<HumanReadableProgram | undefined>(undefined);
 
   constructor(private dialogRef: MatDialogRef<EditProgramDescrComponent, HumanReadableProgram>,
               @Inject(MAT_DIALOG_DATA) private data: DataEditProgramDescr,
@@ -60,7 +60,7 @@ export class EditProgramDescrComponent implements OnInit {
     const data: DataAppendDependency = {
       program: this.data.program,
       vType: 'channels',
-      inOut: undefined
+      inOut: 'local'
     };
     const dialogRef = this.matDialog.open(DialogAppendDependencyComponent, {
       data,
@@ -100,21 +100,21 @@ export class EditProgramDescrComponent implements OnInit {
       height: '100%',
       maxWidth: '100%'
     });
-    const SP: HumanReadableProgram = await dialogRef.afterClosed().toPromise();
+    const SP = await dialogRef.afterClosed().toPromise();
     if (SP) {
       if (name !== undefined && SP.name !== name) {
         // Remove old name
-        delete this.program.subPrograms[name];
+        delete this.program.subPrograms![name];
       }
       const subPrograms: {[key: string]: HumanReadableProgram} = this.program.subPrograms || {};
-      subPrograms[SP.name] = SP;
+      subPrograms[SP.name!] = SP;
       this.newProgSubj.next({...this.program, subPrograms} );
     }
   }
 
   deleteSubProgram(p: HumanReadableProgram) {
-    const subPrograms: {[key: string]: HumanReadableProgram} = this.program.subPrograms || {};
-    delete subPrograms[p.name];
+    const subPrograms: {[key: string]: HumanReadableProgram} = this.program.subPrograms ?? {};
+    delete subPrograms[p.name!];
     this.newProgSubj.next({...this.program, subPrograms} );
   }
 }

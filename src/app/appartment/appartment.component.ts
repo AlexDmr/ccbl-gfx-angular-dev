@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
-import { SceneLocation, People, Device } from '../data/Scene';
+import { SceneLocation, People } from '../data/Scene';
 
 @Component({
   selector: 'app-appartment',
@@ -8,8 +8,8 @@ import { SceneLocation, People, Device } from '../data/Scene';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppartmentComponent implements OnInit {
-  @Input() location: SceneLocation;
-  @Input() peoples: People<any>[];
+  @Input() location?: SceneLocation;
+  @Input() peoples: People<any>[] = [];
 
   constructor() { }
 

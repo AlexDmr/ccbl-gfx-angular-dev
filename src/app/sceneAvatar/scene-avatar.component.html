@@ -12,11 +12,11 @@
           (dndDrop)     = "drop($event, SLBobHome)"
           >
     <img  [src]="houseURL" class="house" />
-    <app-appartment [location]    = "BobHome | async"
-                    [peoples]     = "BobHomePeoples | async"
+    <app-appartment [location]    = "(BobHome | async)!"
+                    [peoples]     = "(BobHomePeoples | async)!"
                     ></app-appartment>
     <section class="Avatar">
-      <div class="back" [style.backgroundColor]="(Avatar | async).color"></div>
+      <div class="back" [style.backgroundColor]="(Avatar | async)!.color"></div>
       <img [src]="AvatarImgURL" />
     </section>
 </section>
@@ -26,8 +26,8 @@
            (dndDrop)     = "drop($event, SLAliceHome)"
            >
     <img  [src]="houseURL" class="house"/>
-    <app-appartment [location]    = "AliceHome | async"
-                    [peoples]     = "AliceHomePeoples | async"
+    <app-appartment [location]    = "(AliceHome | async)!"
+                    [peoples]     = "(AliceHomePeoples | async)!"
                     ></app-appartment>
   </section>
 
@@ -35,8 +35,8 @@
            [dndDropzone] = "allowDndList"
            (dndDrop)     = "drop($event, SLelsewhere)"
            >
-    <app-appartment [location]    = "elsewhere | async"
-                    [peoples]     = "elsewhereHomePeoples | async"
+    <app-appartment [location]    = "(elsewhere | async)!"
+                    [peoples]     = "(elsewhereHomePeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLelsewhere)"
              ></app-appartment>

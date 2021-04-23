@@ -1,7 +1,7 @@
 import { HumanReadableStateContext, HumanReadableStateAction, HumanReadableProgram, VariableDescription, ContextOrProgram } from "ccbl-js/lib/ProgramObjectInterface";
 import { MathNode, MathJsStatic, create, all } from 'mathjs';
 
-const mathjs: Partial<MathJsStatic> = create(all, {});
+const mathjs = create(all, {}) as MathJsStatic;
 
 export interface ExpressionSMT {
   dependencies: string[]; // Emitters or Channels
@@ -61,13 +61,13 @@ export function Combination<T>(LL: T[][]): T[][] {
 
 export function equalLActionsPath(LAP1: ActionsPath[], LAP2: ActionsPath[]): boolean {
   return LAP1.length === LAP2.length
-      && LAP1.reduce( (acc, A) => acc && !!LAP2.find(a => a.context === A.context), true)
+      && LAP1.reduce( (acc: boolean, A) => acc && !!LAP2.find(a => a.context === A.context), true)
         ;
 }
 
 export function unionOrderedAP(...LAP: ActionsPath[]): ActionsPath[] {
   return LAP.reduce(
-              (L, AP) => L.indexOf(AP) >= 0 ? L : [...L, AP], []
+              (L, AP) => L.indexOf(AP) >= 0 ? L : [...L, AP], [] as ActionsPath[]
             ).sort( (a: ActionsPath, b: ActionsPath) => a.priority - b.priority );
 }
 
@@ -127,7 +127,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
       return '';
     }
     if (node.isOperatorNode) {
-      const LA: string[] = node.args.map( n => mathNodeToSMT(P, n) );
+      const LA: string[] = node.args!.map( n => mathNodeToSMT(P, n) );
       const op = node.op === '==' ? '=' : node.op;
       if (LA.length === 1) {
           return `(${op} ${LA[0]})`;
@@ -139,7 +139,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
         return mathNodeToSMT(P, (node as any).content);
     }
     if (node.isSymbolNode) {
-        return node.name;
+        return node.name!;
     }
     if (node.isAccessorNode) {
       const Latt = (node as any).index.dimensions as MathNode[];
@@ -187,7 +187,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
     ];
     return {
       dependencies: node.filter( n => n.isSymbolNode )
-                        .map(n => n.name)
+                        .map(n => n.name!)
                         .filter(n => !!LV.find(v => v.name === n) )
                         ,
       SMT: mathNodeToSMT( P, node )
@@ -261,7 +261,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
               for ( const p in properties ) {
                 const val = properties[p];
                 if (val.isSymbolNode) {
-                  str += getVarDeclaration({name: `${v.name}.${p}`, type: val.name});
+                  str += getVarDeclaration({name: `${v.name}.${p}`, type: val.name!});
                   str += `\n`;
                 } else {
                   if (node.isObjectNode) {
@@ -314,5 +314,5 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
 
   export function getContexts(...L: ActionsPath[]): HumanReadableStateContext[] {
     return L.flatMap( AP => [...getContexts(...AP.ancestors), AP.context] )
-            .reduce( (acc, C: HumanReadableStateContext) => !!acc.find(c => c.id === C.id) ? acc : [...acc, C], []);
+            .reduce( (acc, C: HumanReadableStateContext) => !!acc.find(c => c.id === C.id) ? acc : [...acc, C], [] as HumanReadableStateContext[]);
   }

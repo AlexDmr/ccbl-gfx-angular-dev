@@ -56,15 +56,15 @@ export class AppComponent implements OnInit {
     };
 
     // Import devices
-    prog.dependencies.import.events = this.events.map(s => ({
+    prog.dependencies!.import!.events = this.events.map(s => ({
       name: s.name,
       type: s.type
     }) );
-    prog.dependencies.import.emitters = this.sensors.map(s => ({
+    prog.dependencies!.import!.emitters = this.sensors.map(s => ({
       name: s.name,
       type: s.type
     }) );
-    prog.dependencies.import.channels = this.actuators.map(d => ({
+    prog.dependencies!.import!.channels = this.actuators.map(d => ({
       name: d.name,
       type: d.type
     }) );
@@ -112,7 +112,7 @@ export class AppComponent implements OnInit {
     this.ccblEngineService.appendDevice(label, deviceType, deviceData);
   }
 
-  get progVersionner(): ProgVersionner {
+  get progVersionner(): ProgVersionner | undefined {
     return this.ccblEngineService.progVersionner;
   }
 
@@ -129,7 +129,7 @@ export class AppComponent implements OnInit {
   }
 
   async genEnvFromProg() {
-    const prog = this.progVersionner.getCurrent();
+    const prog = this.progVersionner?.getCurrent() ?? {};
     const events:   VariableDescription[] = prog.dependencies?.import?.events   || [];
     const emitters: VariableDescription[] = prog.dependencies?.import?.emitters || [];
     const channels: VariableDescription[] = prog.dependencies?.import?.channels || [];
@@ -141,7 +141,7 @@ export class AppComponent implements OnInit {
       EnvGeneratorComponent,
       {data, width: '100%', height: '100%', maxWidth: '100%'}
       );
-    const sensors = await dialogRef.afterClosed().toPromise();
+    const sensors = await dialogRef.afterClosed().toPromise() ?? [];
     this.ccblEngineService.unregister( ...this.ccblEngineService.sensors );
     sensors.forEach(s => this.ccblEngineService.register(s.sensor) );
   }

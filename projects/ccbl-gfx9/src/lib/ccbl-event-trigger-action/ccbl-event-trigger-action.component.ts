@@ -3,14 +3,14 @@ import {HumanReadableEventTriggerAction, HumanReadableProgram} from 'ccbl-js/lib
 import {ProgVersionner} from '../ccbl-gfx9.service';
 
 @Component({
-  selector: 'lib-ccbl-event-trigger-action',
+  selector: 'lib-ccbl-event-trigger-action[action][program]',
   templateUrl: './ccbl-event-trigger-action.component.html',
   styleUrls: ['./ccbl-event-trigger-action.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblEventTriggerActionComponent implements OnInit {
-  @Input() action: HumanReadableEventTriggerAction;
-  @Input() program: HumanReadableProgram;
+  @Input() action!: HumanReadableEventTriggerAction;
+  @Input() program!: HumanReadableProgram;
 
   constructor() { }
 

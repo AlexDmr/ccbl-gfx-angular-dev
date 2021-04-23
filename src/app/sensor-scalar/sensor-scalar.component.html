@@ -1,5 +1,6 @@
 <mat-form-field>
   <input matInput
+         *ngIf           ="!!data"
          [placeholder]   = "data.label"
          [ngModel]       = "obs | async"
          (ngModelChange) = "update($event)"

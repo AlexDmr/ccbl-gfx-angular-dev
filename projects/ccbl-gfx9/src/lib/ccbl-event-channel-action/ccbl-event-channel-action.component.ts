@@ -6,13 +6,13 @@ import {MatDialog} from '@angular/material/dialog';
 import {DataDialogEventAction, DialogActionEventComponent} from '../dialog-action-event/dialog-action-event.component';
 
 @Component({
-  selector: 'lib-ccbl-event-channel-action',
+  selector: 'lib-ccbl-event-channel-action[action][program-versionner]',
   templateUrl: './ccbl-event-channel-action.component.html',
   styleUrls: ['./ccbl-event-channel-action.component.scss']
 })
 export class CcblEventChannelActionComponent implements OnInit {
-  @Input() action: HumanReadableEventChannelAction;
-  @Input('program-versionner') progVersionner: ProgVersionner;
+  @Input() action!: HumanReadableEventChannelAction;
+  @Input('program-versionner') progVersionner!: ProgVersionner;
   @Output() update = new EventEmitter<HumanReadableEventChannelAction>();
   static async staticEditAction(dialog: MatDialog, data: DataDialogEventAction): Promise<HumanReadableEventChannelAction> {
     const dialogRef = dialog.open(DialogActionEventComponent, {

@@ -9,7 +9,7 @@ import { SceneService } from '../scene.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PeopleComponent implements OnInit {
-  @Input() data: People<any>;
+  @Input() data?: People<any>;
   @Input() height = 100;
   // @Output() update = new EventEmitter<People<any>>();
   imgPhoning = '/assets/phoning.png';
@@ -20,11 +20,13 @@ export class PeopleComponent implements OnInit {
   }
 
   togglePhoning() {
-    this.sim.updatePeople(this.data.name, {
-      ...this.data,
-      phoning: !this.data.phoning
-    });
-    // this.update.emit({...this.data} );
+    if (this.data) {
+      this.sim.updatePeople(this.data.name, {
+        ...this.data,
+        phoning: !this.data.phoning
+      });
+      // this.update.emit({...this.data} );
+    }
   }
 }
 

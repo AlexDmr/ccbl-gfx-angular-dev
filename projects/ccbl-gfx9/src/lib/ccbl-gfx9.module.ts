@@ -41,7 +41,7 @@ import { ProgInstanceParametersComponent } from './prog-instance-parameters/prog
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {
   constructor(private sanitized: DomSanitizer) {}
-  transform(value) {
+  transform(value: string) {
     return this.sanitized.bypassSecurityTrustHtml(value);
   }
 }

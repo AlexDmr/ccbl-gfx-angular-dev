@@ -14,7 +14,7 @@ import {DataActionState, DialogEditActionStateComponent} from '../dialog-edit-ac
 type OPERATOR = 'expression' | 'constraint';
 
 @Component({
-  selector: 'lib-ccbl-action-state[action][context]',
+  selector: 'lib-ccbl-action-state[action][context][program-versionner]',
   templateUrl: './ccbl-action-state.component.html',
   styleUrls: ['./ccbl-action-state.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -22,10 +22,10 @@ type OPERATOR = 'expression' | 'constraint';
 export class CcblActionStateComponent implements OnInit, OnDestroy {
   active = new BehaviorSubject<boolean>(false);
   overridedWith = new BehaviorSubject<string | undefined>(undefined);
-  newAction: HumanReadableStateAction;
+  // newAction: HumanReadableStateAction;
   @Output() update = new EventEmitter<HumanReadableStateAction>();
-  pAction: HumanReadableStateAction;
-  @Input() context: HumanReadableStateContext;
+  pAction!: HumanReadableStateAction;
+  @Input() context!: HumanReadableStateContext;
   @Input()
   get action(): HumanReadableStateAction {
     return this.pAction;
@@ -46,8 +46,8 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     this.pAction?.ccblAction?.onOverride( this.cbCcblOverridedWith );
   }
   // tslint:disable-next-line: no-input-rename
-  @Input('program-versionner') private progVersionner: ProgVersionner;
-  static async staticEdit(matDialog: MatDialog, data: DataActionState): Promise<HumanReadableStateAction> {
+  @Input('program-versionner') progVersionner!: ProgVersionner;
+  static async staticEdit(matDialog: MatDialog, data: DataActionState): Promise<HumanReadableStateAction | undefined> {
     const dialogRef = matDialog.open<DialogEditActionStateComponent, DataActionState, HumanReadableStateAction>(
       DialogEditActionStateComponent, {
         data,

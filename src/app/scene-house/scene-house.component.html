@@ -1,7 +1,13 @@
 <section class="clock">
       <span >
         <app-clock-display  [tdate]="(DayTimeSubj)"></app-clock-display>
-        <input class="modifiable-Clock" type="time" [ngModel]="(DayTimeSubj | async).toLocaleTimeString()" (ngModelChange)="changeDate($event)"(scroll)="onScroll($event)" #clock>
+        <input class="modifiable-Clock"
+               type="time"
+               [ngModel] = "(DayTimeSubj | async)!.toLocaleTimeString()"
+               (ngModelChange)="changeDate($event)"
+               (scroll)="onScroll()"
+               #clock
+               />
         <img [src]="imgDayNight" class="dayNight"  />
       </span>
 </section>
@@ -13,8 +19,8 @@
 
   <section class="location BathRoom">
     <app-appartment class         = "BathRoom"
-                    [location]    = "BathRoom | async"
-                    [peoples]     = "BathRoomPeoples | async"
+                    [location]    = "(BathRoom | async)!"
+                    [peoples]     = "(BathRoomPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLBathRoom)"
     ></app-appartment>
@@ -22,14 +28,14 @@
   </section>
   <section class="location ParentalRoom">
     <app-appartment class         = "ParentalRoom"
-                    [location]    = "ParentalRoom | async"
-                    [peoples]     = "ParentalRoomPeoples | async"
+                    [location]    = "(ParentalRoom | async)!"
+                    [peoples]     = "(ParentalRoomPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLParentalRoom)"
     ></app-appartment>
     <app-appartment class         = "Bed"
-                    [location]    = "ParentalRoomBed | async"
-                    [peoples]     = "ParentalRoomBedPeoples | async"
+                    [location]    = "(ParentalRoomBed | async)!"
+                    [peoples]     = "(ParentalRoomBedPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLParentalRoomBed)"
     ></app-appartment>
@@ -39,14 +45,14 @@
   <p class="volume-val" [ngStyle]="{'color':(TvVolume.getValue()<0.34)?'#6a9601':(TvVolume.getValue()<0.67)?'#eaf046':'#e94f45','left':(TvVolume.getValue()<1)?'207px':'202px'}">{{100*TvVolume.getValue()}}</p>
   <section class="location LivingRoom">
     <app-appartment class         = "LivingRoom"
-                    [location]    = "LivingRoom | async"
-                    [peoples]     = "LivingRoomPeoples | async"
+                    [location]    = "(LivingRoom | async)!"
+                    [peoples]     = "(LivingRoomPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLLivingRoom)"
     ></app-appartment>
     <app-appartment class         = "LivingRoomSofa"
-                    [location]    = "LivingRoomSofa | async"
-                    [peoples]     = "LivingRoomSofaPeoples | async"
+                    [location]    = "(LivingRoomSofa | async)!"
+                    [peoples]     = "(LivingRoomSofaPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLLivingRoomSofa)"
     ></app-appartment>
@@ -54,8 +60,8 @@
   </section>
   <section class="location Toilet">
     <app-appartment class         = "ToiletRoom"
-                    [location]    = "ToiletRoom | async"
-                    [peoples]     = "ToiletRoomPeoples | async"
+                    [location]    = "(ToiletRoom | async)!"
+                    [peoples]     = "(ToiletRoomPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLToiletRoom)"
     ></app-appartment>
@@ -67,14 +73,14 @@
       Your browser does not support the video tag.
     </video>
     <app-appartment class         = "FirstRoom"
-                    [location]    = "FirstRoom | async"
-                    [peoples]     = "FirstRoomPeoples | async"
+                    [location]    = "(FirstRoom | async)!"
+                    [peoples]     = "(FirstRoomPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLFirstRoom)"
     ></app-appartment>
     <app-appartment class         = "Bed"
-                    [location]    = "FirstRoom | async"
-                    [peoples]     = "FirstRoomBedPeoples | async"
+                    [location]    = "(FirstRoom | async)!"
+                    [peoples]     = "(FirstRoomBedPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLFirstRoomBed)"
     ></app-appartment>
@@ -82,14 +88,14 @@
   </section>
   <section class="location SecondRoom">
     <app-appartment class         = "SecondRoom"
-                    [location]    = "SecondRoom | async"
-                    [peoples]     = "SecondRoomPeoples | async"
+                    [location]    = "(SecondRoom | async)!"
+                    [peoples]     = "(SecondRoomPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLSecondRoom)"
     ></app-appartment>
     <app-appartment class         = "Bed"
-                    [location]    = "SecondRoomBed | async"
-                    [peoples]     = "SecondRoomBedPeoples | async"
+                    [location]    = "(SecondRoomBed | async)!"
+                    [peoples]     = "(SecondRoomBedPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLSecondRoomBed)"
     ></app-appartment>
@@ -98,8 +104,8 @@
   </section>
   <section class="location Kitchen">
     <app-appartment class         = "Kitchen"
-                    [location]    = "Kitchen | async"
-                    [peoples]     = "KitchenPeoples | async"
+                    [location]    = "(Kitchen | async)!"
+                    [peoples]     = "(KitchenPeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLKitchen)"
     ></app-appartment>
@@ -107,8 +113,8 @@
   </section>
   <section class="location Hallway1">
     <app-appartment class         = "Hallway1"
-                    [location]    = "Hallway1 | async"
-                    [peoples]     = "Hallway1Peoples | async"
+                    [location]    = "(Hallway1 | async)!"
+                    [peoples]     = "(Hallway1Peoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLHallway1)"
     ></app-appartment>
@@ -116,8 +122,8 @@
   </section>
   <section class="location Hallway2">
     <app-appartment class         = "Hallway2"
-                    [location]    = "Hallway2 | async"
-                    [peoples]     = "Hallway2Peoples | async"
+                    [location]    = "(Hallway2 | async)!"
+                    [peoples]     = "(Hallway2Peoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLHallway2)"
     ></app-appartment>
@@ -125,8 +131,8 @@
   </section>
   <section class="location outside">
     <app-appartment class         = "outside"
-                    [location]    = "elsewhere | async"
-                    [peoples]     = "elsewhereHomePeoples | async"
+                    [location]    = "(elsewhere | async)!"
+                    [peoples]     = "(elsewhereHomePeoples | async)!"
                     [dndDropzone] = "allowDndList"
                     (dndDrop)     = "drop($event, SLOutside)"
     ></app-appartment>
@@ -146,70 +152,70 @@
 
 <div class="SwitchFirstRoom">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchFirstRoom)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchFirstRoom)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchSecondRoom">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchSecondRoom)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchSecondRoom)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchParentalRoom">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchParentalRoom)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchParentalRoom)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchHallway1">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchHallway1)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchHallway1)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchHallway2">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchHallway2)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchHallway2)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchKitchen">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchKitchen)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchKitchen)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchLivingRoom">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchLivingRoom)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchLivingRoom)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchBathroom">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchBathroom)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchBathroom)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchToilet">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchToilet)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchToilet)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
 </div>
 <div class="SwitchHallway2">
   <label class="rocker">
-    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event,SwitchToilet)">
+    <input type="checkbox" ngModel (ngModelChange)="changeSwitchVal($event, SwitchToilet)">
     <span class="switch-left">On</span>
     <span class="switch-right">Off</span>
   </label>
@@ -237,11 +243,10 @@
 
 <select class='select-Weather'
         #mySelect
-        (change)='changeWeatherVal(mySelect.value)'>
-  <option value='Pluie' [selected]="weather.getValue() =='Pluie'">Pluie</option>
-  <option value='Tempete' [selected]="weather.getValue() =='Tempete'">Tempete</option>
-  <option value='claire' [selected]="weather.getValue() =='claire'">claire</option>
-  <option value='Nuageux'[selected]="weather.getValue() =='Nuageux'">Nuageux</option>
+        [ngModel] = "weather.getValue()"
+        (ngModelChange) = "weather.next($event)"
+        >
+  <option *ngFor="let w of weathers" [value]="w" [selected]="weather.getValue() === w">Pluie</option>
 </select>
 <section class="thermometer outside">
   <img [src]="thermometerURL" />

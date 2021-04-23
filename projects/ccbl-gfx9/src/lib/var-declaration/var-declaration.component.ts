@@ -9,8 +9,8 @@ import {ProgVersionner} from '../ccbl-gfx9.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VarDeclarationComponent implements OnInit {
-  @Input('description') varDescription: VariableDescription;
-  @Input('program-versionner') private progVersionner: ProgVersionner;
+  @Input('description') varDescription?: VariableDescription;
+  @Input('program-versionner') progVersionner?: ProgVersionner;
   editing = false;
 
   constructor() { }
@@ -19,12 +19,16 @@ export class VarDeclarationComponent implements OnInit {
   }
 
   updateWith(name: string, type: string) {
-    this.progVersionner.updateVariableDescription(this.varDescription, {name, type});
+    if (this.progVersionner && this.varDescription) {
+      this.progVersionner.updateVariableDescription(this.varDescription, {name, type});
+    }
     this.editing = false;
   }
 
   delete() {
-    this.progVersionner.removeVariableDescription(this.varDescription);
+    if (this.progVersionner && this.varDescription) {
+      this.progVersionner.removeVariableDescription(this.varDescription);
+    }
   }
 
 }

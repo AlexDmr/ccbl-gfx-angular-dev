@@ -22,12 +22,12 @@ const localProgramKey = 'test_ccbl-gfx_program';
   providedIn: 'root'
 })
 export class CcblEngineService {
-  private privProgVersionner: ProgVersionner;
+  private privProgVersionner?: ProgVersionner;
   env: CCBLEnvironmentExecutionInterface;
   clock: CCBLTestClock = new CCBLTestClock();
   mapObs = new Map<string, Observable<any>>();
   sensors: Sensor[] = [];
-  ccblProg: CCBLProgramObject;
+  ccblProg?: CCBLProgramObject;
   obsClock = new Observable( observer => {
     this.clock.on( ms => observer.next(ms) );
   }).pipe(
@@ -48,11 +48,11 @@ export class CcblEngineService {
     this.env = new CCBLEnvironmentExecution( this.clock );
     try {
       if (localStorage.getItem(localSensorsKey)) {
-        const L: Sensor[] = JSON.parse(localStorage.getItem(localSensorsKey));
+        const L: Sensor[] = JSON.parse(localStorage.getItem(localSensorsKey) ?? "[]");
         L.forEach(s => this.appendDevice(s.label, s.varType, s.type));
       }
       if (localStorage.getItem(localProgramKey)) {
-        const prog: HumanReadableProgram = JSON.parse(localStorage.getItem(localProgramKey));
+        const prog: HumanReadableProgram = JSON.parse(localStorage.getItem(localProgramKey) ?? "{}");
         const CP = copyHumanReadableProgram(prog, false);
         this.setRootProgram( CP );
         // console.log(prog, CP);
@@ -69,7 +69,7 @@ export class CcblEngineService {
 
   load(name: string) {
     this.unregister( ...this.sensors );
-    const {devices, program} = JSON.parse( localStorage.getItem(name) );
+    const {devices, program} = JSON.parse( localStorage.getItem(name) ?? JSON.stringify({devices: [], program: {}}) );
     localStorage.setItem(localSensorsKey, JSON.stringify(devices) );
     localStorage.setItem(localProgramKey, JSON.stringify(program) );
     location.reload();
@@ -83,9 +83,9 @@ export class CcblEngineService {
   save(name: string) {
     localStorage.setItem(`CCBL_TEST::${name}`, JSON.stringify( {
       devices: this.sensors,
-      program: copyHumanReadableProgram( this.progVersionner.getCurrent(), false )
+      program: copyHumanReadableProgram( this.progVersionner!.getCurrent(), false )
     } ) );
-    const obj = JSON.parse( localStorage.getItem(`CCBL_TEST::${name}`) );
+    const obj = JSON.parse( localStorage.getItem(`CCBL_TEST::${name}`)! );
     console.log(`CCBL_TEST::${name}`, obj );
   }
 
@@ -94,19 +94,21 @@ export class CcblEngineService {
       this.clockSubscription.unsubscribe();
       this.ccblProg.dispose();
     }
-    this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
-    this.ccblProg.loadHumanReadableProgram(this.progVersionner.getCurrent(), this.env, {});
+    if (this.progVersionner) {
+      this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
+      this.ccblProg.loadHumanReadableProgram(this.progVersionner.getCurrent(), this.env, {});
 
-    const P = copyHumanReadableProgram( this.ccblProg.toHumanReadableProgram(), false );
-    console.log( P );
+      const P = copyHumanReadableProgram( this.ccblProg.toHumanReadableProgram(), false );
+      console.log( P );
 
-    this.clock.goto( Date.now() );
-    this.ccblProg.activate();
-    this.ccblProg.UpdateChannelsActions(); // commitStateActions();
+      this.clock.goto( Date.now() );
+      this.ccblProg.activate();
+      this.ccblProg.UpdateChannelsActions(); // commitStateActions();
 
-    const prog = this.ccblProg.toHumanReadableProgram();
-    this.progVersionner.updateWith( prog );
-    this.clockSubscription = this.obsClock.connect();
+      const prog = this.ccblProg.toHumanReadableProgram();
+      this.progVersionner.updateWith( prog );
+      this.clockSubscription = this.obsClock.connect();
+    }
   }
 
   reset() {
@@ -169,11 +171,11 @@ export class CcblEngineService {
     this.privProgVersionner.asObservable().subscribe( prog => {
       const copy = copyHumanReadableProgram(prog, false);
       localStorage.setItem(localProgramKey, JSON.stringify( copy ) );
-      const obj = JSON.parse( localStorage.getItem(localProgramKey) );
+      const obj = JSON.parse( localStorage.getItem(localProgramKey)! );
     });
   }
 
-  get progVersionner(): ProgVersionner {
+  get progVersionner(): ProgVersionner | undefined {
     return this.privProgVersionner;
   }
 

@@ -1,12 +1,12 @@
 <section class="standard" *ngIf="!editing" (dblclick)="editing = true">
-  <label>{{varDescription.name}}</label>
+  <label>{{varDescription?.name}}</label>
   is typed as
-  <label>"{{varDescription.type}}"</label>
+  <label>"{{varDescription?.type}}"</label>
   <button class="menu edit" (click)="editing = true">edit</button>
   <button class="menu delete" (click)="delete()">Delete</button>
 </section>
 
-<form *ngIf="editing" (submit)="updateWith(name.value, type.value)">
+<form *ngIf="editing && !!varDescription" (submit)="updateWith(name.value, type.value)">
   <input title="name" name="name" [ngModel]="varDescription.name" #name/>
   is typed as
   <input title="type" name="type" [ngModel]="varDescription.type" #type/>

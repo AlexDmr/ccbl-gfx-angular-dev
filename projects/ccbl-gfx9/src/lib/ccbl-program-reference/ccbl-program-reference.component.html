@@ -18,7 +18,7 @@
       <td [innerHTML]="description"></td>
       <td>
         <lib-prog-instance-parameters [initialProgRef] = "data"
-                                      [parentProgram]  = "parentProgramObs | async"
+                                      [parentProgram]  = "(parentProgramObs | async)!"
                                       (update)         = "updateWith($event)"
         ></lib-prog-instance-parameters>
       </td>
