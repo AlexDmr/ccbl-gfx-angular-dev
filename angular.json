@@ -130,6 +130,46 @@
           }
         }
       }
+    },
+    "ccbl-gfx9": {
+      "projectType": "library",
+      "root": "projects/ccbl-gfx9",
+      "sourceRoot": "projects/ccbl-gfx9/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ccbl-gfx9/tsconfig.lib.json",
+            "project": "projects/ccbl-gfx9/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ccbl-gfx9/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ccbl-gfx9/src/test.ts",
+            "tsConfig": "projects/ccbl-gfx9/tsconfig.spec.json",
+            "karmaConfig": "projects/ccbl-gfx9/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ccbl-gfx9/tsconfig.lib.json",
+              "projects/ccbl-gfx9/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "pipo"
