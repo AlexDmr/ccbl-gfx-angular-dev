@@ -14,7 +14,7 @@ import {
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
 import {scopeInterpolator, mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
-import {MathNode} from 'mathjs';
+import {AccessorNode, ArrayNode, BlockNode, ConstantNode, FunctionNode, MathNode, OperatorNode, ParenthesisNode, SymbolNode} from 'mathjs';
 import {ParsedExprNode} from './dataParsedExpr';
 
 
@@ -301,7 +301,7 @@ export class ProgVersionner {
       return !!(c as ProgramReference).programId;
     }
 
-    const contexts: ContextOrProgram[] = ProgVersionner.getSubContexts( {contextName: 'root', ...prog} );
+    const contexts: ContextOrProgram[] = ProgVersionner.getSubContexts( {contextName: 'root', type: 'STATE', ...prog} );
     const Lpgref: ProgramReference[] = [];
     while (contexts.length) {
       const context = contexts.pop()!;
@@ -373,7 +373,8 @@ export class ProgVersionner {
     const position: number = conf.after ? LC.indexOf(conf.after) + 1 : 0;
     const path = this.getPathToContext(parent);
     const contextToAppend: ContextOrProgram = !!context ? context : {
-      contextName: 'new context'
+      contextName: 'new context',
+      type: 'STATE'
     };
     const newParent: HumanReadableStateContext = {
       ...parent,
@@ -527,7 +528,7 @@ export class ProgVersionner {
   parseExpression(expr: string): {success?: MathNode, error?: string} {
     try {
       return {success: mathjs.parse(expr)};
-    } catch (err) {
+    } catch (err: any) {
       return {error: err};
     }
   }
@@ -629,6 +630,7 @@ export class ProgVersionner {
     return this.getActionsAndPathRec({
       actions: prog.actions,
       contextName: 'programRoot',
+      type: 'STATE',
       allen: prog.allen
     } );
   }
@@ -778,50 +780,50 @@ export class ProgVersionner {
   }
 
   private mathNodeToHTML(node: MathNode): string {
-    if (node.isConstantNode) {
+    if ((node as ConstantNode).isConstantNode) {
       let txt: string;
-      if (typeof node.value === 'string') {
-        txt = `"${node.value}"`;
+      if (typeof (node as ConstantNode).value === 'string') {
+        txt = `"${(node as ConstantNode).value}"`;
       } else {
-        txt = node.value !== undefined && node.value.toString ? node.value.toString() : '';
+        txt = (node as ConstantNode).value !== undefined && (node as ConstantNode).value.toString ? (node as ConstantNode).value.toString() : '';
       }
       return txt !== '' ? `<label class="constant">${txt}</label>` : `<label class="error tooltip">
         EXPRESSION EXPECTED
         <label class="tooltiptext">Empty expression are not allowed.</label>
       </label>`;
     }
-    if (node.isOperatorNode) {
-      const LA: string[] = node.args!.map( n => this.mathNodeToHTML(n) );
+    if ((node as OperatorNode).isOperatorNode) {
+      const LA: string[] = (node as OperatorNode).args!.map( n => this.mathNodeToHTML(n) );
       if (LA.length === 1) {
-        return `${node.op} ${LA[0]}`;
+        return `${(node as OperatorNode).op} ${LA[0]}`;
       } else {
-        return LA.join( ` ${node.op}` );
+        return LA.join( ` ${(node as OperatorNode).op}` );
       }
     }
-    if (node.isSymbolNode) {
+    if ((node as SymbolNode).isSymbolNode) {
       // Channel, emitter, other program, ... ? Is it present in the program ?
-      if (this.isNamedUsed( node.name! )) {
-        return `<label>${node.name}</label>`;
+      if (this.isNamedUsed( (node as SymbolNode).name )) {
+        return `<label>${(node as SymbolNode).name}</label>`;
       } else {
-        return `<label class="error tooltip">${node.name}<label class="tooltiptext">Unknown symbol</label></label>`;
+        return `<label class="error tooltip">${(node as SymbolNode).name}<label class="tooltiptext">Unknown symbol</label></label>`;
       }
     }
-    if ((node as any).isAccessorNode) {
+    if ((node as AccessorNode).isAccessorNode) {
       const obj = this.mathNodeToHTML( (node as any).object );
-      return `${obj}.<label class="accessor">${node.name}</label>`;
+      return `${obj}.<label class="accessor">${(node as AccessorNode).name}</label>`;
     }
-    if ( (node as any).isFunctionNode) {
-      const LA: string[] = node.args!.map( n => this.mathNodeToHTML(n) );
+    if ( (node as FunctionNode).isFunctionNode) {
+      const LA: string[] = (node as FunctionNode).args!.map( n => this.mathNodeToHTML(n) );
       const strArgs = LA.join(', ');
-      return `<label class="function">${node.name}</label>( ${strArgs} )`;
+      return `<label class="function">${(node as FunctionNode).fn.name}</label>( ${strArgs} )`;
     }
-    if (node.isBlockNode) {
+    if ((node as BlockNode).isBlockNode) {
       const blocks = (node as any).blocks as MathNode[];
       return blocks.map( b => this.mathNodeToHTML((b as any).node) ).join(' ; ');
     }
 
     console.error('unknown node', node);
-    return node.name!;
+    return (node as SymbolNode).name;
   }
 
 }
@@ -891,16 +893,16 @@ export function mathNodeToArray(
   P: HumanReadableProgram, node: MathNode, acceptEvent: boolean, ...vocabulary: VariableDescription[]
 ): ParsedExprNode[] {
   const L: ParsedExprNode[] = [];
-  if (node.isConstantNode) {
+  if ((node as ConstantNode).isConstantNode) {
     let txt: string;
-    if (typeof node.value === 'string') {
-      txt = `"${node.value}" `;
+    if (typeof (node as ConstantNode).value === 'string') {
+      txt = `"${(node as ConstantNode).value}" `;
     } else {
-      txt = node.value !== undefined ? `${node.value.toString()} ` : 'undefined';
+      txt = (node as ConstantNode).value !== undefined ? `${(node as ConstantNode).value.toString()} ` : 'undefined';
     }
     L.push({
       label: txt,
-      type: typeof node.value,
+      type: typeof (node as ConstantNode).value,
       mathNode: node
     });
   }
@@ -914,7 +916,7 @@ export function mathNodeToArray(
       ...mathNodeToArray(P, falseExpr, acceptEvent, ...vocabulary),
     );
   }
-  if (node.isArrayNode) {
+  if ((node as ArrayNode).isArrayNode) {
     const items: MathNode[] = (node as any).items;
     const Litems: ParsedExprNode[][] = items.map( item => mathNodeToArray(P, item, acceptEvent, ...vocabulary) );
     L.push(
@@ -927,22 +929,22 @@ export function mathNodeToArray(
       {label: '] ', type: 'MathJS::OperatorArray unary', mathNode: node}
     );
   }
-  if (node.isOperatorNode) {
-    const LA: ParsedExprNode[][] = node.args!.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
+  if ((node as OperatorNode).isOperatorNode) {
+    const LA: ParsedExprNode[][] = (node as OperatorNode).args!.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
     if (LA.length === 1) {
-      L.push( {label: node.op!, type: 'MathJS::OperatorNode unary', mathNode: node}
+      L.push( {label: (node as OperatorNode).op!, type: 'MathJS::OperatorNode unary', mathNode: node}
         , ...LA[0] );
     } else {
-      L.push( ...LA.reduce( (acc, e) => [...acc, {label: `${node.op} `, type: 'MathJS::OperatorNode'}, ...e] ) );
+      L.push( ...LA.reduce( (acc, e) => [...acc, {label: `${(node as OperatorNode).op} `, type: 'MathJS::OperatorNode'}, ...e] ) );
     }
   }
-  if (node.isParenthesisNode) {
+  if ((node as ParenthesisNode).isParenthesisNode) {
     L.push( {label: '( ', type: 'parenthesis', mathNode: node}
       , ...mathNodeToArray( P, (node as any).content, acceptEvent, ...vocabulary )
       , {label: ') ', type: 'parenthesis', mathNode: node} );
   }
-  if (node.isSymbolNode) {
-    const name = node.name!;
+  if ((node as SymbolNode).isSymbolNode) {
+    const name = (node as SymbolNode).name;
     const used = isNameUsedInProg(name!, P);
     if (used) {
       L.push({
@@ -959,7 +961,7 @@ export function mathNodeToArray(
       }
     }
   }
-  if (node.isAccessorNode) {
+  if ((node as AccessorNode).isAccessorNode) {
     const Latt = (node as any).index.dimensions as MathNode[];
     const Lobj = mathNodeToArray( P, (node as any).object, acceptEvent, ...vocabulary );
     const dotNotation = (node as any).index.dotNotation as boolean;
@@ -969,14 +971,14 @@ export function mathNodeToArray(
       ...Latt.reduce( (acc, n) => [
         ...acc,
         {label: dotNotation ? '.' : '[', type: 'attribute', mathNode: node},
-        ...( n.value !== undefined ? [{label: n.value, type: 'attribute accessor'}] : mathNodeToArray(P, n, acceptEvent, ...vocabulary) ),
+        ...( (n as ConstantNode).value !== undefined ? [{label: (n as ConstantNode).value, type: 'attribute accessor'}] : mathNodeToArray(P, n, acceptEvent, ...vocabulary) ),
         {label: dotNotation ? '' : ']', type: 'attribute', mathNode: node},
       ], [] as ParsedExprNode[])
     );
     L[L.length - 1].label += ' ';
   }
-  if (node.isFunctionNode) {
-    const LA: ParsedExprNode[][] = node.args!.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
+  if ((node as FunctionNode).isFunctionNode) {
+    const LA: ParsedExprNode[][] = (node as FunctionNode).args!.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
     const F = mathNodeToArray(P, (node as any).fn, acceptEvent, ...vocabulary);
     F[0].type = 'function';
     L.push(
@@ -986,7 +988,7 @@ export function mathNodeToArray(
       {label: ') ', type: 'parenthesis', mathNode: node}
     );
   }
-  if (node.isBlockNode) {
+  if ((node as BlockNode).isBlockNode) {
     const blocks = (node as any).blocks as MathNode[];
     const LE = blocks.map( b => mathNodeToArray( P, (b as any).node, acceptEvent, ...vocabulary) );
     L.push( ...LE.reduce( (acc, e) => [...acc, {label: '; ', type: 'MathJS::BlockNode'}, ...e] ) );

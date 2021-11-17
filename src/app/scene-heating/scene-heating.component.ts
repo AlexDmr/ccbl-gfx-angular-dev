@@ -163,15 +163,16 @@ export class SceneHeatingComponent implements OnInit {
           {
             contextName: 'Chauffe Marcel !',
             state: '',
+            type: 'STATE',
             eventStart:  {eventSource: '', eventExpression: 'tempInside < temp_min'},
             eventFinish: {eventSource: '', eventExpression: 'tempInside > temp_max'},
             actions: [
               {channel: 'Heating'    , affectation: {value: `true`  }},
             ]
           },{
-
             contextName: 'eve home !',
             state: 'EveAtHome',
+            type: 'STATE',
             actions: [
 
             ],
@@ -182,6 +183,7 @@ export class SceneHeatingComponent implements OnInit {
 
                   contextName: 'jour levé !',
                   state: 'itIsDay',
+                  type: 'STATE',
                   actions: [
                     {channel: 'openWindows'    , affectation: {value: `true`  }},
                     {channel: 'temp_min'    , affectation: {value: `18`  }},
@@ -191,6 +193,7 @@ export class SceneHeatingComponent implements OnInit {
 
                   contextName: 'froid !',
                   state: 'tempOutside < 16',
+                  type: 'STATE',
                   actions: [
                     {channel: 'Avatar'    , affectation: {value: `"blue"`  }},
                   ]
@@ -199,14 +202,15 @@ export class SceneHeatingComponent implements OnInit {
 
                   contextName: 'bon !',
                   state: 'tempOutside > 15 & tempOutside<23',
+                  type: 'STATE',
                   actions: [
                     {channel: 'Avatar'    , affectation: {value: `"green"`  }},
                   ]
                 },
                 {
-
                   contextName: 'chaud !',
                   state: 'tempOutside > 22',
+                  type: 'STATE',
                   actions: [
                     {channel: 'Avatar'    , affectation: {value: `"red"`  }},
                   ]
@@ -269,6 +273,7 @@ export class SceneHeatingComponent implements OnInit {
           {
             contextName: 'Fenêtres fermé => faut voir',
             state: 'not openWindows',
+            type: 'STATE',
             actions: [
               {channel: 'deltaTime', affectation: {value: '1000'}}
             ],
@@ -277,6 +282,7 @@ export class SceneHeatingComponent implements OnInit {
                 {
                   contextName: 'chauffage',
                   state: 'Heating',
+                  type: 'STATE',
                   actions: [
                     {channel: 'deltaTemp', affectation: {value: '1'}}
                   ]
@@ -287,11 +293,13 @@ export class SceneHeatingComponent implements OnInit {
           {
             contextName: 'change température',
             state: 'deltaTemp != 0',
+            type: 'STATE',
             allen: {
               During: [
                 {
                   contextName: 'Ajustement de temperature',
                   state: 'true; false; deltaTime; waitEnd',
+                  type: 'STATE',
                   actionsOnEnd: [
                     {channel: 'tempInside', affectation: 'tempInside + deltaTemp'}
                   ],

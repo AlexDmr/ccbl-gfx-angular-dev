@@ -135,17 +135,20 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
           {
             contextName: 'Bob is at home',
             state: 'BobAtHome',
+            type: 'STATE',
             allen: {
               During: [
                 {
                   contextName: 'Alice at her home',
                   state: 'AliceAtHome',
+                  type: 'STATE',
                   actions: [{channel: 'Avatar', affectation: {value: '"orange"'}}],
                   allen: {
                     During: [
                       {
                         contextName: 'Alice is available if not phoning',
                         state: 'AliceAvailable',
+                        type: 'STATE',
                         actions: [{channel: 'Avatar', affectation: {value: '"lightgreen"'}}],
                       }
                     ]
@@ -154,6 +157,7 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
                 {
                   contextName: 'Alice at Bob home',
                   state: 'AliceAtBobHome',
+                  type: 'STATE',
                   actions: [{channel: 'Avatar', affectation: {value: '"yellow"'}}],
                 }
               ]

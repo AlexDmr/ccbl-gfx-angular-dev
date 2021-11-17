@@ -1,5 +1,5 @@
 import { HumanReadableStateContext, HumanReadableStateAction, HumanReadableProgram, VariableDescription, ContextOrProgram } from "ccbl-js/lib/ProgramObjectInterface";
-import { MathNode, MathJsStatic, create, all } from 'mathjs';
+import { MathNode, MathJsStatic, create, all, ConstantNode, ArrayNode, OperatorNode, ParenthesisNode, SymbolNode, AccessorNode, FunctionNode, BlockNode, ObjectNode } from 'mathjs';
 
 const mathjs = create(all, {}) as MathJsStatic;
 
@@ -115,41 +115,41 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
   }
 
   export function mathNodeToSMT(P: HumanReadableProgram, node: MathNode): string {
-    if (node.isConstantNode) {
-      return node.value.toString();
+    if ((node as ConstantNode).isConstantNode) {
+      return (node as ConstantNode).value.toString();
     }
     if ( (node as any).isConditionalNode ) {
       // const {condition, falseExpr, trueExpr}: {condition: MathNode, falseExpr: MathNode, trueExpr: MathNode} = node as any;
       return '';
     }
-    if (node.isArrayNode) {
+    if ((node as ArrayNode).isArrayNode) {
       // const items: MathNode[] = (node as any).items;
       return '';
     }
-    if (node.isOperatorNode) {
-      const LA: string[] = node.args!.map( n => mathNodeToSMT(P, n) );
-      const op = node.op === '==' ? '=' : node.op;
+    if ((node as OperatorNode).isOperatorNode) {
+      const LA: string[] = (node as OperatorNode).args!.map( n => mathNodeToSMT(P, n) );
+      const op = (node as OperatorNode).op === '==' ? '=' : (node as OperatorNode).op;
       if (LA.length === 1) {
           return `(${op} ${LA[0]})`;
       } else {
           return `(${op} ${LA.join(' ')})`;
       }
     }
-    if (node.isParenthesisNode) {
+    if ((node as ParenthesisNode).isParenthesisNode) {
         return mathNodeToSMT(P, (node as any).content);
     }
-    if (node.isSymbolNode) {
-        return node.name!;
+    if ((node as SymbolNode).isSymbolNode) {
+        return (node as SymbolNode).name;
     }
-    if (node.isAccessorNode) {
+    if ((node as AccessorNode).isAccessorNode) {
       const Latt = (node as any).index.dimensions as MathNode[];
       const dotNotation = (node as any).index.dotNotation as boolean;
       return Latt.reduce(
-        (acc, n) => `${acc}${dotNotation ? '.' : '['}${n.value !== undefined ? n.value : mathNodeToSMT(P, n)}${dotNotation ? '' : ']'}`,
+        (acc, n) => `${acc}${dotNotation ? '.' : '['}${(n as ConstantNode).value !== undefined ? (n as ConstantNode).value : mathNodeToSMT(P, n)}${dotNotation ? '' : ']'}`,
         mathNodeToSMT( P, (node as any).object )
       );
     }
-    if (node.isFunctionNode) {
+    if ((node as FunctionNode).isFunctionNode) {
       /*const LA: ParsedExprNode[][] = node.args.map( n => mathNodeToArray(P, n, acceptEvent, ...vocabulary) );
       const F = mathNodeToArray(P, (node as any).fn, acceptEvent, ...vocabulary);
       F[0].type = 'function';
@@ -160,7 +160,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
         {label: ') ', type: 'parenthesis', mathNode: node}
       );*/
     }
-    if (node.isBlockNode) {
+    if ((node as BlockNode).isBlockNode) {
       /*
       const blocks = (node as any).blocks as MathNode[];
       const LE = blocks.map( b => mathNodeToArray( P, (b as any).node, acceptEvent, ...vocabulary) );
@@ -186,8 +186,8 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
       ...(P.dependencies?.export?.emitters ?? []),
     ];
     return {
-      dependencies: node.filter( n => n.isSymbolNode )
-                        .map(n => n.name!)
+      dependencies: node.filter( n => (n as SymbolNode).isSymbolNode )
+                        .map(n => (n as SymbolNode).name)
                         .filter(n => !!LV.find(v => v.name === n) )
                         ,
       SMT: mathNodeToSMT( P, node )
@@ -195,7 +195,7 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
 }
 
   export function  computeDependencies(P: HumanReadableProgram): ActionsPath[] {
-    const LAP: ActionsPath[] = getStateAffectationPaths(P, {...P, contextName: 'root', id: 'root', state: 'true'});
+    const LAP: ActionsPath[] = getStateAffectationPaths(P, {...P, contextName: 'root', type: 'STATE', id: 'root', state: 'true'});
     LAP.forEach( AP => {
       // AP depend on its parent to be true
       // List all actionsPath dependencies for each variable dependency
@@ -254,17 +254,17 @@ export function getStateAffectationPaths(P: HumanReadableProgram, node: ContextO
           return `(declare-fun ${v.name} () Real)`;
         default:
             const node = mathjs.parse(v.type);
-            if (node.isObjectNode) {
+            if ((node as ObjectNode).isObjectNode) {
               let str = '';
               const properties: {[key: string]: MathNode} = (node as any).properties;
               // tslint:disable-next-line: forin
               for ( const p in properties ) {
                 const val = properties[p];
-                if (val.isSymbolNode) {
-                  str += getVarDeclaration({name: `${v.name}.${p}`, type: val.name!});
+                if ((val as SymbolNode).isSymbolNode) {
+                  str += getVarDeclaration({name: `${v.name}.${p}`, type: (val as SymbolNode).name});
                   str += `\n`;
                 } else {
-                  if (node.isObjectNode) {
+                  if ((node as ObjectNode).isObjectNode) {
                       str += getVarDeclaration({name: `${v.name}.${p}`, type: val.toString()});
                       str += `\n`;
                     }

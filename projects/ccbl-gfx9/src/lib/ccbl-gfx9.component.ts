@@ -50,10 +50,11 @@ export class CcblGfx9Component implements OnInit, OnChanges {
   getRootContext(): HumanReadableStateContext {
     return this.program ? {
       contextName: 'Program',
+      type: 'STATE',
       actions: this.program.actions,
       allen: this.program.allen,
       ccblContext: this.program.ccblContext
-    } : {contextName: '', actions: [], allen: {}};
+    } : {contextName: '', actions: [], allen: {}, type: 'STATE'};
   }
 
   getDuringContexts(): ContextOrProgram[] {

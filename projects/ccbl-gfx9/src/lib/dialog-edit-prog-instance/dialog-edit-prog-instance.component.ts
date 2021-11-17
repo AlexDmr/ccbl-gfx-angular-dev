@@ -10,6 +10,7 @@ import {
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import { mathjs } from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 import { BehaviorSubject } from 'rxjs';
+import { SymbolNode } from 'mathjs';
 
 const errorName = 'Program name should be reductible to a symbol';
 
@@ -197,7 +198,7 @@ export class DialogEditProgInstanceComponent implements OnInit {
     this.errorMessage = [];
     try {
       const N = mathjs.parse( this.progRef.as );
-      if (!N.isSymbolNode) {
+      if (!(N as SymbolNode).isSymbolNode) {
         this.errorMessage.push(errorName);
       }
     } catch(err) {

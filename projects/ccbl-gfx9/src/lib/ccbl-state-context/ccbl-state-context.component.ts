@@ -226,7 +226,7 @@ export class CcblStateContextComponent implements OnInit {
 
   updateLabel(label: string) {
     this.programVersionner!.updateContext(this.pCurrentContext!, {
-      ...this.pCurrentContext,
+      ...this.pCurrentContext!,
       contextName: label
     });
   }
@@ -351,7 +351,7 @@ export class CcblStateContextComponent implements OnInit {
       lastSubContext = LC[LC.length - 1];
     }
     const newContext = await CcblStateContextComponent.staticEditCondition(this.dialog, {
-      context: {contextName: 'C', state: ''},
+      context: {contextName: 'C', state: '', type: 'STATE'},
       progV: this.progVersionner!,
       from: undefined as any
     });
@@ -372,12 +372,14 @@ export class CcblStateContextComponent implements OnInit {
       context = {
           contextName: 'new event context',
           eventSource: events[0].name,
+          type: 'EVENT',
           actions: []
         };
     } else {
       context = {
         contextName: 'new event context',
         eventSource: '',
+        type: "EVENT",
         eventExpression: 'true',
         actions: []
       };

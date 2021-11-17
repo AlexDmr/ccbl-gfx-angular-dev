@@ -13,7 +13,7 @@ import {ParsedExprNode} from '../dataParsedExpr';
 import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MatDialog} from '@angular/material/dialog';
 import {DataEditExpression, DialogEditExpressionComponent} from '../dialog-edit-expression/dialog-edit-expression.component';
-import {MathNode} from 'mathjs';
+import {BlockNode, MathNode} from 'mathjs';
 import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 
 @Component({
@@ -58,7 +58,7 @@ export class CcblExpressionComponent implements OnInit {
   }
 
   get isInterpolation(): boolean {
-    return this.nodeRoot?.isBlockNode ?? false;
+    return (this.nodeRoot as BlockNode)?.isBlockNode ?? false;
   }
 
   get V0(): string {

@@ -46,7 +46,7 @@ export class SmtService {
   }
 
   async developConsequences(AP: ActionsPath, conf: SMTconfig, withAP = false): Promise<ActionsPath> {
-    const L0: ActionsPath[] = EnumerateContextsByPriorityInv({...conf.P, id: 'root', contextName: 'root'})
+    const L0: ActionsPath[] = EnumerateContextsByPriorityInv({...conf.P, id: 'root', type: 'STATE', contextName: 'root'})
                              .map(c => conf.LAP.find(ap => ap.context.id === c.id) )
                              .filter( c => !!c).map(c => c as ActionsPath);
     const lap = L0.filter(ap => ap !== AP && !AP.ancestors.find(a => a.context === ap.context) );

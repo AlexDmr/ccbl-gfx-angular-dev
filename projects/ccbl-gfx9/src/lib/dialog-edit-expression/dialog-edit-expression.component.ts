@@ -2,7 +2,7 @@ import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, O
 import {convertExpressionToNodes} from '../ccbl-gfx9.service';
 import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MathJsStatic, MathNode, create, all} from 'mathjs';
+import {MathJsStatic, MathNode, create, all, BlockNode} from 'mathjs';
 import {BehaviorSubject} from 'rxjs';
 
 const mathjs = create(all, {}) as MathJsStatic;
@@ -77,7 +77,7 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
   }
 
   get isTransition(): boolean {
-    return this.canExpressTransition && !!this.mathNodeRoot?.isBlockNode; // ) ? this.mathNodeRoot.isBlockNode : false;
+    return this.canExpressTransition && !!(this.mathNodeRoot as BlockNode)?.isBlockNode; // ) ? this.mathNodeRoot.isBlockNode : false;
   }
 
   set isTransition(b: boolean) {
@@ -101,7 +101,7 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
     }
     try {
       mathjs.parse(s);
-    } catch(err) {
+    } catch(err: any) {
       this.errorIndicationSubj.next( err.toString() );
       return;
     }
@@ -122,7 +122,7 @@ export class DialogEditExpressionComponent implements OnInit, AfterViewInit {
           this.errorIndicationSubj.next(undefined );
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       this.errorIndicationSubj.next( err.toString() );
       this.pNewExpr = s;
       const res = /\(char ([0-9]*)\)$/.exec(this.errorIndicationSubj.getValue() ?? '');

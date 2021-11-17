@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {EventTrigger, HumanReadableEventContext, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
-import {MathNode} from 'mathjs';
+import {ConstantNode, MathNode, OperatorNode, ParenthesisNode} from 'mathjs';
 import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
 
 export interface DataDialogTrigger {
@@ -53,9 +53,9 @@ export class DialogTriggerComponent implements OnInit {
   setExpression(expr: string) {
     console.log('setExpression', expr);
     const node: MathNode = mathjs.parse( expr );
-    if (node.op === '==' && node.args![0].isParenthesisNode && typeof node.args![1].value === 'boolean') {
-      this.expression = node.args![0].toString();
-      this.setExpectedValue( node.args![1].value );
+    if ((node as OperatorNode).op === '==' && ((node as OperatorNode).args[0] as ParenthesisNode).isParenthesisNode && typeof ((node as OperatorNode).args[1] as ConstantNode).value === 'boolean') {
+      this.expression = (node as OperatorNode).args[0].toString();
+      this.setExpectedValue( ((node as OperatorNode).args[1] as ConstantNode).value );
     } else {
       this.expression = expr;
       this.setExpectedValue( undefined );

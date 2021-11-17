@@ -557,6 +557,7 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName:'someOne In Kitchen',
             state:'someOneInKitchen',
+            type: 'STATE',
             actions:[
               {channel:'OvenState', affectation: {value: 'true'}},
             ]
@@ -565,6 +566,7 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName:'coffee ready',
             state:'CoffeeMachineState=="READY"',
+            type: 'STATE',
             actions:[
               {channel:'Hallway1LampState', affectation: {value: 'true'}},
               {channel:'Hallway2LampState', affectation: {value: 'true'}},
@@ -576,6 +578,7 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName:'storm or rain',
             state:'weather=="Pluie" or weather=="Tempete"',
+            type: 'STATE',
             actions:[
               {channel:'openWindows', affectation: {value: 'false'}},
             ]
@@ -584,6 +587,7 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName:'switch kitchen ok',
             state:'SwitchKitchen',
+            type: 'STATE',
             actions:[
               {channel:'KitchenLampState', affectation: {value: 'true'}},
             ]
@@ -592,6 +596,7 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName:'its night',
             state:'not itIsDay',
+            type: 'STATE',
             actions: [{channel: 'TvPlay', affectation: {value: 'true'}},
               {channel:'openWindows', affectation: {value: 'false'}},
               {channel: 'TvVolume', affectation: {value: '0.2'}},
@@ -723,6 +728,7 @@ export class SceneHomeComponent implements OnInit {
           {
             contextName: 'Some one In room',
             state: 'InRoom',
+            type: 'STATE',
             actions: [{channel: 'lamp', affectation: {value: 'true'}}]
           }
         ]
