@@ -44,9 +44,9 @@ export class CcblStateContextComponent implements OnInit {
   get context(): HumanReadableStateContext {return this.pContext; }
   @Input() set context(c: HumanReadableStateContext) {
     // console.log('Contexte', c);
-    if (this.pContext && this.pContext.ccblContext && this.pContext.ccblContext.onActiveUpdated) {
-      this.pContext.ccblContext.offActiveUpdated( this.cbCCBL );
-    }
+    // if (this.pContext && this.pContext.ccblContext && this.pContext.ccblContext.onActiveUpdated) {
+      this.pContext?.ccblContext?.offActiveUpdated( this.cbCCBL );
+    // }
     this.pContext = c;
     if (c && c.ccblContext && c.ccblContext.onActiveUpdated) {
       // console.log(`On s'abonne !`);

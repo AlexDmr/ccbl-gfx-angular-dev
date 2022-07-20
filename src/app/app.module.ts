@@ -11,7 +11,7 @@ import {SensorComponent} from './sensor/sensor.component';
 import {SensorScalarComponent} from './sensor-scalar/sensor-scalar.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatIconModule} from '@angular/material/icon';
@@ -37,8 +37,10 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {DatePipe} from "@angular/common";
 import { ClockDisplayComponent } from './clock-display/clock-display.component';
 import { SceneHomeComponent } from './scene-house/scene-house.component';
-import { TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.component';
+import { DialogAppendVar, TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { DialogAppendVariableComponent } from './test-editor-verif/dialog-append-variable/dialog-append-variable.component';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 @NgModule({
     declarations: [
@@ -59,6 +61,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         ClockDisplayComponent,
         SceneHomeComponent,
         TestEditorVerifComponent,
+        DialogAppendVariableComponent,
+        DialogAppendVar
     ],
   imports: [
     BrowserModule,
@@ -69,6 +73,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatFormFieldModule,
     MatSelectModule,
     FormsModule,
+    ReactiveFormsModule,
     MatToolbarModule,
     MatCheckboxModule,
     MatIconModule,
@@ -81,6 +86,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatStepperModule,
     MatRadioModule,
     MatTabsModule,
+    MatAutocompleteModule,
     NgbModule
   ],
   providers: [DatePipe],
