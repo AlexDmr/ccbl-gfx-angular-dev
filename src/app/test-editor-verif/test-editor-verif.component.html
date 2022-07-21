@@ -2,8 +2,18 @@
 <button (click)="validate()" mat-raised-button color="primary">Load program</button>
 
 <hr/>
-<input value="http://localhost:8080" #urlOpenHab/>
-<button (click)="initOpenHab(urlOpenHab.value)" mat-raised-button color="primary">Connect to openHab</button>
+<form class="connect">
+  <mat-form-field>
+    <mat-label>openHab adress</mat-label>
+    <input #urlOpenHab type="text" matInput [matAutocomplete]="autoOpenHab" value="http://localhost:8080" />
+    <mat-autocomplete #autoOpenHab="matAutocomplete">
+      <mat-option value="http://localhost:8080">http://localhost:8080</mat-option>
+      <mat-option value="http://adomus-openhab.u-ga.fr:8080">http://adomus-openhab.u-ga.fr:8080</mat-option>
+      <mat-option value="https://adomus-openhab.u-ga.fr:8443">https://adomus-openhab.u-ga.fr:8443</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <button (click)="initOpenHab(urlOpenHab.value)" mat-raised-button color="primary">Connect</button>
+</form>
 
 <hr/>
 <h3>Define environment</h3>
@@ -15,7 +25,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let v of bsVar | async">
-      <td>{{v.name}}</td>
+      <td>{{v.label}}</td>
       <td>{{v.type}}</td>
       <td>{{v.value.get( v.value.init )}}</td>
     </tr>

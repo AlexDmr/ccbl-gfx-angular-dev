@@ -7,4 +7,12 @@
       border: solid black 1px;
     }
   }
+
+  form.connect {
+    display: flex;
+
+    mat-form-field {
+      flex: 1 1;
+    }
+  }
 }

@@ -25,7 +25,7 @@ export class OpenhabService {
   readonly obsUpdatedItem: Observable<Item>;
 
   private url = "http://localhost:8080";
-  private token = "";
+  private token = "oh.ccbl.RZA8Kuukq8Axfs2fcRckLqUyNY0olsX4WvbPkleMJtE9xiOgsY7VuXc4IYhS8G1M4vlLHSqPnBOgIKz5hPGg";
   private sse?: EventSource;
 
   constructor(private zone: NgZone) {
@@ -33,9 +33,10 @@ export class OpenhabService {
     this.obsUpdatedItem = this.bsUpdatedItem.pipe( runInZone(zone) )
   }
 
-  async initConnection(url: string, token: string = ""): Promise<void> {
+  async initConnection(url: string, token?: string): Promise<void> {
     console.log( "Connecting openHab at", url);
     this.url = url;
+    this.token = token ?? this.token;
 
     // Get items
     const MyItems: Item[] = JSON.parse( await (await fetch(`${this.url}/rest/items`)).text() );
@@ -47,7 +48,7 @@ export class OpenhabService {
     this.sse.onerror = err => {console.error("SSE:", err)}
     this.sse.onopen  = evt => console.log("SSE onopen", evt)
     this.sse.onmessage = evt => {
-      console.log(evt);
+      // console.log(evt);
       this.evtMessageHandeling( JSON.parse(evt.data) );
     }
 
@@ -59,7 +60,7 @@ export class OpenhabService {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/plain',
-                    Authorization: this.token
+                    // Authorization: `Bearer ${this.token}`
                 },
                 body: state
             }
@@ -72,7 +73,7 @@ export class OpenhabService {
     console.log("  - payload", typeof msg.payload, msg.payload);
     console.log("  - type", msg.type);*/
     const evt = toItemEvent(msg);
-    console.log(evt);
+    // console.log(evt);
     if (evt) {
       switch (evt.type) {
         case 'ItemCommandEvent':
