@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ProgVersionner } from 'projects/ccbl-gfx9/src/public-api';
+import { ProgVersionner, updateDisplay } from 'projects/ccbl-gfx9/src/public-api';
 import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
 import { ActionsPath } from '../../../projects/ccbl-gfx9/src/lib/smt.definitions';
-import { BehaviorSubject, combineLatest, tap, distinctUntilChanged, filter, firstValueFrom, map, Observable, share, startWith } from 'rxjs';
+import { BehaviorSubject, combineLatest, delay, firstValueFrom, map, Observable, share, startWith } from 'rxjs';
 import { SmtService } from 'projects/ccbl-gfx9/src/lib/smt.service';
 import { OpenhabService } from './openhab.service';
 import { Item } from './openHabItem';
@@ -10,15 +10,28 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
 
 interface CCBL_var<T> {
-  label: string;
-  id: string;
-  type: string;
-  value: {
-    init: T;
-    get: (v: T) => string;
-    set: (s: string) => T;
-  };
-  bs: BehaviorSubject<T>;
+  readonly label: string;
+  readonly id: string;
+  readonly type: string;
+  readonly next: (v: T) => void;
+  readonly obsCCBL: Observable<T>;
+  readonly obsEnv: Observable<T>;
+}
+
+function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update}: {initialValue: T, label: string, id: string, type: string, obsEnv: Observable<T>, update: (v: T) => void}): CCBL_var<T> {
+  const bs = new BehaviorSubject<T>( initialValue );
+  const ctrl = combineLatest([obsEnv, bs.pipe(delay(1000))]);
+  ctrl.subscribe( ([env, ccbl]) => {
+    if (env !== ccbl) {
+      update(ccbl);
+    }
+  });
+  return {
+    label, id, type,
+    next: v => bs.next(v),
+    obsCCBL: bs.asObservable(),
+    obsEnv
+  }
 }
 
 interface CONVERTER<T> {
@@ -52,8 +65,6 @@ export class TestEditorVerifComponent implements OnInit {
   LAP = new BehaviorSubject<ActionsPath[]>([]);
   bsVar = new BehaviorSubject<CCBL_var<unknown>[]>( [] );
 
-
-
   constructor(private smtService: SmtService, private ohs: OpenhabService, private dialog: MatDialog) {
     const json = localStorage.getItem('TestEditorVerif');
     const P: HumanReadableProgram = json ? JSON.parse(json) : {};
@@ -77,27 +88,36 @@ export class TestEditorVerifComponent implements OnInit {
     this.ohs.initConnection(url);
   }
 
-  async appendVar() {
-    const dialog = this.dialog.open<DialogAppendVar, never, CCBL_var<unknown> | undefined>( DialogAppendVar );
-    const res = await firstValueFrom( dialog.afterClosed() );
-    console.log( res );
+  async appendVar(res?:  Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next">) {
+    if (res === undefined) {
+      const dialog = this.dialog.open<DialogAppendVar, never, CCBL_var<unknown> | undefined>( DialogAppendVar );
+      res = await firstValueFrom( dialog.afterClosed() );
+    }
+    console.log( "res =", res );
     if (res) {
-      // Get ref from openHab item
-      const openHabItemObs = this.ohs.obsItems.pipe(
-        map( L => L.find( d => res.id === d.name ) ),
-        filter( it => !!it ),
-        map( it => res.value.set( it!.state ) ),
-        // tap( v => console.log("up", v) ),
-        distinctUntilChanged(),
-        share()
-      );
-
-      openHabItemObs.subscribe( v => console.log(`Item value is now ${v}`) )
+      const obsEnv = this.ohs.getObsItems( res.id );
+      if (obsEnv) {
+        let ccblVar: CCBL_var<any> | undefined = undefined;
+        switch (res?.type) {
+          case "Dimmer":
+            ccblVar = getCCBL_var<number>({
+              ...res,
+              initialValue: 0,
+              update: v => this.ohs.setItem( res!.id, converterDimmer.get(v) ),
+              obsEnv: obsEnv.pipe( map( item => converterDimmer.set(item.state) ) )
+            });
+            break;
+        }
+        if (ccblVar) {
+          this.bsVar.next( [...this.bsVar.value, ccblVar] );
+        }
+      } else {
+        console.error("No observable for item", res);
+      }
       
-      // Update the local value ?
-      this.ohs.setItem(res.id, res.value.get(res.value.init) );
     }
   }
+
 }
 
 
@@ -127,14 +147,6 @@ export class TestEditorVerifComponent implements OnInit {
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <mat-form-field>
-        <mat-label>Type</mat-label>
-        <mat-select [formControl]="typeControl">
-          <mat-option value="boolean">Boolean</mat-option>
-          <mat-option value="number" >Number </mat-option>
-          <mat-option value="string" >String </mat-option>
-        </mat-select>
-      </mat-form-field>
     </form>
     <hr/>
     <button mat-raised-button color="warn" (click)="cancel()">Cancel</button>
@@ -158,7 +170,7 @@ export class DialogAppendVar implements OnInit {
   filteredOptions: Observable<Item[]>;
   allTypes: Observable<string[]>;
 
-  constructor( private ohs: OpenhabService, public dialogRef: MatDialogRef<DialogAppendVar, CCBL_var<any>>,
+  constructor( private ohs: OpenhabService, public dialogRef: MatDialogRef<DialogAppendVar, Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next">>,
     /*@Inject(MAT_DIALOG_DATA) public data: DialogData*/ ) {
       this.filteredOptions = combineLatest( [
         this.itemNameControl.valueChanges.pipe(startWith('')),
@@ -177,43 +189,22 @@ export class DialogAppendVar implements OnInit {
   async ok(): Promise<void> {
     const items: Item[] = await firstValueFrom(this.ohs.obsItems);
     const item = items.find( it => it.name === this.itemNameControl.value );
-    let ccblVar: undefined | CCBL_var<unknown>;
     switch(item?.type) {
       case "String":
       case "Color":
       case "Player":
-        break;
       case "Switch":
-        const ccblSwitch: CCBL_var<boolean> = {
-          label: item.label,
-          id: item.name,
-          type: item.type,
-          value: {
-            init: true,
-            ...converterSwitch
-          },
-          bs: new BehaviorSubject(true)
-        }
-        this.dialogRef.close( ccblSwitch );
-        return;
-      case "Dimmer": 
-        const ccblDimmer: CCBL_var<number> = {
-          label: item.label,
-          id: item.name,
-          type: item.type,
-          value: {
-            init: 100,
-            ...converterDimmer
-          },
-          bs: new BehaviorSubject(100)
-        }
-        this.dialogRef.close( ccblDimmer );
-        return;
+      case "Dimmer":
       case "Rollershutter":
       case "Number":
       case "Number:Dimensionless":
       case "Number:Temperature":
-        break;
+        this.dialogRef.close( {
+          label: item.label,
+          id: item.name,
+          type: item.type
+        } );
+        return;
     }
     throw "Unknown item or type";
   }

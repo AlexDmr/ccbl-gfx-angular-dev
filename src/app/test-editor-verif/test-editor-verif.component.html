@@ -21,13 +21,15 @@
   <thead>
     <th>Name</th>
     <th>Type</th>
-    <th>Initial value</th>
+    <th>CCBL</th>
+    <th>Env</th>
   </thead>
   <tbody>
     <tr *ngFor="let v of bsVar | async">
       <td>{{v.label}}</td>
       <td>{{v.type}}</td>
-      <td>{{v.value.get( v.value.init )}}</td>
+      <td>{{v.obsCCBL | async}}</td>
+      <td>{{v.obsEnv  | async}}</td>
     </tr>
   <tr>
     <td colspan="3">
