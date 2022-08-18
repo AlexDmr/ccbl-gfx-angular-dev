@@ -9,7 +9,7 @@ import { Item } from './openHabItem';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
 
-interface CCBL_var<T> {
+interface CCBL_var<T> extends CONVERTER<T> {
   readonly label: string;
   readonly id: string;
   readonly type: string;
@@ -18,7 +18,7 @@ interface CCBL_var<T> {
   readonly obsEnv: Observable<T>;
 }
 
-function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update}: {initialValue: T, label: string, id: string, type: string, obsEnv: Observable<T>, update: (v: T) => void}): CCBL_var<T> {
+function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update, conv}: {initialValue: T, label: string, id: string, type: string, obsEnv: Observable<T>, update: (v: T) => void, conv: CONVERTER<T>}): CCBL_var<T> {
   const bs = new BehaviorSubject<T>( initialValue );
   const ctrl = combineLatest([obsEnv, bs.pipe(delay(1000))]);
   ctrl.subscribe( ([env, ccbl]) => {
@@ -28,6 +28,7 @@ function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update}: {initia
   });
   return {
     label, id, type,
+    ...conv,
     next: v => bs.next(v),
     obsCCBL: bs.asObservable(),
     obsEnv
@@ -88,7 +89,7 @@ export class TestEditorVerifComponent implements OnInit {
     this.ohs.initConnection(url);
   }
 
-  async appendVar(res?:  Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next">) {
+  async appendVar(res?:  Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next" | "get" | "set">) {
     if (res === undefined) {
       const dialog = this.dialog.open<DialogAppendVar, never, CCBL_var<unknown> | undefined>( DialogAppendVar );
       res = await firstValueFrom( dialog.afterClosed() );
@@ -103,6 +104,7 @@ export class TestEditorVerifComponent implements OnInit {
             ccblVar = getCCBL_var<number>({
               ...res,
               initialValue: 0,
+              conv: converterDimmer,
               update: v => this.ohs.setItem( res!.id, converterDimmer.get(v) ),
               obsEnv: obsEnv.pipe( map( item => converterDimmer.set(item.state) ) )
             });
@@ -170,7 +172,7 @@ export class DialogAppendVar implements OnInit {
   filteredOptions: Observable<Item[]>;
   allTypes: Observable<string[]>;
 
-  constructor( private ohs: OpenhabService, public dialogRef: MatDialogRef<DialogAppendVar, Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next">>,
+  constructor( private ohs: OpenhabService, public dialogRef: MatDialogRef<DialogAppendVar, Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next" | "get" | "set">>,
     /*@Inject(MAT_DIALOG_DATA) public data: DialogData*/ ) {
       this.filteredOptions = combineLatest( [
         this.itemNameControl.valueChanges.pipe(startWith('')),
