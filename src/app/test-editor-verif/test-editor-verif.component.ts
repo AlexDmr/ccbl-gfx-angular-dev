@@ -2,12 +2,13 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ProgVersionner, updateDisplay } from 'projects/ccbl-gfx9/src/public-api';
 import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
 import { ActionsPath } from '../../../projects/ccbl-gfx9/src/lib/smt.definitions';
-import { BehaviorSubject, combineLatest, delay, firstValueFrom, map, Observable, share, startWith } from 'rxjs';
+import { BehaviorSubject, combineLatest, delay, distinctUntilChanged, firstValueFrom, map, Observable, of, share, startWith, switchMap } from 'rxjs';
 import { SmtService } from 'projects/ccbl-gfx9/src/lib/smt.service';
 import { OpenhabService } from './openhab.service';
 import { Item } from './openHabItem';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
+import { CcblProgService } from '../ccbl-prog.service';
 
 interface CCBL_var<T> extends CONVERTER<T> {
   readonly label: string;
@@ -20,8 +21,15 @@ interface CCBL_var<T> extends CONVERTER<T> {
 
 function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update, conv}: {initialValue: T, label: string, id: string, type: string, obsEnv: Observable<T>, update: (v: T) => void, conv: CONVERTER<T>}): CCBL_var<T> {
   const bs = new BehaviorSubject<T>( initialValue );
-  const ctrl = combineLatest([obsEnv, bs.pipe(delay(1000))]);
-  ctrl.subscribe( ([env, ccbl]) => {
+  const ctrl = combineLatest([obsEnv, bs.pipe(
+    distinctUntilChanged(),
+    switchMap( ccbl => {
+      return of(ccbl).pipe( delay(1000) )
+    })
+  ) ]);
+  obsEnv.subscribe( env => console.log("ENV", label, "measured to", env) );
+  bs.subscribe( ccbl => update(ccbl) );                       // Send update as soon as possible
+  ctrl.subscribe( ([env, ccbl]) => {                          // Check after N ms wether env value is the same than ccbl one.
     if (env !== ccbl) {
       update(ccbl);
     }
@@ -62,23 +70,35 @@ const converterDimmer: CONVERTER<number> = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TestEditorVerifComponent implements OnInit {
-  progV: ProgVersionner;
   LAP = new BehaviorSubject<ActionsPath[]>([]);
   bsVar = new BehaviorSubject<CCBL_var<unknown>[]>( [] );
 
-  constructor(private smtService: SmtService, private ohs: OpenhabService, private dialog: MatDialog) {
+  constructor(private progServ: CcblProgService, private smtService: SmtService, private ohs: OpenhabService, private dialog: MatDialog) {
     const json = localStorage.getItem('TestEditorVerif');
     const P: HumanReadableProgram = json ? JSON.parse(json) : {};
-    this.progV = new ProgVersionner( P );
-    this.progV.asObservable().subscribe( nP => localStorage.setItem('TestEditorVerif', JSON.stringify(nP)) );
+    this.load(P);
+    this.progServ.obsProgram.subscribe( nP => localStorage.setItem('TestEditorVerif', JSON.stringify(nP)) );
   }
 
   ngOnInit(): void {
   }
 
+  get progV() {return this.progServ.progV}
+
+  async load(prog?: HumanReadableProgram): Promise<void> {
+    if (prog === undefined) {
+      const dialog = this.dialog.open<DialogLoadProg, never, HumanReadableProgram | undefined>( DialogLoadProg );
+      prog = await firstValueFrom( dialog.afterClosed() );
+    }
+    if (prog) {
+      this.progServ.loadProgram( prog );
+      // XXX Plug with existing environment channels, emitter, etc.
+    }
+  }
+
   async validate() {
-    const conf = await this.smtService.evalProgram( this.progV.getCurrent() );
-    this.LAP.next( conf.LAP );
+    /*const conf = await this.smtService.evalProgram( this.progV.getCurrent() );
+    this.LAP.next( conf.LAP );*/
   }
 
   get obsItems(): Observable<Item[]> {
@@ -222,4 +242,77 @@ export class DialogAppendVar implements OnInit {
                          );
   }
 
+}
+
+
+
+
+
+/**
+ * Composant interne pour dialogue chargement de programme
+ */
+ @Component({
+  selector: 'dialog-load-prog',
+  template: `
+    <mat-toolbar color="primary">
+      Load a CCBL program
+    </mat-toolbar>
+    <form>
+      <mat-form-field>
+        <mat-label>Program (JSON format)</mat-label>
+        <textarea [formControl]="progControl" matInput placeholder="Program (JSON format)"></textarea>
+      </mat-form-field>
+    </form>
+    <hr/>
+    <button mat-raised-button color="warn" (click)="cancel()">Cancel</button>
+    &nbsp;
+    <button mat-raised-button color="primary" (click)="ok()">Append</button>
+  `,
+  styles: [`
+    form {
+      display: flex;
+      flex-flow: column;
+    }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class DialogLoadProg implements OnInit {
+  progControl = new FormControl('', {nonNullable: true});
+
+  constructor( public dialogRef: MatDialogRef<DialogLoadProg, HumanReadableProgram>) {
+  }
+  
+  ngOnInit(): void {
+    this.progControl.setValue( JSON.stringify(pgTest) );
+  }
+  
+  async ok(): Promise<void> {
+    this.dialogRef.close( JSON.parse(this.progControl.value) )
+  }
+
+  cancel(): void {
+    this.dialogRef.close();
+  }
+
+}
+
+
+const pgTest: HumanReadableProgram = {
+  name: "LivingRoom lights",
+  description: "Just a test program for Domus",
+  dependencies: {
+    import: {
+      channels: [
+        {name: "dLivingroomLight1", type: "Dimmer [0-100]"},
+        {name: "dLivingroomLight2", type: "Dimmer [0-100]"},
+      ],
+      emitters: [
+        // Voir un capteur de porte ou autre ?
+      ]
+    }
+  },
+  actions: [
+    {channel: "dLivingroomLight1", affectation: {value: "0"} },
+    {channel: "dLivingroomLight2", affectation: {value: "0"} },
+  ]
 }

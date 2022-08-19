@@ -1,5 +1,5 @@
 <button (click)="validate()" mat-raised-button color="primary">Validation</button>
-<button (click)="validate()" mat-raised-button color="primary">Load program</button>
+<button (click)="load()" mat-raised-button color="primary">Load program</button>
 
 <hr/>
 <form class="connect">
@@ -16,6 +16,27 @@
 </form>
 
 <hr/>
+<h2>CCBL Program</h2>
+<section>
+  <button mat-raised-button color="primary">Start</button>
+</section>
+<hr/>
+<lib-ccbl-program [program-versionner]="progV"></lib-ccbl-program>
+
+<ul>
+  <li *ngFor="let AP of LAP | async" [ngClass]="AP.computationState">
+    {{AP.context.id}} {{AP.context.state}} {{AP.computationState}}
+    <ol>
+      <li *ngFor="let conf of AP.canBeTrue">
+        <ul *ngFor="let ap of conf">
+          {{ap.context.id}} {{ap.context.state}}
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<hr/>
 <h3>Define environment</h3>
 <table>
   <thead>
@@ -29,10 +50,9 @@
       <td>{{v.label}}</td>
       <td>{{v.type}}</td>
       <td>
-        <input mat-input 
-                [ngModel] = "v.get(v.obsCCBL | async)"
-                (ngModelChange) = "v.next( v.set( $event ) )"
-                />
+        <form (ngSubmit)="v.next( v.set( val.value ) )">
+          <input #val name="val" mat-input [ngModel] = "v.get(v.obsCCBL | async)" />
+        </form>
       </td>
       <td>{{v.obsEnv  | async}}</td>
     </tr>
@@ -56,18 +76,3 @@
   </li>
 </ul>
 
-<hr/>
-<lib-ccbl-program [program-versionner]="progV"></lib-ccbl-program>
-
-<ul>
-  <li *ngFor="let AP of LAP | async" [ngClass]="AP.computationState">
-    {{AP.context.id}} {{AP.context.state}} {{AP.computationState}}
-    <ol>
-      <li *ngFor="let conf of AP.canBeTrue">
-        <ul *ngFor="let ap of conf">
-          {{ap.context.id}} {{ap.context.state}}
-        </ul>
-      </li>
-    </ol>
-  </li>
-</ul>

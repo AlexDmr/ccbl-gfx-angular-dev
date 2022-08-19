@@ -154,9 +154,9 @@ export class SceneService {
     if (this.ccblProg) {
       if (this.env) {
         const P = this.ccblProg.toHumanReadableProgram();
-        const LEm: VariableDescription[] = P.dependencies?.import?.emitters || [];
-        const LEv: VariableDescription[] = P.dependencies?.import?.events   || [];
-        const LC:  VariableDescription[] = P.dependencies?.import?.channels || [];
+        const LEm: VariableDescription[] = P.dependencies?.import?.emitters ?? [];
+        const LEv: VariableDescription[] = P.dependencies?.import?.events   ?? [];
+        const LC:  VariableDescription[] = P.dependencies?.import?.channels ?? [];
         LEm.forEach( e => this.env!.unregister_CCBLEmitterValue(e.name) );
         LEv.forEach( e => this.env!.unregisterCCBLEvent        (e.name) );
         LC .forEach( c => this.env!.unregister_Channel         (c.name) );

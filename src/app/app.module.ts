@@ -37,7 +37,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {DatePipe} from "@angular/common";
 import { ClockDisplayComponent } from './clock-display/clock-display.component';
 import { SceneHomeComponent } from './scene-house/scene-house.component';
-import { DialogAppendVar, TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.component';
+import { DialogAppendVar, DialogLoadProg, TestEditorVerifComponent } from './test-editor-verif/test-editor-verif.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DialogAppendVariableComponent } from './test-editor-verif/dialog-append-variable/dialog-append-variable.component';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
@@ -62,7 +62,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
         SceneHomeComponent,
         TestEditorVerifComponent,
         DialogAppendVariableComponent,
-        DialogAppendVar
+        DialogAppendVar, DialogLoadProg,
     ],
   imports: [
     BrowserModule,

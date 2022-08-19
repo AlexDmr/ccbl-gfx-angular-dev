@@ -93,7 +93,7 @@ export class OpenhabService {
     console.log("  - payload", typeof msg.payload, msg.payload);
     console.log("  - type", msg.type);*/
     const evt = toItemEvent(msg);
-    // console.log(evt);
+    console.log(evt);
     if (evt) {
       switch (evt.type) {
         case 'ItemCommandEvent':
@@ -111,6 +111,10 @@ export class OpenhabService {
             localItemData.next( newItem );
             this.bsUpdatedItem.next(newItem);
           }
+          break;
+        case "ItemStatePredictedEvent":
+        case "predictedValue": // "ItemStatePredictedEvent"
+          // On en fait quoi ?
           break;
         default:
           console.error("Unknown openHab event", evt);

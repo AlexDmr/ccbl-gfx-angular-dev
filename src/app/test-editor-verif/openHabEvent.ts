@@ -4,7 +4,8 @@ export type openHabItemEventType    = 'ItemCommandEvent'
                                     | 'ItemAddedEvent'
                                     | 'ItemRemovedEvent'
                                     | 'ItemUpdatedEvent'
-                                    | 'GroupItemStateChangedEvent';
+                                    | 'GroupItemStateChangedEvent'
+                                    | 'ItemStatePredictedEvent';
 
 export interface eventPayload {
     type : string;
@@ -27,7 +28,7 @@ export interface PayloadCSS {
 export type openHabItemEvent = {
     id: string;
     topic: string;
-} & ( { type: 'ItemCommandEvent' | 'ItemStateEvent' | 'ItemStateChangedEvent' | 'GroupItemStateChangedEvent';
+} & ( { type: 'ItemStatePredictedEvent' | 'predictedValue' | 'ItemCommandEvent' | 'ItemStateEvent' | 'ItemStateChangedEvent' | 'GroupItemStateChangedEvent';
         payload: PayloadCSS
       }
 );
@@ -66,6 +67,9 @@ export function toItemEvent({topic, payload, type}: openHabEventRAW): openHabIte
             case 'ItemCommandEvent':
               // On laisse couler...
             break;
+            case "ItemStatePredictedEvent":
+              // On laisse couler...
+              break;
             default:
                 console.error('Unknown event type', {topic, payload, type});
         }
