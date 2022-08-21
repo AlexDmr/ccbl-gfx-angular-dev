@@ -18,7 +18,12 @@
 <hr/>
 <h2>CCBL Program</h2>
 <section>
-  <button mat-raised-button color="primary">Start</button>
+  <button *ngIf="{started: obsStarted | async} as S" 
+          color="primary"
+          (click)="start( !S.started )"
+          >
+    {{S.started ? "Stop" : "Start"}}
+  </button>
 </section>
 <hr/>
 <lib-ccbl-program [program-versionner]="progV"></lib-ccbl-program>

@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ProgVersionner, updateDisplay } from 'projects/ccbl-gfx9/src/public-api';
 import { HumanReadableProgram } from 'ccbl-js/lib/ProgramObjectInterface';
 import { ActionsPath } from '../../../projects/ccbl-gfx9/src/lib/smt.definitions';
-import { BehaviorSubject, combineLatest, delay, distinctUntilChanged, firstValueFrom, map, Observable, of, share, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, delay, distinctUntilChanged, filter, firstValueFrom, map, merge, Observable, of, share, startWith, switchMap, tap } from 'rxjs';
 import { SmtService } from 'projects/ccbl-gfx9/src/lib/smt.service';
 import { OpenhabService } from './openhab.service';
 import { Item } from './openHabItem';
@@ -21,19 +21,16 @@ interface CCBL_var<T> extends CONVERTER<T> {
 
 function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update, conv}: {initialValue: T, label: string, id: string, type: string, obsEnv: Observable<T>, update: (v: T) => void, conv: CONVERTER<T>}): CCBL_var<T> {
   const bs = new BehaviorSubject<T>( initialValue );
-  const ctrl = combineLatest([obsEnv, bs.pipe(
-    distinctUntilChanged(),
-    switchMap( ccbl => {
-      return of(ccbl).pipe( delay(1000) )
+  const ctrl = combineLatest([
+    obsEnv.pipe( distinctUntilChanged() ),
+    bs    .pipe( distinctUntilChanged() )
+  ]).pipe(
+    switchMap( ([env, ccbl]) => {
+      return of(ccbl).pipe( delay(1000), filter( () => env !== ccbl ) )
     })
-  ) ]);
+  );
   obsEnv.subscribe( env => console.log("ENV", label, "measured to", env) );
-  bs.subscribe( ccbl => update(ccbl) );                       // Send update as soon as possible
-  ctrl.subscribe( ([env, ccbl]) => {                          // Check after N ms wether env value is the same than ccbl one.
-    if (env !== ccbl) {
-      update(ccbl);
-    }
-  });
+  merge(bs, ctrl).subscribe( ccbl => update(ccbl) );  // Send update as soon as possible
   return {
     label, id, type,
     ...conv,
@@ -72,18 +69,28 @@ const converterDimmer: CONVERTER<number> = {
 export class TestEditorVerifComponent implements OnInit {
   LAP = new BehaviorSubject<ActionsPath[]>([]);
   bsVar = new BehaviorSubject<CCBL_var<unknown>[]>( [] );
+  obsStarted: Observable<boolean>;
 
   constructor(private progServ: CcblProgService, private smtService: SmtService, private ohs: OpenhabService, private dialog: MatDialog) {
     const json = localStorage.getItem('TestEditorVerif');
-    const P: HumanReadableProgram = json ? JSON.parse(json) : {};
+    const P: HumanReadableProgram = {}; // json ? JSON.parse(json) : {};
     this.load(P);
     this.progServ.obsProgram.subscribe( nP => localStorage.setItem('TestEditorVerif', JSON.stringify(nP)) );
+    this.obsStarted = this.progServ.obsStarted;
   }
 
   ngOnInit(): void {
   }
 
   get progV() {return this.progServ.progV}
+
+  start(s: boolean): void {
+    if (s) {
+      this.progServ.start();
+    } else {
+      this.progServ.stop();
+    }
+  }
 
   async load(prog?: HumanReadableProgram): Promise<void> {
     if (prog === undefined) {
@@ -93,6 +100,21 @@ export class TestEditorVerifComponent implements OnInit {
     if (prog) {
       this.progServ.loadProgram( prog );
       // XXX Plug with existing environment channels, emitter, etc.
+      for (const vChan of this.progServ.channels) {
+        const channel = this.progServ.getChannel(vChan.name);
+        if (channel) {
+          // Get the item from openHab of it exist
+          const ccblVar = this.bsVar.value.find( v => v.id === vChan.name )
+                       ?? await this.appendVar( {label: vChan.name, id: vChan.name, type: vChan.type} );
+          if (ccblVar) {
+            channel.getValueEmitter().on( v => ccblVar.next(v) );  
+          } else {
+            console.error( "no openHab item for", vChan.name );
+          }
+        } else {
+          console.error( "no channel", vChan.name, "in env");
+        }
+      }
     }
   }
 
@@ -114,12 +136,11 @@ export class TestEditorVerifComponent implements OnInit {
       const dialog = this.dialog.open<DialogAppendVar, never, CCBL_var<unknown> | undefined>( DialogAppendVar );
       res = await firstValueFrom( dialog.afterClosed() );
     }
-    console.log( "res =", res );
     if (res) {
-      const obsEnv = this.ohs.getObsItems( res.id );
+      const obsEnv = this.ohs.getObsItem( res.id );
       if (obsEnv) {
         let ccblVar: CCBL_var<any> | undefined = undefined;
-        switch (res?.type) {
+        switch (res?.type.split(" ")[0]) {
           case "Dimmer":
             ccblVar = getCCBL_var<number>({
               ...res,
@@ -132,12 +153,15 @@ export class TestEditorVerifComponent implements OnInit {
         }
         if (ccblVar) {
           this.bsVar.next( [...this.bsVar.value, ccblVar] );
+          return ccblVar;
         }
       } else {
         console.error("No observable for item", res);
       }
       
     }
+
+    return undefined;
   }
 
 }
@@ -303,8 +327,8 @@ const pgTest: HumanReadableProgram = {
   dependencies: {
     import: {
       channels: [
-        {name: "dLivingroomLight1", type: "Dimmer [0-100]"},
-        {name: "dLivingroomLight2", type: "Dimmer [0-100]"},
+        { name: "dLivingroomLight1", type: "Dimmer [0-100]" },
+        { name: "dLivingroomLight2", type: "Dimmer [0-100]" },
       ],
       emitters: [
         // Voir un capteur de porte ou autre ?
@@ -312,7 +336,31 @@ const pgTest: HumanReadableProgram = {
     }
   },
   actions: [
-    {channel: "dLivingroomLight1", affectation: {value: "0"} },
-    {channel: "dLivingroomLight2", affectation: {value: "0"} },
-  ]
+    { channel: "dLivingroomLight1", affectation: { value: "0" } },
+    { channel: "dLivingroomLight2", affectation: { value: "0" } },
+  ],
+  allen: {
+    During: [
+      {
+        type: "STATE", contextName: "ping", state: "true; false; 1000; waitEnd",
+        actions: [
+          { channel: "dLivingroomLight1", affectation: { value: "0" } },
+          { channel: "dLivingroomLight2", affectation: { value: "100" } }
+        ], allen: {
+          Meet: {
+            contextsSequence: [
+              {
+                type: "STATE", contextName: "pong", state: "true; false; 3000; waitEnd",
+                actions: [
+                  { channel: "dLivingroomLight1", affectation: { value: "100" } },
+                  { channel: "dLivingroomLight2", affectation: { value: "0" } }
+                ]
+              },
+            ],
+            loop: 0
+          }
+        }
+      }
+    ]
+  }
 }

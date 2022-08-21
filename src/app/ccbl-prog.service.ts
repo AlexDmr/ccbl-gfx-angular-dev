@@ -30,7 +30,11 @@ export class CcblProgService {
   constructor() {
   }
 
-  getChannel(name: string): ChannelInterface<unknown> | undefined {
+  get channels(): VariableDescription[] {
+    return this.progV.getChannels();
+  }
+
+  getChannel(name: string): ChannelInterface<any> | undefined {
     return this.env.get_Channel_FromId(name);
   }
 
@@ -40,23 +44,27 @@ export class CcblProgService {
       this.stop();
     }
 
-    // Delete no more used channels and create new ones
-    const channels: VariableDescription[] = prog.dependencies?.import?.channels ?? [];
-    const deprecatedChannels: VariableDescription[] = this.progV.getChannels().filter( chan => !channels.find( c => c.name === chan.name ) )
-    const newChannels: VariableDescription[] = channels.filter( chan => !this.progV.getChannels().find(c => c.name === chan.name) );
-    for (const chan of deprecatedChannels) {
+    // Delete revious channels and create new ones
+    for (const chan of this.progV.getChannels()) {
+      const C = this.getChannel( chan.name );
+      console.log("unregister", chan.name)
       this.env.unregister_Channel(chan.name);
+      // this.ccblProg.unregister_Channel(chan.name)
+      C?.dispose();
     }
-    for (const chan of newChannels) {
-      const E = new CCBLEmitterValue<any>( undefined );
+    for (const chan of prog.dependencies?.import?.channels ?? []) {
+      const E = new CCBLEmitterValue<any>( "0" );
       const ccblChannel = new Channel(E);
+      console.log("register", chan.name)
       this.env.register_Channel(chan.name, ccblChannel);
     }
 
     // Load...
+    console.log("update");
     this.progV.updateWith(prog);
+    console.log("load");
     this.ccblProg.loadHumanReadableProgram( this.progV.getCurrent(), this.env, {} );
-
+    console.log("done...");
 
     // Restart if it was already started
     if (wasStarted) {

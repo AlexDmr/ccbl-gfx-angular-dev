@@ -36,7 +36,7 @@ export class OpenhabService {
     this.obsUpdatedItem = this.bsUpdatedItem.pipe( runInZone(zone) )
   }
 
-  getObsItems(id: string): Observable<Item> | undefined {
+  getObsItem(id: string): Observable<Item> | undefined {
     return this.mapObsItem.get(id)?.obs;
   }
 
@@ -75,6 +75,7 @@ export class OpenhabService {
   }
 
   async setItem(id: string, state: string): Promise<void> {
+    console.log("setting", id, "to", state);
     await fetch(`${this.url}/rest/items/${id}`,
             {
                 method: 'POST',
@@ -93,7 +94,7 @@ export class OpenhabService {
     console.log("  - payload", typeof msg.payload, msg.payload);
     console.log("  - type", msg.type);*/
     const evt = toItemEvent(msg);
-    console.log(evt);
+    // console.log(evt);
     if (evt) {
       switch (evt.type) {
         case 'ItemCommandEvent':
