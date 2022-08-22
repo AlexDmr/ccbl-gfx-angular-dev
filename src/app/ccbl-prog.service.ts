@@ -3,7 +3,6 @@ import { Channel } from 'ccbl-js/lib/Channel';
 import { ChannelInterface } from 'ccbl-js/lib/ChannelInterface';
 import { CCBLTestClock } from 'ccbl-js/lib/Clock';
 import { CCBLEmitterValue } from 'ccbl-js/lib/EmitterValue';
-import { CCBLEvent } from 'ccbl-js/lib/Event';
 import { CCBLEnvironmentExecution } from 'ccbl-js/lib/ExecutionEnvironment';
 import { CCBLEnvironmentExecutionInterface } from 'ccbl-js/lib/ExecutionEnvironmentInterface';
 import { CCBLProgramObject } from 'ccbl-js/lib/ProgramObject';
@@ -31,7 +30,7 @@ export class CcblProgService {
   }
 
   get channels(): VariableDescription[] {
-    return this.progV.getChannels();
+    return this.progV.getCurrent().dependencies?.import?.channels ?? [];
   }
 
   getChannel(name: string): ChannelInterface<any> | undefined {
@@ -44,27 +43,19 @@ export class CcblProgService {
       this.stop();
     }
 
-    // Delete revious channels and create new ones
-    for (const chan of this.progV.getChannels()) {
-      const C = this.getChannel( chan.name );
-      console.log("unregister", chan.name)
-      this.env.unregister_Channel(chan.name);
-      // this.ccblProg.unregister_Channel(chan.name)
-      C?.dispose();
-    }
     for (const chan of prog.dependencies?.import?.channels ?? []) {
-      const E = new CCBLEmitterValue<any>( "0" );
-      const ccblChannel = new Channel(E);
-      console.log("register", chan.name)
-      this.env.register_Channel(chan.name, ccblChannel);
+      const C = this.getChannel( chan.name );
+      if (!C) {
+        const E = new CCBLEmitterValue<any>( "0" );
+        const ccblChannel = new Channel(E);
+        console.log("register", chan.name)
+        this.env.register_Channel(chan.name, ccblChannel);
+      }
     }
 
     // Load...
-    console.log("update");
     this.progV.updateWith(prog);
-    console.log("load");
     this.ccblProg.loadHumanReadableProgram( this.progV.getCurrent(), this.env, {} );
-    console.log("done...");
 
     // Restart if it was already started
     if (wasStarted) {

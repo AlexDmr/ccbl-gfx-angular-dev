@@ -73,10 +73,11 @@ export class TestEditorVerifComponent implements OnInit {
 
   constructor(private progServ: CcblProgService, private smtService: SmtService, private ohs: OpenhabService, private dialog: MatDialog) {
     const json = localStorage.getItem('TestEditorVerif');
-    const P: HumanReadableProgram = {}; // json ? JSON.parse(json) : {};
+    const P: HumanReadableProgram =  json ? JSON.parse(json) : {};
     this.load(P);
     this.progServ.obsProgram.subscribe( nP => localStorage.setItem('TestEditorVerif', JSON.stringify(nP)) );
     this.obsStarted = this.progServ.obsStarted;
+    this.obsItems.subscribe( () => this.updateVariables() );
   }
 
   ngOnInit(): void {
@@ -99,22 +100,7 @@ export class TestEditorVerifComponent implements OnInit {
     }
     if (prog) {
       this.progServ.loadProgram( prog );
-      // XXX Plug with existing environment channels, emitter, etc.
-      for (const vChan of this.progServ.channels) {
-        const channel = this.progServ.getChannel(vChan.name);
-        if (channel) {
-          // Get the item from openHab of it exist
-          const ccblVar = this.bsVar.value.find( v => v.id === vChan.name )
-                       ?? await this.appendVar( {label: vChan.name, id: vChan.name, type: vChan.type} );
-          if (ccblVar) {
-            channel.getValueEmitter().on( v => ccblVar.next(v) );  
-          } else {
-            console.error( "no openHab item for", vChan.name );
-          }
-        } else {
-          console.error( "no channel", vChan.name, "in env");
-        }
-      }
+      await this.updateVariables();
     }
   }
 
@@ -164,6 +150,25 @@ export class TestEditorVerifComponent implements OnInit {
     return undefined;
   }
 
+  private async updateVariables(): Promise<void> {
+    for (const vChan of this.progServ.channels) {
+      const channel = this.progServ.getChannel(vChan.name);
+      if (channel) {
+        // Get the item from openHab of it exist
+        let ccblVar = this.bsVar.value.find( v => v.id === vChan.name );
+        if (!ccblVar) {
+          ccblVar = await this.appendVar( {label: vChan.name, id: vChan.name, type: vChan.type} );
+          if (ccblVar) {
+            channel.getValueEmitter().on( v => ccblVar!.next(v) );  
+          } else {
+            console.error( "no openHab item for", vChan.name );
+          }
+        }
+      } else {
+        console.error( "no channel", vChan.name, "in env");
+      }
+    }
+  }
 }
 
 
@@ -335,14 +340,18 @@ const pgTest: HumanReadableProgram = {
       ]
     }
   },
+  localChannels: [
+    { name: "N", type: "N" },
+  ],
   actions: [
+    { channel: "N", affectation: { value: "3000" } },
     { channel: "dLivingroomLight1", affectation: { value: "0" } },
     { channel: "dLivingroomLight2", affectation: { value: "0" } },
   ],
   allen: {
     During: [
       {
-        type: "STATE", contextName: "ping", state: "true; false; 1000; waitEnd",
+        type: "STATE", contextName: "ping", state: "true; false; N; waitEnd",
         actions: [
           { channel: "dLivingroomLight1", affectation: { value: "0" } },
           { channel: "dLivingroomLight2", affectation: { value: "100" } }
@@ -350,7 +359,7 @@ const pgTest: HumanReadableProgram = {
           Meet: {
             contextsSequence: [
               {
-                type: "STATE", contextName: "pong", state: "true; false; 3000; waitEnd",
+                type: "STATE", contextName: "pong", state: "true; false; N; waitEnd",
                 actions: [
                   { channel: "dLivingroomLight1", affectation: { value: "100" } },
                   { channel: "dLivingroomLight2", affectation: { value: "0" } }
