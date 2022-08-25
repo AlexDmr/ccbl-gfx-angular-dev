@@ -1,5 +1,5 @@
 import {Injectable, NgZone} from '@angular/core';
-import {BehaviorSubject, combineLatest, Observable, of, OperatorFunction, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, OperatorFunction, shareReplay, Subject, Subscription} from 'rxjs';
 import { openHabEventRAW, toItemEvent } from './openHabEvent';
 import { Item } from './openHabItem';
 
@@ -32,7 +32,6 @@ export class OpenhabService {
   private sse?: EventSource;
 
   constructor(private zone: NgZone) {
-    // this.obsItems       = this.bsItems      .pipe( runInZone(zone) );
     this.obsUpdatedItem = this.bsUpdatedItem.pipe( runInZone(zone) )
   }
 
@@ -51,7 +50,7 @@ export class OpenhabService {
     for (const item of allItems) {
       const bs = new BehaviorSubject<Item>(item);
       this.mapObsItem.set( item.name, {
-        obs: bs.asObservable(),
+        obs: bs.pipe( runInZone(this.zone), shareReplay(1) ),
         next: item => bs.next(item),
         get value() {return bs.value}
       } )
@@ -102,7 +101,6 @@ export class OpenhabService {
         case 'ItemStateChangedEvent':
         case 'GroupItemStateChangedEvent':
           // const items = this.bsItems.value;
-          let newItem: Item | undefined;
           let localItemData = this.mapObsItem.get( evt.id );
           if (localItemData) {
             const newItem = {

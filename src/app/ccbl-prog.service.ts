@@ -3,6 +3,7 @@ import { Channel } from 'ccbl-js/lib/Channel';
 import { ChannelInterface } from 'ccbl-js/lib/ChannelInterface';
 import { CCBLTestClock } from 'ccbl-js/lib/Clock';
 import { CCBLEmitterValue } from 'ccbl-js/lib/EmitterValue';
+import { CCBLEmitterValueInterface } from 'ccbl-js/lib/EmitterValueInterface';
 import { CCBLEnvironmentExecution } from 'ccbl-js/lib/ExecutionEnvironment';
 import { CCBLEnvironmentExecutionInterface } from 'ccbl-js/lib/ExecutionEnvironmentInterface';
 import { CCBLProgramObject } from 'ccbl-js/lib/ProgramObject';
@@ -29,8 +30,16 @@ export class CcblProgService {
   constructor() {
   }
 
-  get channels(): VariableDescription[] {
+  get inputEmitters(): VariableDescription[] {
+    return this.progV.getCurrent().dependencies?.import?.emitters ?? [];
+  }
+
+  get inputChannels(): VariableDescription[] {
     return this.progV.getCurrent().dependencies?.import?.channels ?? [];
+  }
+
+  getEmitter(name: string): CCBLEmitterValueInterface<any> | undefined {
+    return this.env.get_CCBLEmitterValue_FromId(name);
   }
 
   getChannel(name: string): ChannelInterface<any> | undefined {
@@ -38,24 +47,41 @@ export class CcblProgService {
   }
 
   loadProgram(prog: HumanReadableProgram): void {
+    console.log("loading program", prog);
     const wasStarted = this.bsStarted.value;
     if (wasStarted) {
       this.stop();
     }
 
+    // Create imported emitters !
+    for (const em of prog.dependencies?.import?.emitters ?? []) {
+      let E = this.getEmitter( em.name );
+      if (!E) {
+        E =  new CCBLEmitterValue<any>( "0" );
+        console.log("register emitter", em.name)
+        this.env.register_CCBLEmitterValue(em.name, E);
+      }
+    }
+
+    // Create imported channels
     for (const chan of prog.dependencies?.import?.channels ?? []) {
       const C = this.getChannel( chan.name );
       if (!C) {
         const E = new CCBLEmitterValue<any>( "0" );
         const ccblChannel = new Channel(E);
-        console.log("register", chan.name)
+        console.log("register channel", chan.name)
         this.env.register_Channel(chan.name, ccblChannel);
       }
     }
 
     // Load...
     this.progV.updateWith(prog);
-    this.ccblProg.loadHumanReadableProgram( this.progV.getCurrent(), this.env, {} );
+    this.progV.asObservable().subscribe(
+      prog => {
+        console.log("loadHumanReadableProgram", prog);
+        this.ccblProg.loadHumanReadableProgram( prog, this.env, {} );
+      }
+    );
 
     // Restart if it was already started
     if (wasStarted) {

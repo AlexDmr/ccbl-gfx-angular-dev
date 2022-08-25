@@ -62,9 +62,15 @@
       <td>{{v.obsEnv  | async}}</td>
     </tr>
   <tr>
-    <td colspan="3">
-      <button mat-raised-button color="primary" (click)="appendVar()">Append variable</button>
+    <td colspan="4">
+      <hr/>
+      <!-- <button mat-raised-button color="primary" (click)="appendVar()">Append variable</button> -->
     </td>
+  </tr>
+  <tr *ngFor="let em of bsEmitters | async">
+    <td>{{em.label}}</td>
+    <td colspan="2">{{em.label}}</td>
+    <td>{{em.get( em.obsEnv | async )}}</td>
   </tr>
   </tbody>
 </table>
@@ -80,4 +86,5 @@
     </summary>
   </li>
 </ul>
+
 
