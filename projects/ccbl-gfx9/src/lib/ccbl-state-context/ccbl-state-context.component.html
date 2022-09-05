@@ -161,6 +161,9 @@
 <!---------------------------------------------- Contextual menus ----------------------------------------------------->
 <!--------------------------------------------------------------------------------------------------------------------->
 <mat-menu #menuGeneral="matMenu">
+  <!-- <button mat-menu-item (click)="copyProgram()" *ngIf="isProgramRoot">
+    <b>Copy program to clipboard</b>
+  </button> -->
   <button mat-menu-item (click)="editProgram()" *ngIf="isProgramRoot">
     <b>Edit program</b>
   </button>

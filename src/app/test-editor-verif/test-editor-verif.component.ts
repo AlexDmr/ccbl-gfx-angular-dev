@@ -43,7 +43,7 @@ function getCCBL_var<T>({label, id, type, obsEnv, initialValue, update, conv}: {
   ]);
   const ctrl = couple.pipe(
     switchMap( ([env, ccbl]) => {
-      return interval(500).pipe ( tap( () => console.log("id", env, "/", ccbl) )
+      return interval(1000).pipe ( tap( () => console.log("id", env, "/", ccbl) )
                                 , map( () => ccbl )
                                 , takeUntil( couple.pipe( filter( () => env === ccbl ) ) ) 
                                 )
@@ -97,7 +97,7 @@ export class TestEditorVerifComponent implements OnInit {
 
   constructor(private progServ: CcblProgService, private smtService: SmtService, private ohs: OpenhabService, private dialog: MatDialog) {
     const json = localStorage.getItem('TestEditorVerif');
-    const P: HumanReadableProgram =  {}; // json ? JSON.parse(json) : {};
+    const P: HumanReadableProgram =  json ? JSON.parse(json) : {};
     this.load(P);
     this.progServ.obsProgram.subscribe( nP => localStorage.setItem('TestEditorVerif', JSON.stringify(nP)) );
     this.obsStarted = this.progServ.obsStarted;
@@ -174,6 +174,12 @@ export class TestEditorVerifComponent implements OnInit {
       console.error("No observable for item", em.name);
     }
     return undefined;
+  }
+
+  async copyToClipboard() {
+    const P = this.progServ.toHumanReadableProgram;
+    console.log(P)
+    return navigator.clipboard.writeText( JSON.stringify(P) );
   }
 
   async appendVar(res?:  Omit<CCBL_var<any>, "obsCCBL" | "obsEnv" | "next" | "get" | "set">) {

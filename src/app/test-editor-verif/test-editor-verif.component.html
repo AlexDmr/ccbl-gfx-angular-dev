@@ -19,11 +19,19 @@
 <h2>CCBL Program</h2>
 <section>
   <button *ngIf="{started: obsStarted | async} as S" 
+          mat-raised-button
           color="primary"
           (click)="start( !S.started )"
           >
     {{S.started ? "Stop" : "Start"}}
   </button>
+  &nbsp;
+  <button   mat-raised-button
+            color="primary"
+            (click)="copyToClipboard()"
+            >
+          Copy to clipboard
+          </button>
 </section>
 <hr/>
 <lib-ccbl-program [program-versionner]="progV"></lib-ccbl-program>

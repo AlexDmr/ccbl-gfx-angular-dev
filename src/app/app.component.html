@@ -1,80 +1,16 @@
-<!--
 <mat-toolbar color="primary">
-  <label mat-icon-button [matMenuTriggerFor]="menuGeneral" aria-label="Example icon-button with a menu">
-    <mat-icon>more_vert</mat-icon>
-    Test affichage CCBL et simulation basique
+  <label>CCBL</label>
+  <span class="max"></span>
+  <a routerLink="admin" routerLinkActive="current" *ngIf="US.obsIsAdmin | async">admin</a>
+  <a routerLink="experimentateur" routerLinkActive="current" *ngIf="US.obsIsExperimentateur | async">expe</a>
+  <label *ngIf = "US.obsUser | async as U" class="user">
+    <!-- {{U.email}} -->
+    <img class="photo" [src] = "U.photoURL" />
   </label>
 </mat-toolbar>
 
-<mat-menu #menuGeneral="matMenu">
-  <button mat-menu-item (click)="genEnvFromProg()">
-    Generate environment from program
-  </button>
-  <button mat-menu-item (click)="reset()">
-    <span>Delete program</span>
-  </button>
-  <button mat-menu-item (click)="deleteSensors()">
-    <span>Delete sensors</span>
-  </button>
-  <button mat-menu-item (click)="deleteProgram()">
-    <span>Reset all</span>
-  </button>
-  <hr/>
-  <button mat-menu-item [matMenuTriggerFor]="menuCharger">
-    Load
-  </button>
-</mat-menu>
-
-<mat-menu #menuCharger>
-  <button mat-menu-item
-          *ngFor  = "let name of savedConfigurations"
-          (click) = "load(name)"
-  >
-    {{name.slice(11)}}
-  </button>
-</mat-menu>
-<section class="gridRoot">
-  <section class="pilotage">
-    <button mat-raised-button color="primary" (click)="initProgram()">
-      Initialiser programme
-    </button>
-    <button mat-raised-button color="primary" (click)="startProgram()">
-      Démarrer programme
-    </button>
-  </section>
-  <section class="sensors">
-    <mat-list>
-      <mat-list-item  *ngFor="let sensor of inputs">
-        <app-sensor [data]="sensor"></app-sensor>
-      </mat-list-item>
-    </mat-list>
-  </section>
-  <section class="actuators">
-    <mat-list>
-      <mat-list-item  *ngFor="let sensor of actuators">
-        <app-sensor [data]="sensor"></app-sensor>
-      </mat-list-item>
-    </mat-list>
-  </section>
-  <section class="program" >
-    <lib-ccbl-program *ngIf="progVersionner"
-                      [program-versionner] = "progVersionner"
-    ></lib-ccbl-program>
-  </section>
-</section>
+<!---
+<pre *ngIf = "US.obsUser | async as U" >{{U | json}}</pre>
 -->
 
-<mat-tab-group>
-  <mat-tab label="Editor">
-    <app-test-editor-verif></app-test-editor-verif>
-  </mat-tab>
-  <mat-tab label="Heating">
-    <app-scene-heating></app-scene-heating>
-  </mat-tab>
-  <mat-tab label="Avatar">
-    <app-scene-avatar></app-scene-avatar>
-  </mat-tab>
-  <mat-tab label="Home Detail">
-    <app-scene-house></app-scene-house>
-  </mat-tab>
-</mat-tab-group>
+<router-outlet></router-outlet>

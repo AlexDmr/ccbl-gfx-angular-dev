@@ -2,7 +2,7 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner, stringToAllen, getUID, updateDisplay, getDisplay} from '../ccbl-gfx9.service';
 import {
-  ContextOrProgram, copyHumanReadableEventContext, copyHumanReadableStateContext,
+  ContextOrProgram, copyHumanReadableStateContext,
   HumanReadableContext,
   HumanReadableEventAction, HumanReadableEventChannelAction,
   HumanReadableEventContext, HumanReadableProgram,
@@ -11,7 +11,7 @@ import {
   VariableDescription,
   ProgramReference
 } from 'ccbl-js/lib/ProgramObjectInterface';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, firstValueFrom, Observable} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
 import {MatDialog} from '@angular/material/dialog';
 import {
@@ -504,7 +504,7 @@ export class CcblStateContextComponent implements OnInit {
       data,
       closeOnNavigation: false
     });
-    const refP: ProgramReference = await dialogRef.afterClosed().toPromise();
+    const refP: ProgramReference = await firstValueFrom( dialogRef.afterClosed() );
     if (refP) {
       const L = this.pCurrentContext?.allen?.During ?? [];
       this.progVersionner!.appendContextOrProgram({

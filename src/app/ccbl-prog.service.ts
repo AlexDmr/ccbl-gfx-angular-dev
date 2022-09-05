@@ -30,6 +30,10 @@ export class CcblProgService {
   constructor() {
   }
 
+  get toHumanReadableProgram() {
+    return this.ccblProg.toHumanReadableProgram();
+  }
+
   get inputEmitters(): VariableDescription[] {
     return this.progV.getCurrent().dependencies?.import?.emitters ?? [];
   }

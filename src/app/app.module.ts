@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {CcblGfx9Module} from '../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.module';
@@ -41,6 +42,14 @@ import { DialogAppendVar, DialogLoadProg, TestEditorVerifComponent } from './tes
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DialogAppendVariableComponent } from './test-editor-verif/dialog-append-variable/dialog-append-variable.component';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { DemoComponent } from './demo/demo.component';
+import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
+import { environment } from '../environments/environment';
+import { provideAuth,getAuth } from '@angular/fire/auth';
+import { provideFirestore,getFirestore } from '@angular/fire/firestore';
+import { LoginComponent } from './login/login.component';
+import { AdminComponent } from './admin/admin.component';
+import { ExperimentateurComponent } from './experimentateur/experimentateur.component';
 
 @NgModule({
     declarations: [
@@ -62,7 +71,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
         SceneHomeComponent,
         TestEditorVerifComponent,
         DialogAppendVariableComponent,
-        DialogAppendVar, DialogLoadProg,
+        DialogAppendVar, DialogLoadProg, DemoComponent, LoginComponent, AdminComponent, ExperimentateurComponent,
     ],
   imports: [
     BrowserModule,
@@ -87,9 +96,13 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
     MatRadioModule,
     MatTabsModule,
     MatAutocompleteModule,
-    NgbModule
+    NgbModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore())
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

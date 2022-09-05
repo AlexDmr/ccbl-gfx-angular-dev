@@ -56,7 +56,6 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     return dialogRef.afterClosed().toPromise();
   }
   cbCcblActivation = (a: boolean) => {
-    // console.log('action active:', a);
     this.active.next(a);
   }
   cbCcblOverridedWith = (e: string | undefined) => {
