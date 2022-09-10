@@ -7,9 +7,11 @@ import {
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {EditableOptionType} from '../editable-option/editable-option.component';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, map} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {DataActionState, DialogEditActionStateComponent} from '../dialog-edit-action-state/dialog-edit-action-state.component';
+import {firstValueFrom} from "rxjs";
+import { ProxyCcblProg } from '../ProxyCcblProg';
 
 type OPERATOR = 'expression' | 'constraint';
 
@@ -31,19 +33,13 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     return this.pAction;
   }
   set action(a: HumanReadableStateAction) {
-    if (this.pAction && this.pAction.ccblAction && !!this.pAction.ccblAction.getIsActivated) {
-      // @ts-ignore
-      this.pAction.ccblAction.getIsActivated().off( this.cbCcblActivation );
-    }
-    this.pAction?.ccblAction?.offOverride( this.cbCcblOverridedWith );
     this.pAction = a;
-    if (this.pAction && this.pAction.ccblAction && !!this.pAction.ccblAction.getIsActivated) {
-      // @ts-ignore
-      this.pAction.ccblAction.getIsActivated().on( this.cbCcblActivation );
-      this.active.next( this.pAction.ccblAction.getIsActivated().get() );
-    }
-    this.overridedWith.next( this.pAction?.ccblAction?.getOverrideExpression() );
-    this.pAction?.ccblAction?.onOverride( this.cbCcblOverridedWith );
+    this.proxyCcbl.getActionProxy(a)?.pipe(
+      map( up => up.active )
+    ).subscribe( this.active );
+    this.proxyCcbl.getActionProxy(a)?.pipe(
+      map( up => up.overrided )
+    ).subscribe( this.overridedWith );
   }
   // tslint:disable-next-line: no-input-rename
   @Input('program-versionner') progVersionner!: ProgVersionner;
@@ -53,7 +49,7 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
         data,
         closeOnNavigation: false
       } );
-    return dialogRef.afterClosed().toPromise();
+    return firstValueFrom( dialogRef.afterClosed() );
   }
   cbCcblActivation = (a: boolean) => {
     this.active.next(a);
@@ -62,13 +58,13 @@ export class CcblActionStateComponent implements OnInit, OnDestroy {
     this.overridedWith.next(e);
   }
 
-  constructor(private matDialog: MatDialog) { }
+  constructor(private matDialog: MatDialog, private proxyCcbl: ProxyCcblProg) { }
 
   ngOnInit() {
   }
 
   ngOnDestroy(): void {
-    this.pAction?.ccblAction?.getIsActivated()?.off( this.cbCcblActivation );
+    // this.pAction?.ccblAction?.getIsActivated()?.off( this.cbCcblActivation );
   }
 
   get program(): HumanReadableProgram {

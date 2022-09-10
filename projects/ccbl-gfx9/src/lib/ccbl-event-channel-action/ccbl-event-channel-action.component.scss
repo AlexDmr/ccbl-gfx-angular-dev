@@ -2,7 +2,13 @@
   display: block;
   font-size: medium;
 
+  > section.active {
+    transition: none;
+    background-color: yellow;
+  }
+
   > section {
+    transition: background-color .5s;
     display: flex;
     flex-flow: row;
     // font-size: small;

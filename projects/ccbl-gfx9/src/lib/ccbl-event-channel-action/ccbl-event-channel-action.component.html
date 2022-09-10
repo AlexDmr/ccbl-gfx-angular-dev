@@ -1,4 +1,4 @@
-<section>
+<section [class.active]="active | async">
   <label class="override">Overhides</label>
   <lib-ccbl-expression [expression]="action.channel" [program]="program" ></lib-ccbl-expression>
   <label class="with">with</label>

@@ -11,7 +11,7 @@ import {CCBLEmitterValue} from 'ccbl-js/lib/EmitterValue';
 import {Channel, commitStateActions} from 'ccbl-js/lib/Channel';
 import {CCBLProgramObject} from 'ccbl-js/lib/ProgramObject';
 import {CCBLEvent} from 'ccbl-js/lib/Event';
-import { delay, multicast, distinctUntilChanged, switchMap, takeWhile, tap } from 'rxjs/operators';
+import { delay, multicast, distinctUntilChanged, switchMap, takeWhile, tap, share } from 'rxjs/operators';
 
 initCCBL();
 
@@ -40,9 +40,10 @@ export class CcblEngineService {
         tap( () => {if (this.clock.nextForeseenUpdate !== undefined) this.clock.goto( Date.now() )} )
       )
     ),
-    multicast( () => new Subject() )
-  ) as ConnectableObservable<any>;
-  private clockSubscription: Subscription;
+    // multicast( () => new Subject() )
+    share()
+  )// as ConnectableObservable<any>;
+  // XXX removed with connectable -> share : private clockSubscription: Subscription;
 
   constructor() {
     this.env = new CCBLEnvironmentExecution( this.clock );
@@ -53,7 +54,7 @@ export class CcblEngineService {
       }
       if (localStorage.getItem(localProgramKey)) {
         const prog: HumanReadableProgram = JSON.parse(localStorage.getItem(localProgramKey) ?? "{}");
-        const CP = copyHumanReadableProgram(prog, false);
+        const CP = copyHumanReadableProgram(prog);
         this.setRootProgram( CP );
         // console.log(prog, CP);
       }
@@ -61,7 +62,7 @@ export class CcblEngineService {
       console.error(err);
     }
 
-    this.clockSubscription = this.obsClock.connect();
+    // XXX this.clockSubscription = this.obsClock.connect();
     /*this.obsClock.subscribe( () => {
       console.log('yo');
     });*/
@@ -83,7 +84,7 @@ export class CcblEngineService {
   save(name: string) {
     localStorage.setItem(`CCBL_TEST::${name}`, JSON.stringify( {
       devices: this.sensors,
-      program: copyHumanReadableProgram( this.progVersionner!.getCurrent(), false )
+      program: copyHumanReadableProgram( this.progVersionner!.getCurrent() )
     } ) );
     const obj = JSON.parse( localStorage.getItem(`CCBL_TEST::${name}`)! );
     console.log(`CCBL_TEST::${name}`, obj );
@@ -91,14 +92,14 @@ export class CcblEngineService {
 
   startProgram() {
     if (this.ccblProg) {
-      this.clockSubscription.unsubscribe();
+      // this.clockSubscription.unsubscribe();
       this.ccblProg.dispose();
     }
     if (this.progVersionner) {
       this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
       this.ccblProg.loadHumanReadableProgram(this.progVersionner.getCurrent(), this.env, {});
 
-      const P = copyHumanReadableProgram( this.ccblProg.toHumanReadableProgram(), false );
+      const P = copyHumanReadableProgram( this.ccblProg.toHumanReadableProgram() );
       console.log( P );
 
       this.clock.goto( Date.now() );
@@ -107,7 +108,7 @@ export class CcblEngineService {
 
       const prog = this.ccblProg.toHumanReadableProgram();
       this.progVersionner.updateWith( prog );
-      this.clockSubscription = this.obsClock.connect();
+      // this.clockSubscription = this.obsClock.connect();
     }
   }
 
@@ -169,7 +170,7 @@ export class CcblEngineService {
     }
     this.privProgVersionner = new ProgVersionner(program);
     this.privProgVersionner.asObservable().subscribe( prog => {
-      const copy = copyHumanReadableProgram(prog, false);
+      const copy = copyHumanReadableProgram(prog);
       localStorage.setItem(localProgramKey, JSON.stringify( copy ) );
       const obj = JSON.parse( localStorage.getItem(localProgramKey)! );
     });

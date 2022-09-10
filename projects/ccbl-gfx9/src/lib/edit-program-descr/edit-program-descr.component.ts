@@ -27,7 +27,7 @@ export class EditProgramDescrComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) private data: DataEditProgramDescr,
               private matDialog: MatDialog
   ) {
-    this.newProgSubj.next(copyHumanReadableProgram(data.program, false));
+    this.newProgSubj.next(copyHumanReadableProgram(data.program));
   }
 
   ngOnInit(): void {

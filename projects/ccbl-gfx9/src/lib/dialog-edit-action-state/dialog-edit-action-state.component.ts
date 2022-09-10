@@ -26,7 +26,7 @@ export class DialogEditActionStateComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<DialogEditActionStateComponent>,
               @Inject(MAT_DIALOG_DATA) public data: DataActionState) {
-    this.newAction = copyHumanReadableStateActions(this.data.action, false);
+    this.newAction = copyHumanReadableStateActions(this.data.action);
     const actions: HumanReadableStateAction[] = this.data.context.actions || [];
     this.alreadyUsedChannels = actions.map(a => a.channel).filter(c => c !== this.data.action.channel);
   }

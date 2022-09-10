@@ -3,6 +3,7 @@ import {EventTrigger, HumanReadableEventChannelAction, HumanReadableProgram} fro
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {DataDialogTrigger, DialogTriggerComponent} from '../dialog-trigger/dialog-trigger.component';
 import {MatDialog} from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'lib-ccbl-event-expression[evt][program]',
@@ -19,7 +20,7 @@ export class CcblEventExpressionComponent implements OnInit {
       data,
       closeOnNavigation: false
     } );
-    return dialogRef.afterClosed().toPromise();
+    return firstValueFrom( dialogRef.afterClosed() );
   }
 
   constructor(private dialog: MatDialog) { }

@@ -27,6 +27,7 @@ import { DataEditSubProgram } from '../dialog-edit-sub-program/dialog-edit-sub-p
 import { SmtService } from '../smt.service';
 import { ActionsPath } from '../smt.definitions';
 import { map } from 'rxjs/operators';
+import { ProxyCcblProg } from '../ProxyCcblProg';
 
 @Component({
   selector: 'lib-ccbl-state-context[program-versionner][from][context]',
@@ -43,16 +44,9 @@ export class CcblStateContextComponent implements OnInit {
   @Input() from?: AllenType;
   get context(): HumanReadableStateContext {return this.pContext; }
   @Input() set context(c: HumanReadableStateContext) {
-    // console.log('Contexte', c);
-    // if (this.pContext && this.pContext.ccblContext && this.pContext.ccblContext.onActiveUpdated) {
-      this.pContext?.ccblContext?.offActiveUpdated( this.cbCCBL );
-    // }
-    this.pContext = c;
-    if (c && c.ccblContext && c.ccblContext.onActiveUpdated) {
-      // console.log(`On s'abonne !`);
-      c.ccblContext.onActiveUpdated( this.cbCCBL );
-      this.cbCCBL( c.ccblContext.getActive() );
-    }
+    this.proxyCcbl.getContextProxy(c)?.pipe(
+      map( up => up.active )
+    ).subscribe( this.active );
     if (!!c) {
       c.id = c.id || getUID('SC');
       this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
@@ -62,9 +56,7 @@ export class CcblStateContextComponent implements OnInit {
   // tslint:disable-next-line:no-input-rename
   @Input('program-versionner') progVersionner!: ProgVersionner;
   @Input() isProgramRoot = false;
-  cbCCBL = (a: boolean) => {
-    this.active.next(a);
-  }
+
   private pCurrentIndexInSequence = 1;
   private pCurrentContext?: HumanReadableStateContext;
   private subjAP = new BehaviorSubject<ActionsPath | undefined>( undefined );
@@ -82,7 +74,7 @@ export class CcblStateContextComponent implements OnInit {
       height: '100%',
       maxWidth: '100vw !important'
     });
-    return dialogRef.afterClosed().toPromise();
+    return firstValueFrom( dialogRef.afterClosed() );
   }
 
   static async staticEditCondition(dialog: MatDialog, data: DataEditionContextState): Promise<HumanReadableStateContext | undefined> {
@@ -91,7 +83,7 @@ export class CcblStateContextComponent implements OnInit {
       data,
       closeOnNavigation: false
     });
-    return dialogRef.afterClosed().toPromise();
+    return firstValueFrom( dialogRef.afterClosed() );
   }
 
 
@@ -99,7 +91,8 @@ export class CcblStateContextComponent implements OnInit {
   constructor(
     private clipboard: ClipboardService,
     private dialog: MatDialog,
-    private smtService: SmtService
+    private smtService: SmtService,
+    private proxyCcbl: ProxyCcblProg
   ) {
     this.currentContext.subscribe( c => this.pCurrentContext = c);
   }
@@ -543,7 +536,7 @@ export class CcblStateContextComponent implements OnInit {
 
   set currentIndexInSequence(i: number) {
     this.pCurrentIndexInSequence = i;
-    updateDisplay(this.context as {id: string}, {currentIndexInSequence: i});
+    // XXX à revoir sans les id ... ? updateDisplay(this.context as {id: string}, {currentIndexInSequence: i});
     if (this.context?.allen?.Meet?.contextsSequence) {
       this.currentContext.next( i === 1 ? this.context : this.context.allen.Meet.contextsSequence[i-2] );
     }

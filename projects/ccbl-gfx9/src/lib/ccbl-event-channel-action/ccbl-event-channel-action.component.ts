@@ -1,17 +1,32 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 import {MatDialog} from '@angular/material/dialog';
 import {DataDialogEventAction, DialogActionEventComponent} from '../dialog-action-event/dialog-action-event.component';
+import { BehaviorSubject, firstValueFrom, map } from 'rxjs';
+import { ProxyCcblProg } from '../ProxyCcblProg';
 
 @Component({
   selector: 'lib-ccbl-event-channel-action[action][program-versionner]',
   templateUrl: './ccbl-event-channel-action.component.html',
-  styleUrls: ['./ccbl-event-channel-action.component.scss']
+  styleUrls: ['./ccbl-event-channel-action.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CcblEventChannelActionComponent implements OnInit {
-  @Input() action!: HumanReadableEventChannelAction;
+  active = new BehaviorSubject<boolean>(false);
+  private _action: HumanReadableEventChannelAction = {channel: "", affectation: ""};
+  @Input()// action!: HumanReadableEventChannelAction;
+  get action(): HumanReadableEventChannelAction {
+    return this._action;
+  }
+  set action(a: HumanReadableEventChannelAction) {
+    this._action = a;
+    this.proxyCcbl.getActionProxy(a)?.pipe(
+      map( update => update.active )
+    ).subscribe( this.active );
+  }
+
   @Input('program-versionner') progVersionner!: ProgVersionner;
   @Output() update = new EventEmitter<HumanReadableEventChannelAction>();
   static async staticEditAction(dialog: MatDialog, data: DataDialogEventAction): Promise<HumanReadableEventChannelAction> {
@@ -19,10 +34,10 @@ export class CcblEventChannelActionComponent implements OnInit {
       data,
       closeOnNavigation: false
     });
-    return dialogRef.afterClosed().toPromise();
+    return firstValueFrom( dialogRef.afterClosed() );
   }
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private proxyCcbl: ProxyCcblProg) { }
 
   ngOnInit() {
   }

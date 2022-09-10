@@ -37,6 +37,8 @@ import {MatInputModule} from '@angular/material/input';
 import { DialogEditSubProgramComponent } from './dialog-edit-sub-program/dialog-edit-sub-program.component';
 import { DialogEditProgInstanceComponent } from './dialog-edit-prog-instance/dialog-edit-prog-instance.component';
 import { ProgInstanceParametersComponent } from './prog-instance-parameters/prog-instance-parameters.component';
+import { EmptyProxyCcblProgService } from './empty-proxy-ccbl-prog.service';
+import {ProxyCcblProg} from "./ProxyCcblProg";
 
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {
@@ -89,6 +91,10 @@ export class SafeHtmlPipe implements PipeTransform  {
         MatInputModule
     ],
   exports: [CcblGfx9Component],
-  providers: [CcblGfx9Service, ClipboardService],
+  providers: [
+    CcblGfx9Service,
+    ClipboardService,
+    { provide: ProxyCcblProg, useClass: EmptyProxyCcblProgService }
+  ],
 })
 export class CcblGfx9Module { }

@@ -10,7 +10,7 @@ import {CcblGfx9Service, ProgVersionner} from './ccbl-gfx9.service';
 import { SmtService } from './smt.service';
 
 @Component({
-  selector: 'lib-ccbl-program',
+  selector: 'lib-ccbl-program[program-versionner]',
   styleUrls: ['ccbl-gfx9.component.scss'],
   templateUrl: 'ccbl-gfx9.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,8 +52,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
       contextName: 'Program',
       type: 'STATE',
       actions: this.program.actions,
-      allen: this.program.allen,
-      ccblContext: this.program.ccblContext
+      allen: this.program.allen
     } : {contextName: '', actions: [], allen: {}, type: 'STATE'};
   }
 

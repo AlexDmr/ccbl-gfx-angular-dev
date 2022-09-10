@@ -7,6 +7,8 @@ import { DeviceLamp } from '../device-lamp/device-lamp.component';
 import {ProgVersionner} from '../../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.service';
 import {SceneService} from '../scene.service';
 import {map} from 'rxjs/operators';
+import { DirectProxyCcblProgService } from 'projects/ccbl-gfx9/src/lib/direct-proxy-ccbl-prog.service';
+import { ProxyCcblProg } from 'projects/ccbl-gfx9/src/lib/ProxyCcblProg';
 
 export type PossibleLocations = 'AliceHome' | 'BobHome' | 'elsewhere';
 
@@ -15,7 +17,7 @@ export type PossibleLocations = 'AliceHome' | 'BobHome' | 'elsewhere';
   templateUrl: './scene-avatar.component.html',
   styleUrls: ['./scene-avatar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [SceneService]
+  providers: [SceneService, { provide: ProxyCcblProg, useClass: DirectProxyCcblProgService }]
 })
 export class SceneAvatarComponent implements OnInit, AfterViewInit {
   SLAliceHome: PossibleLocations = 'AliceHome';
@@ -46,7 +48,7 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
   progV    = new ProgVersionner( this.initialRootProg    );
   subProgV = new ProgVersionner( this.initialSubProgUser );
 
-  constructor(private sim: SceneService) {
+  constructor(private sim: SceneService, private proxyCcbl: ProxyCcblProg) {
     sim.init([ {
         imgURL: `assets/Alice.png`,
         name: 'Alice',
@@ -95,6 +97,7 @@ export class SceneAvatarComponent implements OnInit, AfterViewInit {
 
   start() {
     const P = this.sim.start( this.progV.getCurrent());
+    this.proxyCcbl.setProgram(P);
     this.progV.updateWith( P.toHumanReadableProgram() );
     const SP = P.getProgramInstance( 'subProgUser' );
     if (SP) {
