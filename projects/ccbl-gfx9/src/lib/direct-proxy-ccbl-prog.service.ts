@@ -2,21 +2,35 @@ import { Injectable } from '@angular/core';
 import { ActionUpdate, ContextUpdate } from 'ccbl-js/lib/ccbl-exec-data';
 import { ChannelActionInterface, ChannelActionStateInterface } from 'ccbl-js/lib/ChannelActionStateEventInterface';
 import { CCBLContext } from 'ccbl-js/lib/Context';
-import { CcblProgramElements, CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableStateAction, HumanReadableStateContext } from 'ccbl-js/lib/ProgramObjectInterface';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { CcblProgramElements, CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext } from 'ccbl-js/lib/ProgramObjectInterface';
+import { BehaviorSubject, map, Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/internal/operators/shareReplay';
 import { ProxyCcblProg } from './ProxyCcblProg';
+// import { getCCBLProgramForBrowser } from "ccbl-js/lib/ccbl-browser";
 
 @Injectable()
 export class DirectProxyCcblProgService implements ProxyCcblProg {
-  private ccblProg?: CCBLProgramObjectInterface;
+  private ccblProg = new BehaviorSubject<CCBLProgramObjectInterface | undefined>( undefined );
   private elements?: CcblProgramElements;
   private mapActions  = new Map<string, Observable<ActionUpdate>>;
   private mapContexts = new Map<string, Observable<ContextUpdate>>;
 
-  constructor() { }
+  constructor() {
+    // console.log("import.meta.url:", import.meta.url);
+    // const ccblNode = getCCBLProgramForBrowser();
+  }
+
+  readonly program: Observable<HumanReadableProgram> = this.ccblProg.pipe(
+    map( ccblProg => ccblProg ? ccblProg.toHumanReadableProgram() : {} ),
+    shareReplay(1)
+  )
+  
+  connect(url: string): this {
+    throw "cannot connect to a server using a DirectProxyCcblProgService, use a RemoteProxyCcblProgService instead";
+  }
 
   setProgram(p: CCBLProgramObjectInterface): this {
-    this.ccblProg = p;
+    this.ccblProg.next(p);
     this.elements = p.getCcblElements();
     
     // Plug actions
@@ -78,3 +92,10 @@ export class DirectProxyCcblProgService implements ProxyCcblProg {
   }
 
 }
+
+
+function getCCBLProgramForBrowser() {
+  // return new DirectProxyCcblProgService
+  throw new Error('Function not implemented.');
+}
+

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithPopup, User } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithPopup, User, signOut } from '@angular/fire/auth';
 import { NavigationEnd, Router } from '@angular/router';
 import { BehaviorSubject, filter, firstValueFrom, map, Observable, shareReplay } from 'rxjs';
+import { combineLatest } from 'rxjs/internal/observable/combineLatest';
+import { startWith } from 'rxjs/internal/operators/startWith';
 
 
 const admins: string[] = ["alxdmr2@gmail.com"];
@@ -36,12 +38,19 @@ export class UserService {
   )
 
   constructor(private afa: Auth, private router: Router) {
+    const obsUrl = this.router.events.pipe(
+      filter( e => e instanceof NavigationEnd ),
+      map(e => (e as NavigationEnd).url ),
+      startWith("/")
+    )
     afa.onAuthStateChanged(this.bsUser);
-    this.obsRoles.subscribe( async L => {
-      const url = await firstValueFrom( this.router.events.pipe( filter( e => e instanceof NavigationEnd ), map(e => (e as NavigationEnd).url ) ) );
-      if (url.indexOf("demo") === -1) {
+    combineLatest([this.obsRoles, obsUrl]).subscribe( ([L, url]) => {
+      console.log("Rôles:", L, "and url", url);
+      if (  url.indexOf("/demo") === -1) {
         if (L.indexOf("ADMIN") >= 0) {
-          this.router.navigate(["admin"])
+          if (url.indexOf("/experimentateur") === -1) {
+            this.router.navigate(["admin"])
+          }
         } else {
           if (L.indexOf("EXPERIMENTATEUR") >= 0) {
             this.router.navigate(["experimentateur"])
@@ -57,7 +66,12 @@ export class UserService {
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
+    provider.setCustomParameters({prompt: 'select_account'})
     signInWithPopup(this.afa, provider);
+  }
+
+  signOut() {
+    signOut(this.afa);
   }
 
 }

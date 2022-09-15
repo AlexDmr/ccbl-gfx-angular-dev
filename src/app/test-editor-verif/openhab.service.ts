@@ -1,18 +1,8 @@
 import {Injectable, NgZone} from '@angular/core';
+import { runInZone } from 'projects/ccbl-gfx9/src/lib/runInZone';
 import {BehaviorSubject, combineLatest, Observable, of, OperatorFunction, shareReplay, Subject, Subscription} from 'rxjs';
 import { openHabEventRAW, toItemEvent } from './openHabEvent';
 import { Item } from './openHabItem';
-
-export function runInZone<T>(zone: NgZone): OperatorFunction<T, T> {
-  return (source) => {
-    return new Observable(observer => {
-      const next = (value: T) => zone.run(() => observer.next(value));
-      const error = (e: any) => zone.run(() => observer.error(e));
-      const complete = () => zone.run(() => observer.complete());
-      return source.subscribe({next, error, complete});
-    });
-  };
-}
 
 @Injectable({
   providedIn: 'root'

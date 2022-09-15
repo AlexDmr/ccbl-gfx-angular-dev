@@ -44,6 +44,7 @@ export class CcblStateContextComponent implements OnInit {
   @Input() from?: AllenType;
   get context(): HumanReadableStateContext {return this.pContext; }
   @Input() set context(c: HumanReadableStateContext) {
+    this.pContext = c;
     this.proxyCcbl.getContextProxy(c)?.pipe(
       map( up => up.active )
     ).subscribe( this.active );
