@@ -12,19 +12,27 @@ export class EmptyProxyCcblProgService implements ProxyCcblProg {
 
   readonly program: Observable<HumanReadableProgram> = of({});
 
+  disconnect(code: number = 1001): this {
+    return this;
+  }
+  
   connect(url: string): this {
-    throw "cannot connect to a server using a EmptyProxyCcblProgService, use a RemoteProxyCcblProgService instead";
+    // throw "cannot connect to a server using a EmptyProxyCcblProgService, use a RemoteProxyCcblProgService instead";
+    return this;
   }
 
   setProgram(p: CCBLProgramObjectInterface): this {
-    throw "cannot set a program with EmptyProxyCcblProgService, use a DirectProxyCcblProgService instead";
+    // throw "cannot set a program with EmptyProxyCcblProgService, use a DirectProxyCcblProgService instead";
+    return this;
   }
 
   getActionProxy (A: HumanReadableStateAction  | HumanReadableEventAction ): undefined | Observable<ActionUpdate > {
-    throw "cannot getActionProxy with EmptyProxyCcblProgService"
+    // throw "cannot getActionProxy with EmptyProxyCcblProgService"
+    return undefined;
   }
   getContextProxy(A: HumanReadableStateContext | HumanReadableEventContext): undefined | Observable<ContextUpdate> {
-    throw "cannot getContextProxy with EmptyProxyCcblProgService"
+    // throw "cannot getContextProxy with EmptyProxyCcblProgService"
+    return undefined;
   }
 
 }

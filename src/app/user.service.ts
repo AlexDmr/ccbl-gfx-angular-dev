@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithPopup, User, signOut } from '@angular/fire/auth';
 import { NavigationEnd, Router } from '@angular/router';
-import { BehaviorSubject, filter, firstValueFrom, map, Observable, shareReplay } from 'rxjs';
+import { ProxyCcblProg } from 'projects/ccbl-gfx9/src/lib/ProxyCcblProg';
+import { BehaviorSubject, filter, map, Observable, shareReplay, Subject } from 'rxjs';
 import { combineLatest } from 'rxjs/internal/observable/combineLatest';
-import { startWith } from 'rxjs/internal/operators/startWith';
 
 
 const admins: string[] = ["alxdmr2@gmail.com"];
@@ -17,7 +17,7 @@ export type ROLE = "ADMIN" | "EXPERIMENTATEUR";
 export class UserService {
   private f_IsAdmin = (u: User | null) => !!u?.email ? admins.indexOf(u.email) >= 0 : false
   private f_IsExperimentateur = (u: User | null) => !!u?.email ? experimentateurs.indexOf(u.email) >= 0 : false
-  private bsUser = new BehaviorSubject<User | null>( null );
+  private bsUser = new Subject<User | null>( );
   readonly obsUser = this.bsUser.asObservable();
   readonly obsIsAdmin: Observable<boolean> = this.obsUser.pipe(
     map( this.f_IsAdmin ),
@@ -37,15 +37,15 @@ export class UserService {
     shareReplay(1)
   )
 
-  constructor(private afa: Auth, private router: Router) {
+  constructor(private afa: Auth, private router: Router, private proxyCcbl: ProxyCcblProg) {
     const obsUrl = this.router.events.pipe(
       filter( e => e instanceof NavigationEnd ),
       map(e => (e as NavigationEnd).url ),
-      startWith("/")
+      // startWith("/")
     )
     afa.onAuthStateChanged(this.bsUser);
     combineLatest([this.obsRoles, obsUrl]).subscribe( ([L, url]) => {
-      console.log("Rôles:", L, "and url", url);
+      // console.log("Rôles:", L, "and url", url);
       if (  url.indexOf("/demo") === -1) {
         if (L.indexOf("ADMIN") >= 0) {
           if (url.indexOf("/experimentateur") === -1) {
@@ -60,6 +60,19 @@ export class UserService {
         }
       }
     });
+
+    // Plug to websocket
+    this.bsUser.subscribe( async U => {
+      console.log("User", U?.displayName);
+      if (U) {
+        const jwt: string = await U.getIdToken();
+        this.proxyCcbl.connect("ws://localhost:3001", {jwt});
+      } else {
+        this.proxyCcbl.disconnect(1001);
+      }
+      
+    });
+    
   }
 
   loginGoogle() {

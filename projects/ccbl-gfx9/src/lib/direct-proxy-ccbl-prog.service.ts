@@ -25,6 +25,10 @@ export class DirectProxyCcblProgService implements ProxyCcblProg {
     shareReplay(1)
   )
   
+  disconnect(code: number = 1001): this {
+    return this;
+  }
+
   connect(url: string): this {
     throw "cannot connect to a server using a DirectProxyCcblProgService, use a RemoteProxyCcblProgService instead";
   }

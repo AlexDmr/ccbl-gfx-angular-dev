@@ -11,10 +11,10 @@ import { LoginComponent } from './login/login.component';
 const routes: Routes = [
   { path: 'demo', component: DemoComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'admin', component: AdminComponent, canActivate: [AuthAdminGuard],
+  { path: 'admin', component: AdminComponent/*, canActivate: [AuthAdminGuard]*/,
     children: []
   },
-  { path: 'experimentateur', component: ExperimentateurComponent, canActivate: [AuthExpeGuard],
+  { path: 'experimentateur', component: ExperimentateurComponent/*, canActivate: [AuthExpeGuard]*/,
     children: []
   },
   { path: "**", component: LoginComponent }

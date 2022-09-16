@@ -38,7 +38,7 @@ export class CcblGfx9Component implements OnInit, OnChanges {
     this.program = this.progVersionner.getCurrent();
     this.subscription = this.progVersionner.asObservable().subscribe( P => {
       this.program = P;
-      console.log('New program version:', P);
+      // console.log('New program version:', P);
       this.updateObs.next( true );
     } );
   }

@@ -10,10 +10,7 @@ import { Observable } from 'rxjs/internal/Observable';
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {provide: ProxyCcblProg, useClass: RemoteProxyCcblProgService }
-  ]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminComponent implements OnInit, OnDestroy {
   readonly obsProgram: Observable<HumanReadableProgram>;
@@ -21,10 +18,9 @@ export class AdminComponent implements OnInit, OnDestroy {
   private sub?: Subscription;
 
   constructor(private proxyCcbl: ProxyCcblProg) {
-    proxyCcbl.connect("ws://localhost:3001");
     this.obsProgram = proxyCcbl.program;
     this.sub = this.obsProgram.subscribe( P => {
-      console.log("Program updated with", P)
+      // console.log("Program updated with", P)
       this.progV.updateWith(P)
     })
   }

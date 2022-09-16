@@ -17,7 +17,7 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
   private readonly cbOpen  = () => {console.log("ws open"); this.bsOpen.next(true );}
   private readonly cbClose = () => {console.log("ws close"); this.bsOpen.next(false);}
   private readonly cbMessage = (ME: MessageEvent<string>) => {
-    console.log("RemoteProxyCcblProgService::cbMessage", ME)
+    // console.log("RemoteProxyCcblProgService::cbMessage", ME)
     const msg: PayloadForMain = JSON.parse(ME.data);
     if (msg) {
       switch (msg.type) {
@@ -57,11 +57,21 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
   private bsProg = new BehaviorSubject<HumanReadableProgram>( {} );
   readonly program: Observable<HumanReadableProgram>;
   
-  connect(url: string): this {
+  disconnect(code: number = 1001): this {
+    this.ws?.close(code);
+    return this;
+  }
+
+  connect(url: string, options?: {jwt: string}): this {
     this.ws?.close();
     console.log("ws connect to", url);
     this.ws = new WebSocket(url/*, ["ccbl-remote"]*/);
-    this.ws.addEventListener("open" , this.cbOpen  );
+    this.ws.addEventListener("open" , () => {
+      this.cbOpen();
+      if (options?.jwt) {
+        this.ws!.send( JSON.stringify({jwt: options.jwt}) );
+      }
+    });
     this.ws.addEventListener("close", this.cbClose );
     this.ws.addEventListener("message", this.cbMessage );
     return this;

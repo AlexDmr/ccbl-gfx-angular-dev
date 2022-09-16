@@ -9,5 +9,6 @@ export abstract class ProxyCcblProg {
     abstract getContextProxy(A: HumanReadableStateContext | HumanReadableEventContext): undefined | Observable<ContextUpdate>;
 
     abstract setProgram(p: CCBLProgramObjectInterface): this;
-    abstract connect(url: string): this;
+    abstract connect(url: string, options?: {jwt: string}): this;
+    abstract disconnect(code: number): this;
 }
