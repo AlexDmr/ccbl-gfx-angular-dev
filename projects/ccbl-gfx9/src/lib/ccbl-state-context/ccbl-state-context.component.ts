@@ -11,7 +11,7 @@ import {
   VariableDescription,
   ProgramReference
 } from 'ccbl-js/lib/ProgramObjectInterface';
-import {BehaviorSubject, firstValueFrom, Observable} from 'rxjs';
+import {BehaviorSubject, firstValueFrom, Observable, of, Subscription} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
 import {MatDialog} from '@angular/material/dialog';
 import {
@@ -26,7 +26,7 @@ import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/di
 import { DataEditSubProgram } from '../dialog-edit-sub-program/dialog-edit-sub-program.component';
 import { SmtService } from '../smt.service';
 import { ActionsPath } from '../smt.definitions';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { ProxyCcblProg } from '../ProxyCcblProg';
 
 @Component({
@@ -38,21 +38,23 @@ import { ProxyCcblProg } from '../ProxyCcblProg';
 export class CcblStateContextComponent implements OnInit {
   currentContext = new BehaviorSubject<HumanReadableStateContext | undefined>(undefined);
   hide = false;
-  active = new BehaviorSubject<boolean>(false);
+  // private subActive?: Subscription;
+  active: Observable<boolean> = of(false); // = new BehaviorSubject<boolean>(false);
   pContext!: HumanReadableStateContext;
   pDndDropZoneAll: string[] = ['HumanReadableStateContext', 'HumanReadableEventContext'];
   @Input() from?: AllenType;
   get context(): HumanReadableStateContext {return this.pContext; }
   @Input() set context(c: HumanReadableStateContext) {
     this.pContext = c;
-    this.proxyCcbl.getContextProxy(c)?.pipe(
-      map( up => up.active )
-    ).subscribe( this.active );
     if (!!c) {
       c.id = c.id || getUID('SC');
       this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
     }
     this.currentContext.next(c);
+    // this.subActive?.unsubscribe();
+    this.active = this.currentContext.pipe(
+      switchMap( ctxt => (ctxt ? this.proxyCcbl.getContextProxy(ctxt)?.pipe(map( up => up.active ) ) : undefined ) ?? of(false) )
+    )
   }
   // tslint:disable-next-line:no-input-rename
   @Input('program-versionner') progVersionner!: ProgVersionner;

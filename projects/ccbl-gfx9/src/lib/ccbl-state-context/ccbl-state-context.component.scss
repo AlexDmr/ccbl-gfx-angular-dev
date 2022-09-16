@@ -98,6 +98,10 @@ $canDropColor: lightgreen;
     flex-flow: column;
     min-height: 1em;
 
+    label.contextName {
+      display: block;
+    }
+
     > section.state > label {
       //color: rgba(0, 0, 0, 0);
       font-weight: bold;

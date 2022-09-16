@@ -24,7 +24,7 @@
     </label>
   </section>
 
-  <section [class.isActive]="active | async"
+  <section [class.isActive]="active| async"
            [class.hide]="hide"
            *ngIf = "currentContext | async as C"
            >
@@ -49,7 +49,7 @@
         <label class="programName" *ngIf="isProgramRoot">
           {{program.name || 'Root program'}}
         </label>
-        {{!isProgramRoot && C ? C.id : ''}}
+        <label class="contextName">{{!isProgramRoot && C ? C.contextName : ''}}</label>
         <lib-ccbl-expression [program]    = "program"
                             [expression] = "C.state"
                             (update)     = "updateState($event)"
