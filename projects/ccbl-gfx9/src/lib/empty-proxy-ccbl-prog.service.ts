@@ -10,7 +10,7 @@ export class EmptyProxyCcblProgService implements ProxyCcblProg {
 
   constructor() { }
 
-  readonly program: Observable<HumanReadableProgram> = of({});
+  readonly programs: Observable<{path: string[], program: HumanReadableProgram}[]> = of([]);
 
   disconnect(code: number = 1001): this {
     return this;

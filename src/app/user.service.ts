@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithPopup, User, signOut } from '@angular/fire/auth';
 import { NavigationEnd, Router } from '@angular/router';
 import { ProxyCcblProg } from 'projects/ccbl-gfx9/src/lib/ProxyCcblProg';
-import { BehaviorSubject, filter, map, Observable, shareReplay, Subject } from 'rxjs';
+import { filter, map, Observable, shareReplay, Subject } from 'rxjs';
 import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 
 

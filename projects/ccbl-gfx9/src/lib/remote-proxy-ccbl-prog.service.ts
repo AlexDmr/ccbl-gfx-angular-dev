@@ -32,7 +32,8 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
             const bs = new BehaviorSubject<ContextUpdate>({type: "context update", contextId, active: false});
             this.mapContexts.set(contextId, {bs, obs: bs.pipe( runInZone(this.zone) )});
           }
-          this.bsProg.next( msg.program );
+          // this.bsProg.next( msg.program );
+          // XXX DEPRECATED, attention à ce qu'on remonte du server...
           break;
         case "action update":
           this.mapActions.get(msg.actionId)?.bs.next(msg);
@@ -46,16 +47,16 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
 
   constructor(private zone: NgZone) {
     console.log("New RemoteProxyCcblProgService");
-    this.obsOpen = this.bsOpen.pipe( runInZone(zone) );
-    this.program = this.bsProg.pipe( runInZone(zone) );
+    this.obsOpen  = this.bsOpen.pipe( runInZone(zone) );
+    this.programs = this.bsProg.pipe( runInZone(zone) );
   }
 
   ngOnDestroy(): void {
       this.ws?.close();
   }
 
-  private bsProg = new BehaviorSubject<HumanReadableProgram>( {} );
-  readonly program: Observable<HumanReadableProgram>;
+  private bsProg = new BehaviorSubject<{path: string[], program: HumanReadableProgram}[]>( [] );
+  readonly programs: Observable<{path: string[], program: HumanReadableProgram}[]>;
   
   disconnect(code: number = 1001): this {
     this.ws?.close(code);
@@ -63,6 +64,16 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
   }
 
   connect(url: string, options?: {jwt: string}): this {
+    // XXX DEBUG/DEV
+    interface CcblProgramElementsJSON {
+      program: HumanReadableProgram;
+      subProgramInstances: {[id in string]: CcblProgramElementsJSON};
+      stateContexts: string[]; // ids
+      eventContexts: string[]; // ids
+      stateActions: string[]; // ids
+      eventActions: string[]; // ids
+    }
+    // /XXX
     this.ws?.close();
     console.log("ws connect to", url);
     this.ws = new WebSocket(url/*, ["ccbl-remote"]*/);
@@ -70,10 +81,32 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
       this.cbOpen();
       if (options?.jwt) {
         this.ws!.send( JSON.stringify({jwt: options.jwt}) );
+        // Wait for server response
+        let cbUser: (m: MessageEvent<any>) => void;
+        this.ws?.addEventListener("message", cbUser = m => {
+          try {
+            const obj = JSON.parse( m.data ) as {id: string; role: string, programInstances: {
+              available: boolean;
+              path: string[];
+              elements: undefined | Omit<CcblProgramElementsJSON, "subProgramInstances">
+            }[]};
+            console.log(obj);
+            this.bsProg.next(
+              obj.programInstances.map( ({available, elements, path}) => available && elements?.program ? {path, program: elements.program} : undefined )
+                                  .map( p => {console.log(p); return p} )
+                                  .filter( p => !!p )
+                                  .map( p => p as {path: string[], program: HumanReadableProgram} )
+            );
+          } catch(err) {
+            console.error("Error during post identification message processing from server", err)
+          } finally {
+            this.ws?.removeEventListener("message", cbUser);
+          }
+        })
       }
     });
     this.ws.addEventListener("close", this.cbClose );
-    this.ws.addEventListener("message", this.cbMessage );
+    // this.ws.addEventListener("message", this.cbMessage );
     return this;
   }
 

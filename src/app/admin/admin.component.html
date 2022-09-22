@@ -1,12 +1,19 @@
-<pre>
+<!-- <pre>
     Charger / Décharger program
     Visu program (en action)
     Visu des variables, channels, émetteur et source d'événements.
 
-</pre>
+</pre> -->
 
-<lib-ccbl-program [program-versionner]="progV"></lib-ccbl-program>
+<mat-tab-group>
+    <mat-tab    *ngFor  = "let descr of obsLprogV | async"
+                [label] = "descr.label"
+        >
+        <lib-ccbl-program [program-versionner]="descr.PV"></lib-ccbl-program>
+    </mat-tab>
+  </mat-tab-group>
 
+<pre>{{(obsLprogV | async)?.length}} programs</pre>
 
 <!--
 <pre>{{obsProgram | async | json}}</pre>

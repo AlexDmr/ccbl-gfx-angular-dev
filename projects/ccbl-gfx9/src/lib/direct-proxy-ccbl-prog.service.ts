@@ -20,8 +20,8 @@ export class DirectProxyCcblProgService implements ProxyCcblProg {
     // const ccblNode = getCCBLProgramForBrowser();
   }
 
-  readonly program: Observable<HumanReadableProgram> = this.ccblProg.pipe(
-    map( ccblProg => ccblProg ? ccblProg.toHumanReadableProgram() : {} ),
+  readonly programs: Observable<{path: string[], program: HumanReadableProgram}[]> = this.ccblProg.pipe(
+    map( ccblProg => [{path: ["root"], program: ccblProg ? ccblProg.toHumanReadableProgram() : {}}] ),
     shareReplay(1)
   )
   
