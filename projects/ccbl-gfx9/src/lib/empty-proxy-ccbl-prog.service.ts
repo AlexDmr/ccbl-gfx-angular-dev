@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionUpdate, ContextUpdate } from 'ccbl-js/lib/ccbl-exec-data';
-import { CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext } from 'ccbl-js/lib/ProgramObjectInterface';
+import { CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext, ProgramPath } from 'ccbl-js/lib/ProgramObjectInterface';
 import { Observable } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { ProxyCcblProg } from './ProxyCcblProg';
@@ -21,6 +21,10 @@ export class EmptyProxyCcblProgService implements ProxyCcblProg {
     return this;
   }
 
+  subscribeToProgram(path: ProgramPath, onOff: "on" | "off"): this {
+    return this;
+  }
+  
   setProgram(p: CCBLProgramObjectInterface): this {
     // throw "cannot set a program with EmptyProxyCcblProgService, use a DirectProxyCcblProgService instead";
     return this;

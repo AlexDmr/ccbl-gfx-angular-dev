@@ -1,13 +1,15 @@
 import {BehaviorSubject, Subscription} from 'rxjs';
-import {ChangeDetectionStrategy, Component, HostListener, Input, OnChanges, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, Input, OnChanges, OnDestroy, OnInit} from '@angular/core';
 import {
   ContextOrProgram,
   HumanReadableProgram,
   HumanReadableStateContext,
+  ProgramPath,
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {CcblGfx9Service, ProgVersionner} from './ccbl-gfx9.service';
 import { SmtService } from './smt.service';
+import { ProxyCcblProg } from './ProxyCcblProg';
 
 @Component({
   selector: 'lib-ccbl-program[program-versionner]',
@@ -16,17 +18,27 @@ import { SmtService } from './smt.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [SmtService]
 })
-export class CcblGfx9Component implements OnInit, OnChanges {
+export class CcblGfx9Component implements OnInit, OnChanges, OnDestroy {
   // tslint:disable-next-line: no-input-rename
+  @Input("program-path") programPath?: ProgramPath;
   @Input('program-versionner') progVersionner!: ProgVersionner;
   updateObs = new BehaviorSubject<boolean>(true);
   private program?: HumanReadableProgram;
   private subscription?: Subscription;
 
-  constructor(private ccblGfxService: CcblGfx9Service) {
+  constructor(private ccblGfxService: CcblGfx9Service, private ccblProxy: ProxyCcblProg) {
   }
 
   ngOnInit() {
+    if (this.programPath) {
+      this.ccblProxy.subscribeToProgram( this.programPath, "on" );
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.programPath) {
+      this.ccblProxy.subscribeToProgram( this.programPath, "off" );
+    }
   }
 
   ngOnChanges() {

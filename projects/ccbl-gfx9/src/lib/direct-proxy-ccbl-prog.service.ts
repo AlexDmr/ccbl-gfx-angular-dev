@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActionUpdate, ContextUpdate } from 'ccbl-js/lib/ccbl-exec-data';
 import { ChannelActionInterface, ChannelActionStateInterface } from 'ccbl-js/lib/ChannelActionStateEventInterface';
 import { CCBLContext } from 'ccbl-js/lib/Context';
-import { CcblProgramElements, CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext } from 'ccbl-js/lib/ProgramObjectInterface';
+import { CcblProgramElements, CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext, ProgramPath } from 'ccbl-js/lib/ProgramObjectInterface';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { shareReplay } from 'rxjs/internal/operators/shareReplay';
 import { ProxyCcblProg } from './ProxyCcblProg';
@@ -31,6 +31,10 @@ export class DirectProxyCcblProgService implements ProxyCcblProg {
 
   connect(url: string): this {
     throw "cannot connect to a server using a DirectProxyCcblProgService, use a RemoteProxyCcblProgService instead";
+  }
+
+  subscribeToProgram(path: ProgramPath, onOff: "on" | "off"): this {
+    return this;
   }
 
   setProgram(p: CCBLProgramObjectInterface): this {

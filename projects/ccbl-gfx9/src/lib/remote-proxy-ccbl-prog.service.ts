@@ -1,10 +1,10 @@
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { ActionUpdate, ContextUpdate, PayloadForMain } from 'ccbl-js/lib/ccbl-exec-data';
-import { CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext } from 'ccbl-js/lib/ProgramObjectInterface';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { CcblProgramElementsJSON, CCBLProgramObjectInterface, HumanReadableEventAction, HumanReadableEventContext, HumanReadableProgram, HumanReadableStateAction, HumanReadableStateContext, ProgramPath } from 'ccbl-js/lib/ProgramObjectInterface';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProxyCcblProg } from './ProxyCcblProg';
 import { runInZone } from './runInZone';
-
+import { SubscribeToProgram } from "ccbl-js/lib/ccbl-client-server-protocol-data"
 
 @Injectable()
 export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
@@ -21,20 +21,6 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
     const msg: PayloadForMain = JSON.parse(ME.data);
     if (msg) {
       switch (msg.type) {
-        case "program update":
-          this.mapActions .clear();
-          this.mapContexts.clear();
-          for (const actionId of [...msg.eventActions, ...msg.stateActions]) {
-            const bs = new BehaviorSubject<ActionUpdate>({type: "action update", actionId, active: false, overrided: undefined});
-            this.mapActions.set(actionId, {bs, obs: bs.pipe( runInZone(this.zone) )});
-          }
-          for (const contextId of [...msg.eventContexts, ...msg.stateContexts]) {
-            const bs = new BehaviorSubject<ContextUpdate>({type: "context update", contextId, active: false});
-            this.mapContexts.set(contextId, {bs, obs: bs.pipe( runInZone(this.zone) )});
-          }
-          // this.bsProg.next( msg.program );
-          // XXX DEPRECATED, attention à ce qu'on remonte du server...
-          break;
         case "action update":
           this.mapActions.get(msg.actionId)?.bs.next(msg);
           break;
@@ -49,13 +35,29 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
     console.log("New RemoteProxyCcblProgService");
     this.obsOpen  = this.bsOpen.pipe( runInZone(zone) );
     this.programs = this.bsProg.pipe( runInZone(zone) );
+    this.subBsProg = this.bsProg.subscribe( L => {
+      this.mapActions .clear();
+      this.mapContexts.clear();
+      for (const PG of L) {
+        for (const actionId of [...PG.elements.eventActions, ...PG.elements.stateActions]) {
+          const bs = new BehaviorSubject<ActionUpdate>({type: "action update", actionId, active: false, overrided: undefined});
+          this.mapActions.set(actionId, {bs, obs: bs.pipe( runInZone(this.zone) )});
+        }
+        for (const contextId of [...PG.elements.eventContexts, ...PG.elements.stateContexts]) {
+          const bs = new BehaviorSubject<ContextUpdate>({type: "context update", contextId, active: false});
+          this.mapContexts.set(contextId, {bs, obs: bs.pipe( runInZone(this.zone) )});
+        }
+      }
+    } )
   }
 
   ngOnDestroy(): void {
+    this.subBsProg.unsubscribe();
       this.ws?.close();
   }
 
-  private bsProg = new BehaviorSubject<{path: string[], program: HumanReadableProgram}[]>( [] );
+  private subBsProg: Subscription;
+  private bsProg = new BehaviorSubject<{path: string[], program: HumanReadableProgram, elements: CcblProgramElementsJSON}[]>( [] );
   readonly programs: Observable<{path: string[], program: HumanReadableProgram}[]>;
   
   disconnect(code: number = 1001): this {
@@ -64,16 +66,6 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
   }
 
   connect(url: string, options?: {jwt: string}): this {
-    // XXX DEBUG/DEV
-    interface CcblProgramElementsJSON {
-      program: HumanReadableProgram;
-      subProgramInstances: {[id in string]: CcblProgramElementsJSON};
-      stateContexts: string[]; // ids
-      eventContexts: string[]; // ids
-      stateActions: string[]; // ids
-      eventActions: string[]; // ids
-    }
-    // /XXX
     this.ws?.close();
     console.log("ws connect to", url);
     this.ws = new WebSocket(url/*, ["ccbl-remote"]*/);
@@ -92,10 +84,10 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
             }[]};
             console.log(obj);
             this.bsProg.next(
-              obj.programInstances.map( ({available, elements, path}) => available && elements?.program ? {path, program: elements.program} : undefined )
+              obj.programInstances.map( ({available, elements, path}) => available && elements?.program ? {path, elements, program: elements.program} : undefined )
                                   .map( p => {console.log(p); return p} )
                                   .filter( p => !!p )
-                                  .map( p => p as {path: string[], program: HumanReadableProgram} )
+                                  .map( p => p as {path: string[], program: HumanReadableProgram, elements: CcblProgramElementsJSON} )
             );
           } catch(err) {
             console.error("Error during post identification message processing from server", err)
@@ -106,12 +98,22 @@ export class RemoteProxyCcblProgService implements ProxyCcblProg, OnDestroy {
       }
     });
     this.ws.addEventListener("close", this.cbClose );
-    // this.ws.addEventListener("message", this.cbMessage );
+    this.ws.addEventListener("message", this.cbMessage );
     return this;
   }
 
   setProgram(p: CCBLProgramObjectInterface): this {
     throw "cannot set a program with RemoteProxyCcblProgService, use a DirectProxyCcblProgService instead";
+  }
+
+  subscribeToProgram(path: ProgramPath, onOff: "on" | "off"): this {
+    const msg: SubscribeToProgram = {
+      type: "SubscribeToProgram",
+      path,
+      subscribe: onOff === "on"
+    };
+    this.ws?.send( JSON.stringify(msg) );
+    return this;
   }
 
   getActionProxy (A: HumanReadableStateAction  | HumanReadableEventAction ): undefined | Observable<ActionUpdate > {
