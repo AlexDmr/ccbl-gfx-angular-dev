@@ -1,7 +1,8 @@
 <section [class.isSequence]="startSequence">
   <section class="sequence" *ngIf="startSequence">
     <label (click)="currentIndexInSequence = 1"
-           [class.currentStep]="currentIndexInSequence === 1"
+           [class.currentStep]    = "currentIndexInSequence === 1"
+           [class.isActive]       = "(bsActiveIndex | async) === 1"
            [dndDropzone]          = "['HumanReadableStateContext']"
            (dndDrop)              = "moveContextInSequence(1, this.draggedContext )"
           >
@@ -9,7 +10,8 @@
     </label>
     <label *ngFor="let c of contextSequenceRest; let i = index"
            (click)="currentIndexInSequence = i + 2"
-           [class.currentStep]="currentIndexInSequence === i + 2"
+           [class.isActive]       = "(bsActiveIndex | async) === i + 2"
+           [class.currentStep]    = "currentIndexInSequence === i + 2"
            [dndDropzone]          = "['HumanReadableStateContext']"
            (dndDrop)              = "moveContextInSequence(i+2, this.draggedContext )"
     >
@@ -45,7 +47,6 @@
                                   ></lib-ccbl-event-expression>
       </section>
       <section class="state" [class.cannotBeTrue]="!(canBeTrue | async)">
-        <!-- <label class="contextName">&nbsp;{{C.contextName}}:&nbsp;</label> -->
         <label class="programName" *ngIf="isProgramRoot">
           {{program.name || 'Root program'}}
         </label>

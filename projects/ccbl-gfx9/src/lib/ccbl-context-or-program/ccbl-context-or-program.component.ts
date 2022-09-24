@@ -30,7 +30,7 @@ export class CcblContextOrProgramComponent implements OnInit {
 
   isStateContext(): boolean {
     const stateContext = this.data as HumanReadableStateContext;
-    return !!stateContext.contextName && !this.isEventContext() && !this.isProgramReference();
+    return stateContext.contextName !== undefined && !this.isEventContext() && !this.isProgramReference();
   }
 
   isEventContext(): boolean {

@@ -1,5 +1,5 @@
 /* tslint:disable:member-ordering */
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ProgVersionner, stringToAllen, getUID, updateDisplay, getDisplay} from '../ccbl-gfx9.service';
 import {
   ContextOrProgram, copyHumanReadableStateContext,
@@ -26,7 +26,7 @@ import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/di
 import { DataEditSubProgram } from '../dialog-edit-sub-program/dialog-edit-sub-program.component';
 import { SmtService } from '../smt.service';
 import { ActionsPath } from '../smt.definitions';
-import { map, switchMap } from 'rxjs/operators';
+import { combineLatest, map, switchMap } from 'rxjs';
 import { ProxyCcblProg } from '../ProxyCcblProg';
 
 @Component({
@@ -35,7 +35,10 @@ import { ProxyCcblProg } from '../ProxyCcblProg';
   styleUrls: ['./ccbl-state-context.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CcblStateContextComponent implements OnInit {
+export class CcblStateContextComponent implements OnInit, OnDestroy {
+  subActiveIndex?: Subscription;
+  bsActiveIndex = new BehaviorSubject<number>(0); // Indexes starts at 1, so 0 mean none.
+
   currentContext = new BehaviorSubject<HumanReadableStateContext | undefined>(undefined);
   hide = false;
   // private subActive?: Subscription;
@@ -55,6 +58,14 @@ export class CcblStateContextComponent implements OnInit {
     this.active = this.currentContext.pipe(
       switchMap( ctxt => (ctxt ? this.proxyCcbl.getContextProxy(ctxt)?.pipe(map( up => up.active ) ) : undefined ) ?? of(false) )
     )
+
+    // Manage sequence tab
+    if (c.allen?.Meet) {
+      this.subActiveIndex = combineLatest( [
+        this.proxyCcbl.getContextProxy(c)?.pipe( map(up => up.active ? 1 : 0) ) ?? of(0),
+        ...c.allen.Meet.contextsSequence.map( (ctxt, i) => this.proxyCcbl.getContextProxy(ctxt)?.pipe( map(up => up.active ? i + 2 : 0) ) ?? of(0) )
+      ] ).pipe( map(L => L.find(index => index > 0) ?? 0) ).subscribe(this.bsActiveIndex)
+    }
   }
   // tslint:disable-next-line:no-input-rename
   @Input('program-versionner') progVersionner!: ProgVersionner;
@@ -109,6 +120,10 @@ export class CcblStateContextComponent implements OnInit {
       // console.log('AP =', AP);
       this.subjAP.next( AP );
     });
+  }
+
+  ngOnDestroy(): void {
+      this.subActiveIndex?.unsubscribe();
   }
 
   programVerification(): void {

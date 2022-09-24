@@ -9,7 +9,7 @@ import {
   HumanReadableProgram,
   HumanReadableStateAction,
   HumanReadableStateContext, isNameUsedInProg, ProgramReference,
-  VariableDescription, VarLocation, VarRange, Vocabulary
+  VariableDescription, Vocabulary
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
