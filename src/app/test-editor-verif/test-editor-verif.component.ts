@@ -414,7 +414,7 @@ export class DialogLoadProg implements OnInit {
 
 
 const pgTest: HumanReadableProgram = {
-  name: "LivingRoom lights",
+  label: "LivingRoom lights",
   description: "Just a test program for Domus",
   dependencies: {
     import: {

@@ -97,7 +97,7 @@ export class CcblEngineService {
     }
     if (this.progVersionner) {
       this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
-      this.ccblProg.loadHumanReadableProgram(this.progVersionner.getCurrent(), this.env, {});
+      this.ccblProg.loadHumanReadableProgram("", this.progVersionner.getCurrent(), this.env, {});
 
       const P = copyHumanReadableProgram( this.ccblProg.toHumanReadableProgram() );
       console.log( P );

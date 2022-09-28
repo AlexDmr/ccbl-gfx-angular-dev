@@ -135,7 +135,7 @@ export class SceneService {
 
     // Load program P
     this.ccblProg = new CCBLProgramObject('progRoot', this.clock);
-    this.ccblProg.loadHumanReadableProgram(P, this.env, {});
+    this.ccblProg.loadHumanReadableProgram("root", P, this.env, {});
 
     // Start it
     this.clock.goto( Date.now() );

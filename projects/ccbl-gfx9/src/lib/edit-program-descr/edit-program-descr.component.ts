@@ -88,6 +88,8 @@ export class EditProgramDescrComponent implements OnInit {
   }
 
   async editSubProgram(name?: string) {
+    throw "Must reimplement editSubProgram !!!";
+    /*
     const data: DataEditSubProgram = {
       parentProgram: this.program,
       program: (name && this.program.subPrograms) ? {...this.program.subPrograms[name], name} : {name}
@@ -110,11 +112,13 @@ export class EditProgramDescrComponent implements OnInit {
       subPrograms[SP.name!] = SP;
       this.newProgSubj.next({...this.program, subPrograms} );
     }
+    */
   }
 
   deleteSubProgram(p: HumanReadableProgram) {
-    const subPrograms: {[key: string]: HumanReadableProgram} = this.program.subPrograms ?? {};
-    delete subPrograms[p.name!];
+    const subPrograms: {[key: string]: HumanReadableProgram} = {};
+    Object.keys(this.program.subPrograms ?? {}) .filter( n => this.program.subPrograms?.[n] !== p )
+                                                .forEach( n => subPrograms[n] = this.program.subPrograms![n]! );
     this.newProgSubj.next({...this.program, subPrograms} );
   }
 }

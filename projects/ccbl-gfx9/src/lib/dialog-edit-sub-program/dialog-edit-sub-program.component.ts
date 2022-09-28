@@ -52,7 +52,7 @@ export class DialogEditSubProgramComponent implements OnInit, OnDestroy {
   }
 
   updateTitle(title: string) {
-    this.progV.updateWith({...this.progV.getCurrent(), name: title});
+    this.progV.updateWith({...this.progV.getCurrent(), label: title});
   }
 
   updateDescription(description: string): void {

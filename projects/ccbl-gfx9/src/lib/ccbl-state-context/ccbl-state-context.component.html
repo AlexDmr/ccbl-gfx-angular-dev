@@ -48,7 +48,7 @@
       </section>
       <section class="state" [class.cannotBeTrue]="!(canBeTrue | async)">
         <label class="programName" *ngIf="isProgramRoot">
-          {{program.name || 'Root program'}}
+          {{program.label || 'Root program'}}
         </label>
         <label class="contextName">{{!isProgramRoot && C ? C.contextName : ''}}</label>
         <lib-ccbl-expression [program]    = "program"

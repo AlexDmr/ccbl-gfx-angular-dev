@@ -83,7 +83,7 @@ export class CcblProgService {
     this.progV.asObservable().subscribe(
       prog => {
         console.log("loadHumanReadableProgram", prog);
-        this.ccblProg.loadHumanReadableProgram( prog, this.env, {} );
+        this.ccblProg.loadHumanReadableProgram( "", prog, this.env, {} );
       }
     );
 
