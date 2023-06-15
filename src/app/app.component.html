@@ -5,7 +5,7 @@
   <a routerLink="experimentateur" routerLinkActive="current" *ngIf="US.obsIsExperimentateur | async">expe</a>
   <label *ngIf = "US.obsUser | async as U" class="user" >
     <!-- {{U.email}} -->
-    <img class="photo" [src] = "U.photoURL" [matMenuTriggerFor]="menuUser" />
+    <img class="photo" [src] = "U.photoURL" [matMenuTriggerFor]="menuUser" referrerpolicy="no-referrer" />
   </label>
 </mat-toolbar>
 

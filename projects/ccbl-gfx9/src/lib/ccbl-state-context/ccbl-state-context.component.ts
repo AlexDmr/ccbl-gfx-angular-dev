@@ -51,7 +51,7 @@ export class CcblStateContextComponent implements OnInit, OnDestroy {
     this.pContext = c;
     if (!!c) {
       c.id = c.id || getUID('SC');
-      this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
+      this.currentIndexInSequence = getDisplay(this.context)?.['currentIndexInSequence'] || 1;
     }
     this.currentContext.next(c);
     // this.subActive?.unsubscribe();
@@ -112,7 +112,7 @@ export class CcblStateContextComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.currentIndexInSequence = getDisplay(this.context)?.currentIndexInSequence || 1;
+    this.currentIndexInSequence = getDisplay(this.context)?.['currentIndexInSequence'] || 1;
     console.log('Ready for', this.context?.id);
     this.smtService.obsProgEval.subscribe( conf => {
       const id = this.isProgramRoot ? 'root' : this.context?.id;

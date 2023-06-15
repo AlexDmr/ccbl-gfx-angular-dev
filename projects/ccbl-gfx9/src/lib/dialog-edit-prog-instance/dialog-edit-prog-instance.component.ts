@@ -1,5 +1,4 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit, Input} from '@angular/core';
-import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef, MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {
   HumanReadableProgram,
   ProgramReference,
@@ -9,8 +8,9 @@ import {
   copyProgRef,
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import { mathjs } from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { SymbolNode } from 'mathjs';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 const errorName = 'Program name should be reductible to a symbol';
 
@@ -40,7 +40,7 @@ export class DialogEditProgInstanceComponent implements OnInit {
       width: '80%',
       position: {bottom: '10px'}
     });
-    return dialogRef.afterClosed().toPromise();
+    return firstValueFrom( dialogRef.afterClosed() );
   }
 
   constructor(private dialogRef: MatDialogRef<DialogEditProgInstanceComponent, ProgramReference>,
