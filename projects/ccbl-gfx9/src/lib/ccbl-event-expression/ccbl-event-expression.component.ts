@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy}
 import {EventTrigger, HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {DataDialogTrigger, DialogTriggerComponent} from '../dialog-trigger/dialog-trigger.component';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import { firstValueFrom } from 'rxjs';
 
 @Component({

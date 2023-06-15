@@ -5,7 +5,7 @@ import { BehaviorSubject, combineLatest, delay, distinctUntilChanged, filter, fi
 import { SmtService } from 'projects/ccbl-gfx9/src/lib/smt.service';
 import { OpenhabService } from './openhab.service';
 import { Item } from './openHabItem';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { FormControl } from '@angular/forms';
 import { CcblProgService } from '../ccbl-prog.service';
 

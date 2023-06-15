@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output}
 import {HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {EditableOptionType} from '../editable-option/editable-option.component';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {DataDialogEventAction, DialogActionEventComponent} from '../dialog-action-event/dialog-action-event.component';
 import { BehaviorSubject, firstValueFrom, map } from 'rxjs';
 import { ProxyCcblProg } from '../ProxyCcblProg';

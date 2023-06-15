@@ -11,7 +11,7 @@ import {
 import {convertExpressionToNodes, isAttributeAccessor, isOperatorUnary, ProgVersionner} from '../ccbl-gfx9.service';
 import {ParsedExprNode} from '../dataParsedExpr';
 import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {DataEditExpression, DialogEditExpressionComponent} from '../dialog-edit-expression/dialog-edit-expression.component';
 import {BlockNode, MathNode} from 'mathjs';
 import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';

@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {CcblGfx9Service, ProgVersionner} from '../../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.service';
 import {CcblEngineService} from '../ccbl-engine.service';
 import {Sensor, SensorVarType} from '../data/setup';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {DialogDeviceComponent} from '../dialog-device/dialog-device.component';
 import {
   HumanReadableProgram,

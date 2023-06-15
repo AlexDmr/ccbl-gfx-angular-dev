@@ -8,7 +8,7 @@ import {
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 import {BehaviorSubject, map} from 'rxjs';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {DataActionState, DialogEditActionStateComponent} from '../dialog-edit-action-state/dialog-edit-action-state.component';
 import {firstValueFrom} from "rxjs";
 import { ProxyCcblProg } from '../ProxyCcblProg';

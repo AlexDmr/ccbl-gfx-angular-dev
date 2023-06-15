@@ -13,7 +13,7 @@ import {
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {BehaviorSubject, firstValueFrom, Observable, of, Subscription} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {
   DataEditionContextState,
   DialogEditContextStateConditionComponent

@@ -11,7 +11,7 @@ import {
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {EditableOptionType} from '../editable-option/editable-option.component';
 import {CcblEventChannelActionComponent} from '../ccbl-event-channel-action/ccbl-event-channel-action.component';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 
 @Component({
   selector: 'lib-ccbl-event-context[context][program-versionner]',

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HumanReadableProgram, VariableDescription } from 'ccbl-js/lib/ProgramObjectInterface';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import {Sensor, SensorDataType, SensorVarType} from '../data/setup';
 import { DialogDeviceComponent } from '../dialog-device/dialog-device.component';
 

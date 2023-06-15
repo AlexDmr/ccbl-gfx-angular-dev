@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {convertExpressionToNodes} from '../ccbl-gfx9.service';
 import {HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 import {MathJsStatic, MathNode, create, all, BlockNode} from 'mathjs';
 import {BehaviorSubject} from 'rxjs';
 
