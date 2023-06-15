@@ -16,29 +16,29 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {CcblGfx9Service} from './ccbl-gfx9.service';
 import {ClipboardService} from './clipboard.service';
-import {MatLegacyMenuModule as MatMenuModule} from '@angular/material/legacy-menu';
 import {DndModule} from 'ngx-drag-drop';
 import { DialogTriggerComponent } from './dialog-trigger/dialog-trigger.component';
-import {MatLegacyButtonModule as MatButtonModule} from '@angular/material/legacy-button';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatLegacySelectModule as MatSelectModule} from '@angular/material/legacy-select';
 import { DialogActionEventComponent } from './dialog-action-event/dialog-action-event.component';
 import { DialogEditContextStateConditionComponent } from './dialog-edit-context-state-condition/dialog-edit-context-state-condition.component';
-import {MatLegacyCheckboxModule as MatCheckboxModule} from '@angular/material/legacy-checkbox';
 import { CcblEventExpressionComponent } from './ccbl-event-expression/ccbl-event-expression.component';
 import { DialogEditExpressionComponent } from './dialog-edit-expression/dialog-edit-expression.component';
 import { DialogEditActionStateComponent } from './dialog-edit-action-state/dialog-edit-action-state.component';
 import { EditProgramDescrComponent } from './edit-program-descr/edit-program-descr.component';
-import {MatLegacyTabsModule as MatTabsModule} from '@angular/material/legacy-tabs';
 import { CcblProgramApiComponent } from './ccbl-program-api/ccbl-program-api.component';
 import { CcblVariableDescriptionComponent } from './ccbl-variable-description/ccbl-variable-description.component';
 import { DialogAppendDependencyComponent } from './dialog-append-dependency/dialog-append-dependency.component';
-import {MatLegacyInputModule as MatInputModule} from '@angular/material/legacy-input';
 import { DialogEditSubProgramComponent } from './dialog-edit-sub-program/dialog-edit-sub-program.component';
 import { DialogEditProgInstanceComponent } from './dialog-edit-prog-instance/dialog-edit-prog-instance.component';
 import { ProgInstanceParametersComponent } from './prog-instance-parameters/prog-instance-parameters.component';
 import { EmptyProxyCcblProgService } from './empty-proxy-ccbl-prog.service';
 import {ProxyCcblProg} from "./ProxyCcblProg";
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Pipe({ name: 'safeHtml'})
 export class SafeHtmlPipe implements PipeTransform  {

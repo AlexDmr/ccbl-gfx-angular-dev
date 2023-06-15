@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import {copyHumanReadableProgram, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
 import {Sensor, SensorDataType, SensorVarType} from './data/setup';
 import {initCCBL} from 'ccbl-js/lib/main';
-import {Observable, Subject, interval, ConnectableObservable, of, Subscription} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {ProgVersionner} from '../../projects/ccbl-gfx9/src/lib/ccbl-gfx9.service';
 import {CCBLEnvironmentExecutionInterface} from 'ccbl-js/lib/ExecutionEnvironmentInterface';
 import {CCBLEnvironmentExecution} from 'ccbl-js/lib/ExecutionEnvironment';
-import {CCBLClock, CCBLTestClock} from 'ccbl-js/lib/Clock';
+import {CCBLTestClock} from 'ccbl-js/lib/Clock';
 import {CCBLEmitterValue} from 'ccbl-js/lib/EmitterValue';
-import {Channel, commitStateActions} from 'ccbl-js/lib/Channel';
+import {Channel} from 'ccbl-js/lib/Channel';
 import {CCBLProgramObject} from 'ccbl-js/lib/ProgramObject';
 import {CCBLEvent} from 'ccbl-js/lib/Event';
-import { delay, multicast, distinctUntilChanged, switchMap, takeWhile, tap, share } from 'rxjs/operators';
+import { delay, distinctUntilChanged, switchMap, tap, share } from 'rxjs/operators';
 
 initCCBL();
 

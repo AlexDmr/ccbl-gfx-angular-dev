@@ -1,13 +1,8 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {copyHumanReadableProgram, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
-import {ProgVersionner} from '../ccbl-gfx9.service';
-import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 import {DataAppendDependency, DialogAppendDependencyComponent} from '../dialog-append-dependency/dialog-append-dependency.component';
 import {BehaviorSubject} from 'rxjs';
-import {
-  DataEditSubProgram,
-  DialogEditSubProgramComponent
-} from '../dialog-edit-sub-program/dialog-edit-sub-program.component';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 export interface DataEditProgramDescr {
   program: HumanReadableProgram;

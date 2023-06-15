@@ -1,6 +1,6 @@
 /* tslint:disable:member-ordering */
 import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {ProgVersionner, stringToAllen, getUID, updateDisplay, getDisplay} from '../ccbl-gfx9.service';
+import {ProgVersionner, stringToAllen, getUID, getDisplay} from '../ccbl-gfx9.service';
 import {
   ContextOrProgram, copyHumanReadableStateContext,
   HumanReadableContext,
@@ -13,7 +13,6 @@ import {
 } from 'ccbl-js/lib/ProgramObjectInterface';
 import {BehaviorSubject, firstValueFrom, Observable, of, Subscription} from 'rxjs';
 import {ClipboardService} from '../clipboard.service';
-import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {
   DataEditionContextState,
   DialogEditContextStateConditionComponent
@@ -28,6 +27,7 @@ import { SmtService } from '../smt.service';
 import { ActionsPath } from '../smt.definitions';
 import { combineLatest, map, switchMap } from 'rxjs';
 import { ProxyCcblProg } from '../ProxyCcblProg';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'lib-ccbl-state-context[program-versionner][from][context]',

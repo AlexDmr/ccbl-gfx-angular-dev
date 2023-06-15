@@ -1,11 +1,11 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {
   copyHumanReadableStateActions, HumanReadableProgram,
   HumanReadableStateAction,
   HumanReadableStateContext,
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
-import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 
 export interface DataActionState {
   action: HumanReadableStateAction;

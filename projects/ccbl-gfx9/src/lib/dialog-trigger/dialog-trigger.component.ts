@@ -1,8 +1,8 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
-import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
-import {EventTrigger, HumanReadableEventContext, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
+import {EventTrigger, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ConstantNode, MathNode, OperatorNode, ParenthesisNode} from 'mathjs';
 import {mathjs} from 'ccbl-js/lib/CCBLExpressionInExecutionEnvironment';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface DataDialogTrigger {
   evt: EventTrigger;

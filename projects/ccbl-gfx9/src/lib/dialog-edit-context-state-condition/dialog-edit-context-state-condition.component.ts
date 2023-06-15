@@ -1,8 +1,8 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
-import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 import {copyHumanReadableStateContext, HumanReadableProgram, HumanReadableStateContext} from 'ccbl-js/lib/ProgramObjectInterface';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {AllenType} from 'ccbl-js/lib/AllenInterface';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface DataEditionContextState {
   context: HumanReadableStateContext;

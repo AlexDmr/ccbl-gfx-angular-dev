@@ -1,5 +1,4 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
-import {MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef} from '@angular/material/legacy-dialog';
 import {ProgVersionner} from '../ccbl-gfx9.service';
 import {
   HumanReadableEventAction,
@@ -7,6 +6,7 @@ import {
   HumanReadableProgram,
   VariableDescription
 } from 'ccbl-js/lib/ProgramObjectInterface';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface DataDialogEventAction {
   action: HumanReadableEventAction;

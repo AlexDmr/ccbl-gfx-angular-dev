@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy} from '@angular/core';
-import {EventTrigger, HumanReadableEventChannelAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
-import {ProgVersionner} from '../ccbl-gfx9.service';
+import {EventTrigger, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
+// import {ProgVersionner} from '../ccbl-gfx9.service';
 import {DataDialogTrigger, DialogTriggerComponent} from '../dialog-trigger/dialog-trigger.component';
-import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import { firstValueFrom } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'lib-ccbl-event-expression[evt][program]',

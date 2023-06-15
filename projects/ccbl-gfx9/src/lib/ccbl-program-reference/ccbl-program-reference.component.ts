@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {ProgVersionner, getUID, getDisplay, updateDisplay} from '../ccbl-gfx9.service';
-import {HumanReadableProgram, ProgramReference, VariableDescription, ProgramInput} from 'ccbl-js/lib/ProgramObjectInterface';
+import {HumanReadableProgram, ProgramReference, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import { DialogEditProgInstanceComponent } from '../dialog-edit-prog-instance/dialog-edit-prog-instance.component';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';

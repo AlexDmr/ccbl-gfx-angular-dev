@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {HumanReadableEventTriggerAction, HumanReadableProgram} from 'ccbl-js/lib/ProgramObjectInterface';
-import {ProgVersionner} from '../ccbl-gfx9.service';
+// import {ProgVersionner} from '../ccbl-gfx9.service';
 
 @Component({
   selector: 'lib-ccbl-event-trigger-action[action][program]',

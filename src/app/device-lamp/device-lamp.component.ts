@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
-import { Observable } from 'rxjs';
 
 export interface DeviceLamp {
   name: string;

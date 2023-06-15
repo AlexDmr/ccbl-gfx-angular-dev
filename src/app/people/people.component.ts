@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, ChangeDetectionStrategy, Input} from '@angular/core';
 import { People } from '../data/Scene';
 import { SceneService } from '../scene.service';
 
