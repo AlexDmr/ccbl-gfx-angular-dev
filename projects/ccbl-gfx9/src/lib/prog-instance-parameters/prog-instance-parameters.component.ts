@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { HumanReadableProgram, ProgramReference, VariableDescription, EventTrigger, copyContextOrProgram, ProgramInput } from 'ccbl-js/lib/ProgramObjectInterface';
-import { getUID, getDisplay, updateDisplay } from '../ccbl-gfx9.service';
 
 @Component({
   selector: 'lib-prog-instance-parameters',
