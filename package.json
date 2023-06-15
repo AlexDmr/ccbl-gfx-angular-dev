@@ -24,8 +24,6 @@
     "@angular/platform-browser": "^14.1.3",
     "@angular/platform-browser-dynamic": "^14.1.3",
     "@angular/router": "^14.1.3",
-    "@ng-bootstrap/ng-bootstrap": "^13.0.0",
-    "bootstrap": "^5.1.3",
     "ccbl-js": "1.2.6",
     "mathjs": "~10.6.4",
     "ngx-drag-drop": "14.0.0",
