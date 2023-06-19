@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import {CCBLEnvironmentExecutionInterface} from 'ccbl-js/lib/ExecutionEnvironmentInterface';
 import {CCBLTestClock} from 'ccbl-js/lib/Clock';
 import {CCBLProgramObject} from 'ccbl-js/lib/ProgramObject';
-import {BehaviorSubject, combineLatest, ConnectableObservable, merge, Observable, of, Subject, Subscription} from 'rxjs';
-import {delay, distinctUntilChanged, multicast, switchMap, tap} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, merge, Observable, of, Subject, Subscription} from 'rxjs';
+import {delay, distinctUntilChanged, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {CCBLEnvironmentExecution} from 'ccbl-js/lib/ExecutionEnvironment';
 import {CCBLProgramObjectInterface, HumanReadableProgram, VariableDescription} from 'ccbl-js/lib/ProgramObjectInterface';
 import {CCBLEvent} from 'ccbl-js/lib/Event';
@@ -37,15 +37,15 @@ export class SceneService {
         tap( () => {if (this.clock.nextForeseenUpdate !== undefined) this.clock.goto( Date.now() )} )
       )
     ),
-    multicast( () => new Subject() )
-  ) as ConnectableObservable<any>;
+    shareReplay(1)
+  ); // as ConnectableObservable<any>;
   private simEnvConfig: SimEnvConfig = {inputs: {}, outputs: {}};
   private peoples: BehaviorSubject<People<any>>[] = [];
   private devices: BehaviorSubject<Device>     [] = [];
   private clockSubscription: Subscription;
 
   constructor() {
-    this.clockSubscription = this.obsClock.connect();
+    this.clockSubscription = this.obsClock.subscribe();
   }
 
   init(peoples: People<any>[], devices: Device[], cbSimEnv: () => SimEnvConfig) {
@@ -144,13 +144,15 @@ export class SceneService {
     console.log(this.clock, this.clock.nextForeseenUpdate);
 
     // Subscribe to clock changes
-    this.clockSubscription = this.obsClock.connect();
+    // Already done in constructor...
+    // this.clockSubscription.unsubscribe();
+    // this.clockSubscription = this.obsClock.subscribe();
 
     return this.ccblProg;
   }
 
   reset() {
-    this.clockSubscription?.unsubscribe();
+    this.clockSubscription.unsubscribe();
     if (this.ccblProg) {
       if (this.env) {
         const P = this.ccblProg.toHumanReadableProgram();
